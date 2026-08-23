@@ -7,6 +7,11 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+### Düzeltildi
+
+- Windows CI iş akışında MinGW64 GNU Fortran paketi ve araç zinciri PATH
+  doğrulaması eklendi.
+
 ## [0.1.2] - 2026-08-23
 
 ### Eklendi

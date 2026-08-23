@@ -26,12 +26,18 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-gcc-fortran
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
 
       - name: Araç zincirini doğrula
         shell: "msys2 {0}"
         run: |
+          export PATH="/mingw64/bin:${PATH}"
+          test -x /mingw64/bin/gfortran
+          command -v gfortran
+          command -v cmake
+          command -v ninja
           gfortran --version
           cmake --version
           ninja --version
