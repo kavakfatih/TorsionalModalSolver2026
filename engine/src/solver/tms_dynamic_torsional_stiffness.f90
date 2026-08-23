@@ -47,9 +47,10 @@ contains
   !! sıcaklık K alanlarından oluşan complex_torsional_stiffness_t değeridir.
   !! Varsayımlar ve geçerlilik: Elastomer homojen, lineer viskoelastik ve
   !! küçük deformasyon bölgesindedir; 0 <= ri < ro, L > 0, G' > 0 ve
-  !! G'' >= 0 olmalıdır. Yordam bu önkoşulları doğrulamaz ve frequency_points
-  !! dizisinde seçim veya interpolasyon yapmaz; mevcut tek çalışma noktası
-  !! alanlarını kullanır. Ayrıntılar:
+  !! G'' >= 0 olmalıdır. Yordam bu fiziksel önkoşulları doğrular ve
+  !! geçersiz girdide error stop ile sonlanır. frequency_points dizisinde
+  !! seçim veya interpolasyon yapmaz; mevcut tek çalışma noktası alanlarını
+  !! kullanır. Ayrıntılar:
   !! docs/mathematics/dynamic_elastomer_model.md ve
   !! docs/physics/complex_torsional_stiffness.md.
   pure function calculate_dynamic_torsional_stiffness(material, rubber) &
@@ -59,6 +60,18 @@ contains
     type(complex_torsional_stiffness_t) :: stiffness
 
     real(dp) :: polar_area_moment_m4
+
+    if (rubber%axial_length_m <= 0.0_dp) then
+      error stop "Elastomer etkin uzunluğu sıfırdan büyük olmalıdır."
+    end if
+
+    if (material%storage_shear_modulus_pa <= 0.0_dp) then
+      error stop "Depolama kayma modülü G' sıfırdan büyük olmalıdır."
+    end if
+
+    if (material%loss_shear_modulus_pa < 0.0_dp) then
+      error stop "Kayıp kayma modülü G'' negatif olamaz."
+    end if
 
     polar_area_moment_m4 = calculate_rubber_polar_area_moment( &
       rubber%outer_radius_m, rubber%inner_radius_m)

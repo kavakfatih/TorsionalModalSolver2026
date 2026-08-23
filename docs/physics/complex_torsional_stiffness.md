@@ -61,6 +61,22 @@ fazı ve sönümlü rezonans konumu değerlendirilirken dikkate alınır. V0.2.1
 sönümsüz doğal frekans hesaplamayı sürdürür. Kompleks eigen veya frekans cevabı
 çözümü bu sürümün kapsamı dışındadır.
 
+## Girdi doğrulaması
+
+Hesabın sonlu ve fiziksel anlamlı bir kompleks rijitlik üretmesi için aşağıdaki
+önkoşullar zorunludur:
+
+- İç ve dış yarıçaplar negatif olamaz.
+- Annüler kesitte `ro > ri` olmalıdır.
+- Etkin elastomer uzunluğu için `L > 0` olmalıdır.
+- Depolama modülü için `G' > 0` olmalıdır.
+- Pasif kayıp modeli için `G'' >= 0` olmalıdır.
+
+`calculate_dynamic_torsional_stiffness` ve ortak polar alan momenti yordamı bu
+koşulları `pure` niteliklerini koruyarak denetler; geçersiz girdide hesap
+`error stop` ile sonlanır. Frekans ve sıcaklık bu modelde hesap girdisi olarak
+dönüştürülmez, malzeme çalışma noktasından sonuca aynen aktarılır.
+
 ## Uygulama sınırları
 
 - Malzeme homojen ve lineer viskoelastik kabul edilir.

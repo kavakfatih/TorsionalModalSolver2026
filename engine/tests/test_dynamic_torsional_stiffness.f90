@@ -5,20 +5,12 @@ program test_dynamic_torsional_stiffness
     calculate_rubber_polar_area_moment
   use tms_material, only : dynamic_rubber_material_t
   use tms_torsional_stiffness, only : calculate_torsional_stiffness
+  use tms_dynamic_torsional_stiffness, only : &
+    complex_torsional_stiffness_t, &
+    calculate_dynamic_torsional_stiffness
   implicit none
 
-  ! The production dynamic-stiffness module may not be built when this
-  ! standalone test is compiled.  Keep the analytical calculation local so
-  ! the test does not require tms_dynamic_torsional_stiffness.mod.
-  type :: complex_torsional_stiffness_t
-    real(dp) :: storage_stiffness
-    real(dp) :: loss_stiffness
-    real(dp) :: loss_factor
-    real(dp) :: frequency
-    real(dp) :: temperature
-  end type complex_torsional_stiffness_t
-
-  real(dp), parameter :: maximum_relative_error = 1.0e-3_dp
+  real(dp), parameter :: maximum_relative_error = 1.0e-10_dp
   real(dp), parameter :: expected_polar_area_moment_m4 = &
     9.56614963018092e-6_dp
   real(dp), parameter :: expected_storage_stiffness = &
@@ -33,6 +25,15 @@ program test_dynamic_torsional_stiffness
   real(dp) :: modulus_loss_factor
   real(dp) :: static_stiffness
   real(dp) :: stiffness_loss_factor
+  character(len=32) :: validation_case
+
+  ! CTest, geçersiz girdilerin üretim yordamları tarafından reddedildiğini
+  ! aynı test yürütülebilir dosyasını farklı bir argümanla çağırarak sınar.
+  if (command_argument_count() > 0) then
+    call get_command_argument(1, validation_case)
+    call exercise_invalid_case(trim(validation_case))
+    stop 0
+  end if
 
   rubber = rubber_geometry_t( &
     inner_radius_m=0.02_dp, &
@@ -83,6 +84,10 @@ program test_dynamic_torsional_stiffness
     "Modül ve rijitlik kayıp faktörleri eşit değil." &
   )
   call assert_relative_close( &
+    stiffness%loss_factor, stiffness_loss_factor, &
+    "Sonuç kayıp faktörü K''/K' oranına eşit değil." &
+  )
+  call assert_relative_close( &
     stiffness%frequency, material%frequency_hz, &
     "Frekans çalışma noktasına aktarılamadı." &
   )
@@ -95,28 +100,66 @@ program test_dynamic_torsional_stiffness
 
 contains
 
-  function calculate_dynamic_torsional_stiffness(dynamic_material, rubber_geometry) result(dynamic_stiffness)
-    type(dynamic_rubber_material_t), intent(in) :: dynamic_material
-    type(rubber_geometry_t), intent(in) :: rubber_geometry
-    type(complex_torsional_stiffness_t) :: dynamic_stiffness
-    real(dp) :: polar_area_moment
+  !> Geçersiz fiziksel girdinin ilgili saf üretim yordamında reddedildiğini
+  !! sınamak için seçilen hata durumunu çalıştırır.
+  !! Model ve birimler: Yarıçaplar ile etkin uzunluk m, G' ve G'' Pa
+  !! cinsindedir. Geçersiz durum error stop üretmelidir; yordam normal
+  !! dönerse CTest'in WILL_FAIL özelliği regresyon testini başarısız sayar.
+  subroutine exercise_invalid_case(case_name)
+    character(len=*), intent(in) :: case_name
 
-    polar_area_moment = calculate_rubber_polar_area_moment( &
-      rubber_geometry%outer_radius_m, rubber_geometry%inner_radius_m)
-    dynamic_stiffness%storage_stiffness = dynamic_material%storage_shear_modulus_pa * &
-      polar_area_moment / rubber_geometry%axial_length_m
-    dynamic_stiffness%loss_stiffness = dynamic_material%loss_shear_modulus_pa * &
-      polar_area_moment / rubber_geometry%axial_length_m
-    dynamic_stiffness%loss_factor = dynamic_stiffness%loss_stiffness / &
-      dynamic_stiffness%storage_stiffness
-    dynamic_stiffness%frequency = dynamic_material%frequency_hz
-    dynamic_stiffness%temperature = dynamic_material%temperature_k
-  end function calculate_dynamic_torsional_stiffness
+    type(rubber_geometry_t) :: invalid_rubber
+    type(dynamic_rubber_material_t) :: invalid_material
+    type(complex_torsional_stiffness_t) :: rejected_stiffness
+    real(dp) :: rejected_polar_area_moment
+
+    invalid_rubber = rubber_geometry_t( &
+      inner_radius_m=0.02_dp, &
+      outer_radius_m=0.05_dp, &
+      axial_length_m=0.01_dp &
+    )
+    invalid_material%storage_shear_modulus_pa = mpa_to_pa(1.0_dp)
+    invalid_material%loss_shear_modulus_pa = mpa_to_pa(0.1_dp)
+    invalid_material%frequency_hz = 100.0_dp
+    invalid_material%temperature_k = 293.15_dp
+    rejected_polar_area_moment = 0.0_dp
+
+    select case (case_name)
+      case ("negative_radius")
+        rejected_polar_area_moment = &
+          calculate_rubber_polar_area_moment(0.05_dp, -0.01_dp)
+      case ("unordered_radii")
+        rejected_polar_area_moment = &
+          calculate_rubber_polar_area_moment(0.02_dp, 0.05_dp)
+      case ("equal_radii")
+        rejected_polar_area_moment = &
+          calculate_rubber_polar_area_moment(0.05_dp, 0.05_dp)
+      case ("zero_length")
+        invalid_rubber%axial_length_m = 0.0_dp
+        rejected_stiffness = calculate_dynamic_torsional_stiffness( &
+          invalid_material, invalid_rubber)
+      case ("nonpositive_storage_modulus")
+        invalid_material%storage_shear_modulus_pa = 0.0_dp
+        rejected_stiffness = calculate_dynamic_torsional_stiffness( &
+          invalid_material, invalid_rubber)
+      case ("negative_loss_modulus")
+        invalid_material%loss_shear_modulus_pa = -mpa_to_pa(0.1_dp)
+        rejected_stiffness = calculate_dynamic_torsional_stiffness( &
+          invalid_material, invalid_rubber)
+      case default
+        error stop "Bilinmeyen geçersiz girdi testi istendi."
+    end select
+
+    print *, "Geçersiz girdi beklenmedik biçimde kabul edildi: ", &
+      case_name, rejected_polar_area_moment, &
+      rejected_stiffness%storage_stiffness
+  end subroutine exercise_invalid_case
 
   !> Hesaplanan değerin analitik referansa göre bağıl hatasını sınar.
-  !! Matematiksel model: |actual-expected|/|expected| < 0,001.
+  !! Matematiksel model: |actual-expected|/|expected| < 1e-10.
   !! Girdiler actual ve expected aynı fiziksel birimde, message ise hata
-  !! açıklamasıdır. Çıktı üretmez; sınır aşılırsa test hata ile sonlanır.
+  !! açıklamasıdır; expected sıfırdan farklı olmalıdır. Çıktı
+  !! üretmez; sınır aşılırsa test hata ile sonlanır.
   subroutine assert_relative_close(actual, expected, message)
     real(dp), intent(in) :: actual
     real(dp), intent(in) :: expected

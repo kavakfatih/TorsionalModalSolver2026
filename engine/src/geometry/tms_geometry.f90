@@ -50,13 +50,23 @@ contains
   !! Çıktı: jp polar alan momentidir ve metrenin dördüncü kuvveti (m^4)
   !! cinsindendir.
   !! Varsayımlar ve geçerlilik: Kesit eksenel simetrik ve annülerdir;
-  !! 0 <= ri < ro olmalıdır. Yordam bu önkoşulları doğrulamaz.
+  !! 0 <= ri < ro olmalıdır. Negatif yarıçap veya ro <= ri durumunda
+  !! fiziksel olarak geçersiz geometriyi önlemek için yordam error stop ile
+  !! sonlanır.
   !! Ayrıntılar: docs/mathematics/torsional-physics-core.md.
   pure function calculate_rubber_polar_area_moment(outer_radius, &
       inner_radius) result(jp)
     real(dp), intent(in) :: outer_radius
     real(dp), intent(in) :: inner_radius
     real(dp) :: jp
+
+    if (outer_radius < 0.0_dp .or. inner_radius < 0.0_dp) then
+      error stop "Elastomer yarıçapları negatif olamaz."
+    end if
+
+    if (outer_radius <= inner_radius) then
+      error stop "Elastomer dış yarıçapı iç yarıçapından büyük olmalıdır."
+    end if
 
     jp = 0.5_dp * pi * (outer_radius**4 - inner_radius**4)
   end function calculate_rubber_polar_area_moment

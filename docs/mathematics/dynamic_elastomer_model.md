@@ -44,8 +44,10 @@ tan(delta) = G'' / G'
 ```
 
 Bu boyutsuz oran sönüm davranışının göstergesidir. Hesabın geçerli olması için
-`G' > 0` önkoşulu uygulanır. Veri modeli ve V0.2.1 solver'ı negatif veya
-fiziksel olmayan girdileri kendiliğinden doğrulamaz.
+`G' > 0` önkoşulu uygulanır. Genel amaçlı `calculate_loss_factor` yardımcı
+yordamı bu önkoşulun çağıran tarafından sağlandığını varsayar. V0.2.1
+dinamik burulma rijitliği solver'ı ise kendi hesabından önce `G' > 0` ve
+`G'' >= 0` koşullarını doğrular.
 
 ## Kompleks burulma rijitliğine bağlantı
 
@@ -70,7 +72,8 @@ tan(delta) = G''/G' = K''/K'
 Bu eşitlik `G' > 0`, geçerli annüler geometri ve `L > 0` koşullarında
 geçerlidir. `calculate_dynamic_torsional_stiffness`, malzemenin mevcut tek
 çalışma noktası alanlarını kullanır; frekans noktası seçimi veya interpolasyon
-yapmaz.
+yapmaz. Hesap, negatif yarıçapı, `ro <= ri`, `L <= 0`, `G' <= 0` ve
+`G'' < 0` girdilerini kabul etmez.
 
 ## Birimler
 

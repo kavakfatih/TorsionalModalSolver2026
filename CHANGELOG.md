@@ -15,11 +15,17 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
   yordamı ve fizik testi kuralları standartlaştırıldı.
 - Annüler elastomer polar alan momenti geometri testinde doğrudan analitik
   referansla doğrulanacak şekilde test kapsamı güçlendirildi.
+- Dinamik burulma rijitliği analitik testinin bağıl hata sınırı `1e-10`
+  seviyesine sıkılaştırıldı ve fiziksel girdi sınırları CTest'e eklendi.
 
 ### Düzeltildi
 
 - `calculate_rubber_polar_area_moment` yordamının public PURE arayüzü dış ve iç
   yarıçapı metre cinsinden alan iki skaler argümanla uyumlu hale getirildi.
+- Dinamik rijitlik testinin üretim yordamı yerine yerel bir hesap kopyasını
+  sınaması giderildi; test doğrudan üretim modülüne bağlandı.
+- Negatif veya sırasız yarıçaplar, pozitif olmayan etkin uzunluk ve depolama
+  modülü ile negatif kayıp modülünün geçersiz sonuç üretmesi engellendi.
 
 ## [0.2.1] - 2026-08-23
 

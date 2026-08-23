@@ -48,6 +48,9 @@ rijitliği `kθ` N·m/rad cinsindendir. Elastomer homojen ve izotrop kabul edili
 statik sonuçta kullanılmaz. V0.2.1 dinamik solver'ı aynı ortak `Jp` hesabını
 kullanarak K' ve K'' bileşenlerini ayrı üretir; ayrıntılı bağıntılar
 [`dynamic_elastomer_model.md`](dynamic_elastomer_model.md) altında verilir.
+Ortak geometri yordamı negatif yarıçapı ve `ro <= ri` durumunu reddeder.
+Dinamik solver ayrıca `L > 0`, `G' > 0` ve `G'' >= 0` koşullarını çalışma
+zamanında zorunlu kılar.
 
 ## Doğal frekans
 
@@ -67,5 +70,7 @@ ve `J > 0` koşullarını gerektirir. Sönüm, nonlinear elastomer davranışı,
 
 Her fizik yordamı bağımsız analitik değerle sınanır. Kabul ölçütü, hesaplanan
 değer ile referans değer arasındaki bağıl hatanın `0,001` değerinden, yani yüzde
-`0,1`'den küçük olmasıdır. Ortak referans model
-`benchmarks/001_simple_annular_tvd/` altında tanımlanmıştır.
+`0,1`'den küçük olması temel mühendislik kabulüdür. Dinamik burulma
+rijitliği analitik doğrulamasında daha sıkı `1e-10` bağıl hata sınırı
+uygulanır. Ortak referans model `benchmarks/001_simple_annular_tvd/` altında
+tanımlanmıştır.

@@ -66,5 +66,31 @@ if(BUILD_TESTING)
     dynamic_torsional_stiffness
     tests/test_dynamic_torsional_stiffness.f90
   )
+
+  # Aynı yürütülebilir dosyayı geçersiz fiziksel girdilerle çalıştırır.
+  # Üretim yordamının error stop ile reddetmesi bu testlerin başarı koşuludur.
+  foreach(
+    validation_case
+    IN ITEMS
+      negative_radius
+      unordered_radii
+      equal_radii
+      zero_length
+      nonpositive_storage_modulus
+      negative_loss_modulus
+  )
+    set(
+      validation_test
+      "tms26.dynamic_torsional_stiffness.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_dynamic_torsional_stiffness>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
   tms26_add_fortran_test(frequency_solver tests/test_frequency_solver.f90)
 endif()

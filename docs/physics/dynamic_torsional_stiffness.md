@@ -15,8 +15,8 @@ Lineer kayma idealizasyonunda kompleks burulma rijitliği şöyledir:
 
 ```text
 K* = K' + iK''
-K' = G'J/L
-K'' = G''J/L
+K' = G'Jp/L
+K'' = G''Jp/L
 ```
 
 `K'`, elastik olarak enerji depolayan burulma rijitliği bileşenidir. `K''`,
@@ -29,12 +29,12 @@ bileşen de kullanılan G' ve G'' verilerinin frekans ve sıcaklığına bağlı
 | --- | --- | --- |
 | `G'` | Depolama kayma modülü | `Pa = N/m²` |
 | `G''` | Kayıp kayma modülü | `Pa = N/m²` |
-| `J` | Elastomer kesitinin polar alan atalet momenti | `m⁴` |
+| `Jp` | Elastomer kesitinin polar alan momenti | `m⁴` |
 | `L` | Elastomerin etkin burulma uzunluğu | `m` |
 | `K'` | Depolama burulma rijitliği | `N·m/rad` |
 | `K''` | Kayıp burulma rijitliği | `N·m/rad` |
 
-Buradaki `J`, geometriye ait polar **alan** atalet momentidir; doğal frekans
+Buradaki `Jp`, geometriye ait polar **alan** momentidir; doğal frekans
 denkleminde kullanılan `kg·m²` birimli polar **kütle** ataletiyle aynı büyüklük
 değildir. Radyan SI boyut analizinde boyutsuz kabul edilse de mühendislik
 anlamını açık tutmak için rijitlik birimi `N·m/rad` olarak yazılır.
@@ -42,6 +42,8 @@ anlamını açık tutmak için rijitlik birimi `N·m/rad` olarak yazılır.
 ## Varsayımlar ve sınırlar
 
 - Elastomer lineer viskoelastik ve geometri küçük deformasyon bölgesindedir.
-- G', G'', J ve L kullanılan çalışma noktası için geçerli kabul edilir.
+- G', G'', Jp ve L kullanılan çalışma noktası için geçerli kabul edilir.
+- Hesapta `0 <= ri < ro`, `L > 0`, `G' > 0` ve `G'' >= 0` koşulları
+  doğrulanır; geçersiz girdiler reddedilir.
 - Geometrik nonlinearite, hiperelastisite ve frekanslar arası interpolasyon
   bu modelin kapsamı dışındadır.

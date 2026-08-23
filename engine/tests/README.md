@@ -19,10 +19,17 @@ değerle sınar.
 Fiziksel veya matematiksel yordam, bağımsız analitik sonuç ve açık bir hata
 sınırıyla doğrulanır. `test_inertia`, `test_torsional_stiffness`,
 `test_dynamic_torsional_stiffness` ve `test_frequency_solver` bu kategoridedir.
-V0.2.1 fizik doğrulamalarında bağıl hata yüzde `0,1`'den küçük olmalıdır.
-Dinamik rijitlik testi Jp, K', K'', frekans, sıcaklık ve
+Genel fizik doğrulamalarında bağıl hata yüzde `0,1`'den küçük olmalıdır;
+dinamik burulma rijitliği testi `1e-10` bağıl hata sınırı kullanır. Bu test
+üretim `tms_dynamic_torsional_stiffness` modülünü doğrudan çağırarak Jp,
+K', K'', frekans, sıcaklık ve
 `G''/G' = K''/K' = tan(delta)` eşitliğini birlikte doğrular. Ayrıca K'
 bileşeninin mevcut statik solver sonucuyla aynı kaldığını sınar.
+
+Negatif yarıçap, sırasız veya eşit yarıçaplar, sıfır etkin uzunluk,
+sıfır depolama modülü ve negatif kayıp modülü ayrı CTest vakalarıdır.
+Bu vakalarda üretim yordamının `error stop` ile sonlanması beklenir ve
+`WILL_FAIL` özelliği beklenen reddi test başarısına dönüştürür.
 
 ## Benchmark regression
 
