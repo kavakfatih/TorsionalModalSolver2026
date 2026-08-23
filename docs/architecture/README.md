@@ -1,0 +1,12 @@
+# Mimari Dokümantasyon
+
+Bu dizin, TMS26 modüllerinin sorumluluklarını, bağımlılıklarını, veri akışını ve
+katman sınırlarını açıklar.
+
+## Mevcut belgeler
+
+- [`core-data-model.md`](core-data-model.md): çekirdek geometri, malzeme ve
+  torsional fizik modüllerinin veri modeli
+
+Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
+etkisi burada belgelenmelidir.

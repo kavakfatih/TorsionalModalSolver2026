@@ -65,9 +65,13 @@ Tüm geliştirme görevlerinde aşağıdaki sıra uygulanacaktır:
 
 ### Kurallar
 
+- CMake configure ve build adımları her geliştirme görevinde zorunludur.
+- CTest çalıştırılması ve tüm testlerin geçmesi zorunludur.
 - Build başarısızsa commit yapılmaz.
 - Test başarısızsa push yapılmaz.
-- Fiziksel veya matematiksel hesap değişikliklerinde dokümantasyon güncellenir.
+- Commit ve push sonrasında GitHub Actions sonuçları kontrol edilmelidir.
+- Fiziksel veya matematiksel hesap değişikliklerinde `docs/mathematics/`
+  altındaki ilgili dokümantasyonun güncellenmesi zorunludur.
 - Her commit tek bir amacı temsil eder.
 
 ### Commit örnekleri

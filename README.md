@@ -4,11 +4,12 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.1.2`, temel veri altyapısına ek olarak ilk torsional
-fizik hesaplarını içerir. FEM, nonlinear elastomer, eigen çözümü, kullanıcı
-arayüzü ve DXF desteği henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.1.3`, V0.2.0 modal çözücü çalışması öncesinde
+mühendislik altyapısını, dokümantasyonu, test sınıflandırmasını ve CI akışını
+kararlı hale getirir. Bu sürüm yeni bir fizik çözümü eklemez. FEM, nonlinear
+elastomer, eigen çözümü, kullanıcı arayüzü ve DXF desteği henüz uygulanmamıştır.
 
-## V0.1.2 çekirdek kapsamı
+## V0.1.3 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -26,8 +27,9 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.1.2 aşamasındadır. Hesap motorunun temel veri sözleşmesi ve
-ilk analitik torsional hesap zinciri kullanılabilir durumdadır.
+TMS26 şu anda V0.1.3 aşamasındadır. Hesap motorunun temel veri sözleşmesi ve
+ilk analitik torsional hesap zinciri kullanılabilir; dokümantasyon ve doğrulama
+altyapısı V0.2.0 modal çözücü geliştirmesine hazırlanmıştır.
 
 ### Tamamlananlar
 
@@ -38,6 +40,7 @@ ilk analitik torsional hesap zinciri kullanılabilir durumdadır.
 - Tek serbestlik dereceli, sönümsüz doğal frekans hesabı
 - Analitik referans testleri ve basit annüler TVD benchmark'ı
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
+- Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
 
 ### Henüz kapsam dışında
 
@@ -107,7 +110,7 @@ request'lerde derleme ve test doğrulaması yapar.
 
 ## Dizin yapısı
 
-- `docs/`: mimari, matematik, geliştirme ve karar kayıtları
+- `docs/`: mimari, matematik, fizik, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
 - `engine/tests/`: hesap motoru testleri
 - `benchmarks/`: performans ölçümleri
@@ -129,6 +132,8 @@ belgelenmiştir.
 
 İlk torsional fizik modelinin denklemleri
 [`docs/mathematics/torsional-physics-core.md`](docs/mathematics/torsional-physics-core.md),
+tek serbestlik dereceli frekans modeli
+[`docs/mathematics/torsional_frequency_model.md`](docs/mathematics/torsional_frequency_model.md),
 analitik referans problemi ise
 [`benchmarks/001_simple_annular_tvd/`](benchmarks/001_simple_annular_tvd/)
 altında açıklanmıştır.

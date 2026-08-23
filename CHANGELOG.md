@@ -7,6 +7,21 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.1.3] - 2026-08-23
+
+### Eklendi
+
+- Mimari, matematik, fizik, geliştirme ve karar dokümantasyonu dizin indeksleri.
+- Tek serbestlik dereceli torsional frekans modeli matematik belgesi.
+- Unit test, physics validation ve benchmark regression kategorilerini açıklayan
+  hesap motoru test belgesi.
+
+### Değiştirildi
+
+- GitHub otomasyon kuralları zorunlu build, test ve commit sonrası CI kalite
+  kapılarıyla netleştirildi.
+- Basit annüler TVD benchmark belgesine fiziksel model ve hesap zinciri eklendi.
+
 ### Düzeltildi
 
 - Windows CI iş akışında MinGW64 GNU Fortran paketi ve araç zinciri PATH
