@@ -2,7 +2,9 @@ name: Windows Derleme ve Test
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
   pull_request:
 
 permissions:
@@ -15,7 +17,7 @@ jobs:
 
     steps:
       - name: Kaynak kodu al
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: MinGW64, GNU Fortran, CMake ve Ninja kur
         uses: msys2/setup-msys2@v2
