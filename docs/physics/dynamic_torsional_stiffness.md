@@ -2,10 +2,12 @@
 
 ## Amaç ve kapsam
 
-Bu belge, frekans ve sıcaklığa bağlı kompleks kayma modülünün gelecekte
-kompleks burulma rijitliğine nasıl aktarılacağını tanımlar. V0.2.0 yalnızca
-hazırlık veri modelini sağlar; aşağıdaki ilişkileri hesaplayan bir solver veya
-kompleks rijitlik yordamı henüz yoktur.
+Bu belge, V0.2.0 sırasında frekans ve sıcaklığa bağlı kompleks kayma modülünün
+burulma rijitliğine aktarılması için hazırlanan modeli tanımlar. İlişkiler
+V0.2.1 ile `tms_dynamic_torsional_stiffness` modülünde uygulanmıştır. Fiziksel
+yorum ve doğal frekans bağlantısı
+[`complex_torsional_stiffness.md`](complex_torsional_stiffness.md) belgesinde
+ayrıntılandırılır.
 
 ## Kompleks burulma rijitliği
 
@@ -42,4 +44,4 @@ anlamını açık tutmak için rijitlik birimi `N·m/rad` olarak yazılır.
 - Elastomer lineer viskoelastik ve geometri küçük deformasyon bölgesindedir.
 - G', G'', J ve L kullanılan çalışma noktası için geçerli kabul edilir.
 - Geometrik nonlinearite, hiperelastisite ve frekanslar arası interpolasyon
-  bu hazırlık modelinin kapsamı dışındadır.
+  bu modelin kapsamı dışındadır.

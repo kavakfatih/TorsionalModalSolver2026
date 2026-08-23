@@ -44,8 +44,33 @@ tan(delta) = G'' / G'
 ```
 
 Bu boyutsuz oran sönüm davranışının göstergesidir. Hesabın geçerli olması için
-`G' > 0` önkoşulu uygulanır. V0.2.0 veri modeli negatif veya fiziksel olmayan
-girdileri kendiliğinden doğrulamaz.
+`G' > 0` önkoşulu uygulanır. Veri modeli ve V0.2.1 solver'ı negatif veya
+fiziksel olmayan girdileri kendiliğinden doğrulamaz.
+
+## Kompleks burulma rijitliğine bağlantı
+
+V0.2.1, aynı çalışma noktasındaki kompleks kayma modülünü annüler elastomer
+geometrisine aşağıdaki şekilde uygular:
+
+```text
+Jp = π/2 (ro⁴ - ri⁴)
+K* = K' + iK''
+K' = G' Jp / L
+K'' = G'' Jp / L
+```
+
+`Jp` annüler kauçuk kesitinin `m⁴` birimli polar alan momenti, `L` ise `m`
+birimli etkin burulma uzunluğudur. K' ve K'' değerleri `N·m/rad` birimindedir.
+Aynı geometri katsayısı iki modül bileşenine de uygulandığı için:
+
+```text
+tan(delta) = G''/G' = K''/K'
+```
+
+Bu eşitlik `G' > 0`, geçerli annüler geometri ve `L > 0` koşullarında
+geçerlidir. `calculate_dynamic_torsional_stiffness`, malzemenin mevcut tek
+çalışma noktası alanlarını kullanır; frekans noktası seçimi veya interpolasyon
+yapmaz.
 
 ## Birimler
 

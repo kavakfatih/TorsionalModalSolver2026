@@ -2,7 +2,7 @@
 
 ## Amaç
 
-V0.2.0 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
+V0.2.1 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
 geometrik ve malzeme özelliklerini fizik yordamlarına taşır. Veri türleri
 doğrulama veya hesap yapmaz; fizik davranışı `engine/src/solver/` altındaki
 modüllerde tutulur.
@@ -12,7 +12,8 @@ modüllerde tutulur.
 - `tms_kinds`, proje genelindeki çift hassasiyetli `dp` türünü tanımlar.
 - `tms_constants`, `tms_kinds` türüyle matematik ve dönüşüm sabitlerini tanımlar.
 - `tms_units`, `tms_constants` çarpanlarını kullanan birim dönüşümlerini sunar.
-- `tms_geometry`, `tms_kinds` tabanlı TVD geometri türlerini tanımlar.
+- `tms_geometry`, TVD geometri türlerini ve annüler elastomer için ortak polar
+  alan momenti hesabını tanımlar.
 - `tms_dynamic_modulus`, G', G'', frekans ve sıcaklık alanlarıyla kompleks
   kayma modülü veri türünü ve kayıp faktörü hesabını tanımlar.
 - `tms_material_frequency`, dinamik modül türünü bir malzeme çalışma noktası
@@ -23,16 +24,21 @@ modüllerde tutulur.
   hesaplar.
 - `tms_torsional_stiffness`, `rubber_geometry_t` ve
   `dynamic_rubber_material_t` ile lineer burulma rijitliğini hesaplar.
+- `tms_dynamic_torsional_stiffness`, aynı girdilerden K', K'', kayıp faktörü
+  ve çalışma noktası üstverisini üretir.
 - `tms_frequency_solver`, hesaplanan rijitlik ve ataletten doğal frekansı bulur.
 
 Mevcut torsional fizik akışı aşağıdaki sırayı izler:
 
 1. Mühendislik birimleri `tms_units` ile SI birimlerine dönüştürülür.
 2. SI değerleri mevcut geometri ve malzeme türlerine yazılır.
-3. Atalet ve burulma rijitliği birbirinden bağımsız hesaplanır.
-4. Bu iki skaler sonuç doğal frekans yordamına verilir.
+3. Atalet ile statik veya kompleks burulma rijitliği birbirinden bağımsız
+   hesaplanır.
+4. Statik skaler rijitlik ve atalet mevcut doğal frekans yordamına verilebilir.
+   Kompleks rijitlik sonucu bu sürümde doğal frekans yordamına bağlanmaz.
 
-Fizik yordamları için yeni bir derived type oluşturulmamıştır.
+Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
+`complex_torsional_stiffness_t` derived type değeriyle taşınır.
 
 ## Geometri türleri
 
@@ -45,7 +51,8 @@ Fizik yordamları için yeni bir derived type oluşturulmamıştır.
 
 Tüm geometrik alanlar metre cinsindedir. Sıfır başlangıç değerleri yalnızca
 deterministik ilk durumu sağlar; fiziksel olarak geçerli bir geometri anlamına
-gelmez.
+gelmez. `calculate_rubber_polar_area_moment`, annüler elastomer için
+`Jp = π/2 (ro⁴-ri⁴)` hesabını hem statik hem dinamik solver'a sağlar.
 
 ## Dinamik elastomer türleri
 
@@ -75,5 +82,20 @@ alanlarını devralır:
 
 Bu ayrım DMA ile Dewesoft veya Brüel & Kjær modal test verilerinin ortak veri
 alanlarına alınmasına hazırlık sağlar. Mevcut burulma rijitliği hesabı, geriye
-uyumlu tek çalışma noktasındaki G' değerini kullanmayı sürdürür; yeni dizi ve
-G'' henüz solver akışına bağlanmamıştır.
+uyumlu tek çalışma noktasındaki G' değerini kullanmayı sürdürür. V0.2.1 dinamik
+solver'ı aynı noktadaki G' ve G'' değerlerini kullanır; yeni dizi üzerinde seçim
+veya interpolasyon henüz yapılmaz.
+
+## Kompleks rijitlik sonuç türü
+
+`complex_torsional_stiffness_t` aşağıdaki alanları taşır:
+
+- `storage_stiffness`: K' (`N·m/rad`)
+- `loss_stiffness`: K'' (`N·m/rad`)
+- `loss_factor`: K''/K' (`boyutsuz`)
+- `frequency`: kullanılan çalışma noktası (`Hz`)
+- `temperature`: kullanılan çalışma noktası (`K`)
+
+Bu sonuç türü solver katmanında tanımlıdır. Geometri ve malzeme veri türleri
+solver sonuçlarına bağımlı değildir; bağımlılık yönü çekirdek veriden solver'a
+doğrudur.

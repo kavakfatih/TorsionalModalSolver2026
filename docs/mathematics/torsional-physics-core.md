@@ -27,7 +27,7 @@ J = 1/2 m (ro² + ri²)
 momenti `J` kg·m² cinsindendir. Model homojen yoğunluk ve eksenel simetri kabul
 eder. Geçerli girdiler `0 <= ri < ro`, `b > 0` ve `ρ > 0` koşullarını sağlar.
 
-## Elastomer burulma rijitliği
+## Elastomer polar alan momenti ve burulma rijitliği
 
 Annüler elastomer kesitin polar alan atalet momenti:
 
@@ -45,7 +45,9 @@ kθ = G' Jp / L
 rijitliği `kθ` N·m/rad cinsindendir. Elastomer homojen ve izotrop kabul edilir;
 şekil değiştirmeler küçük, davranış lineer elastiktir. Geçerli girdiler
 `0 <= ri < ro`, `L > 0` ve `G' > 0` koşullarını sağlar. Loss shear modulus `G''`
-bu ilk modelde kullanılmaz.
+statik sonuçta kullanılmaz. V0.2.1 dinamik solver'ı aynı ortak `Jp` hesabını
+kullanarak K' ve K'' bileşenlerini ayrı üretir; ayrıntılı bağıntılar
+[`dynamic_elastomer_model.md`](dynamic_elastomer_model.md) altında verilir.
 
 ## Doğal frekans
 

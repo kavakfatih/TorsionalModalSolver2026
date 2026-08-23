@@ -1,7 +1,7 @@
 module tms_torsional_stiffness
   use tms_kinds, only : dp
-  use tms_constants, only : pi
-  use tms_geometry, only : rubber_geometry_t
+  use tms_geometry, only : rubber_geometry_t, &
+    calculate_rubber_polar_area_moment
   use tms_material, only : dynamic_rubber_material_t
   implicit none
   private
@@ -32,8 +32,7 @@ contains
 
     real(dp) :: polar_area_moment_m4
 
-    polar_area_moment_m4 = 0.5_dp * pi * &
-      (rubber%outer_radius_m**4 - rubber%inner_radius_m**4)
+    polar_area_moment_m4 = calculate_rubber_polar_area_moment(rubber)
     stiffness_nm_per_rad = material%storage_shear_modulus_pa * &
       polar_area_moment_m4 / rubber%axial_length_m
   end function calculate_torsional_stiffness

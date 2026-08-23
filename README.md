@@ -4,12 +4,12 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.2.0`, elastomerlerin frekans ve sıcaklığa bağlı
-kompleks kayma modülü verilerini temsil edecek mühendislik temelini sağlar.
-Bu sürüm veri saklama ve kayıp faktörü hesabıyla sınırlıdır; interpolasyon,
-eğri uydurma ve kompleks burulma rijitliği çözümü henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.2.1`, elastomerlerin kompleks kayma modülünü
+annüler kesitin kompleks burulma rijitliğine bağlar. K', K'', kayıp faktörü,
+frekans ve sıcaklık aynı sonuç türünde sunulur. Frekans interpolasyonu ve
+kompleks doğal frekans çözümü henüz uygulanmamıştır.
 
-## V0.2.0 çekirdek kapsamı
+## V0.2.1 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -20,6 +20,7 @@ eğri uydurma ve kompleks burulma rijitliği çözümü henüz uygulanmamıştı
 - `tms_material`: tek çalışma noktası alanları ve dinamik veri noktaları
 - `tms_inertia`: homojen annüler halkanın kütlesi ve polar kütle ataleti
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
+- `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
 
 Hesap motorunun iç veri sözleşmesi SI birimlerini kullanır. Uzunluk metre,
@@ -29,9 +30,10 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.2.0 aşamasındadır. Hesap motorunun temel veri sözleşmesi, ilk
-analitik torsional hesap zinciri ve dinamik elastomer veri modeli kullanılabilir.
-Kompleks modül yaklaşımı bu sürümde çözüm algoritmasına bağlanmamıştır.
+TMS26 şu anda V0.2.1 aşamasındadır. Hesap motorunun temel veri sözleşmesi, ilk
+analitik torsional hesap zinciri, dinamik elastomer veri modeli ve kompleks
+burulma rijitliği hesabı kullanılabilir. Kompleks rijitlik henüz modal veya
+doğal frekans solver'ına bağlanmamıştır.
 
 ### Tamamlananlar
 
@@ -39,6 +41,9 @@ Kompleks modül yaklaşımı bu sürümde çözüm algoritmasına bağlanmamış
 - SI birim dönüşümleri ile geometri ve dinamik elastomer veri türleri
 - Frekans ve sıcaklık çalışma noktalarında G' ve G'' saklama altyapısı
 - `tan(delta) = G'' / G'` kayıp faktörü hesabı ve analitik testi
+- Annüler elastomer için ortak polar alan momenti hesabı
+- `K' = G'Jp/L` ve `K'' = G''Jp/L` kompleks rijitlik bileşenleri
+- `G''/G' = K''/K'` eşitliğinin analitik doğrulaması
 - Homojen annüler atalet halkası için kütle ve polar kütle ataleti hesabı
 - Lineer elastomer bölgesi için burulma rijitliği hesabı
 - Tek serbestlik dereceli, sönümsüz doğal frekans hesabı
@@ -49,7 +54,7 @@ Kompleks modül yaklaşımı bu sürümde çözüm algoritmasına bağlanmamış
 ### Henüz kapsam dışında
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
-- Kompleks burulma rijitliği ve G'' kullanımına dayalı dinamik çözüm
+- Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
 - Çok serbestlik dereceli modal/eigen çözümü
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
 
@@ -145,7 +150,11 @@ altında açıklanmıştır. Dinamik elastomer veri örneği
 [`benchmarks/002_dynamic_elastomer/`](benchmarks/002_dynamic_elastomer/),
 kompleks modül modeli ise
 [`docs/mathematics/dynamic_elastomer_model.md`](docs/mathematics/dynamic_elastomer_model.md)
-altında açıklanmıştır.
+altında açıklanmıştır. Kompleks rijitlik fiziksel modeli
+[`docs/physics/complex_torsional_stiffness.md`](docs/physics/complex_torsional_stiffness.md),
+EPDM analitik örneği ise
+[`benchmarks/003_dynamic_torsional_stiffness/`](benchmarks/003_dynamic_torsional_stiffness/)
+altında bulunur.
 
 ## Lisans
 

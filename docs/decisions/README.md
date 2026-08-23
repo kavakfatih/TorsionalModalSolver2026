@@ -11,6 +11,8 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
   ilk lineer ve tek serbestlik dereceli torsional fizik kapsamı
 - [`0003-dynamic-elastomer-data-model.md`](0003-dynamic-elastomer-data-model.md):
   dinamik modül çalışma noktaları ve geriye uyumlu malzeme genişletmesi
+- [`0004-complex-stiffness-interface.md`](0004-complex-stiffness-interface.md):
+  kompleks rijitlik sonuç türü, ortak geometri hesabı ve çalışma noktası seçimi
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

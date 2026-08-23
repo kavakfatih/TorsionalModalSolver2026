@@ -7,6 +7,26 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.2.1] - 2026-08-23
+
+### Eklendi
+
+- K', K'', kayıp faktörü, frekans ve sıcaklığı taşıyan
+  `complex_torsional_stiffness_t` veri türü.
+- Dinamik elastomer malzemesi ile annüler kauçuk geometrisinden kompleks
+  burulma rijitliği hesaplayan `calculate_dynamic_torsional_stiffness` yordamı.
+- `rubber_geometry_t` için yeniden kullanılabilir polar alan momenti hesabı.
+- G''/G' ile K''/K' eşitliğini yüzde 0,1'den küçük hata sınırında doğrulayan
+  CTest testi ve EPDM Benchmark 003 referansı.
+- Kompleks rijitliğin fiziksel etkileri, matematiksel bağlantısı, mimari veri
+  akışı ve API kararı için dokümantasyon.
+
+### Değiştirildi
+
+- Mevcut statik burulma rijitliği solver'ı davranışı korunarak ortak polar
+  alan momenti yordamını kullanacak şekilde düzenlendi.
+- Proje sürümü `0.2.1` olarak güncellendi ve CTest kapsamı on teste çıkarıldı.
+
 ## [0.2.0] - 2026-08-23
 
 ### Eklendi

@@ -25,9 +25,11 @@ eklenir; birim testlerinin yerini almaz.
 ## Benchmark test
 
 Benchmark testleri, temsilî TVD modellerinde yürütme süresi ve bellek kullanım
-eğilimlerini izler. Başlangıçta `benchmarks/` altında tekrarlanabilir senaryolar
-olarak tutulur. Donanım farklılıkları nedeniyle benchmark sonuçları henüz ana
-CI geçiş koşulu değildir; performans regresyonu izleme amacı taşır.
+eğilimlerinin yanı sıra analitik referans sonuçların korunmasını sağlar.
+Başlangıç senaryoları `benchmarks/` altında tekrarlanabilir girdiler ve beklenen
+sonuçlar olarak tutulur. Donanım farklılıklarına bağlı performans değerleri
+henüz ana CI geçiş koşulu değildir; analitik referanslar ilgili CTest fizik
+doğrulamalarında sınanır.
 
 ## CI validation
 

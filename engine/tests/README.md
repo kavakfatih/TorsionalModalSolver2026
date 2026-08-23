@@ -15,9 +15,12 @@ değerlerinin SI biriminde saklanmasını, çoklu çalışma noktası altyapıs�
 ## Physics validation
 
 Fiziksel veya matematiksel yordam, bağımsız analitik sonuç ve açık bir hata
-sınırıyla doğrulanır. `test_inertia`, `test_torsional_stiffness` ve
-`test_frequency_solver` bu kategoridedir. V0.1.3 fizik doğrulamalarında bağıl
-hata yüzde `0,1`'den küçük olmalıdır.
+sınırıyla doğrulanır. `test_inertia`, `test_torsional_stiffness`,
+`test_dynamic_torsional_stiffness` ve `test_frequency_solver` bu kategoridedir.
+V0.2.1 fizik doğrulamalarında bağıl hata yüzde `0,1`'den küçük olmalıdır.
+Dinamik rijitlik testi Jp, K', K'', frekans, sıcaklık ve
+`G''/G' = K''/K' = tan(delta)` eşitliğini birlikte doğrular. Ayrıca K'
+bileşeninin mevcut statik solver sonucuyla aynı kaldığını sınar.
 
 ## Benchmark regression
 
@@ -26,6 +29,10 @@ içinde korunur. `benchmarks/001_simple_annular_tvd/` girdileri; kütle, polar
 atalet, rijitlik ve doğal frekans testlerinin ortak regresyon temelidir. Model
 veya kabul edilen formül değişirse benchmark girdileri, beklenen sonuçlar ve
 ilgili testler aynı commit içinde güncellenir.
+
+`benchmarks/002_dynamic_elastomer/` dinamik modül veri noktasını,
+`benchmarks/003_dynamic_torsional_stiffness/` ise bu noktanın annüler geometri
+üzerindeki kompleks rijitlik sonucunu tanımlar.
 
 ## Test ekleme
 
