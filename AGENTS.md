@@ -48,6 +48,64 @@ Bu kurallar deponun tamamı için geçerlidir.
 - Kaynak ağacında derleme çıktısı üretilmemeli; ayrı bir `build/` dizini
   kullanılmalıdır.
 
+## Definition of Done
+
+Bir geliştirme görevi, aşağıdaki kalite kapılarının tamamı başarıyla geçmeden
+tamamlanmış kabul edilmez.
+
+1. Proje kökündeki önceki build dizini silinerek temiz başlangıç hazırlanır:
+
+   ```sh
+   rm -rf build
+   ```
+
+2. Debug yapılandırması CMake ve Ninja ile oluşturulur:
+
+   ```sh
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+   ```
+
+3. Tüm hedefler tam olarak derlenir:
+
+   ```sh
+   cmake --build build
+   ```
+
+4. Tüm testler hata ayrıntılarıyla çalıştırılır:
+
+   ```sh
+   ctest --test-dir build --output-on-failure
+   ```
+
+5. Yerel doğrulama sonrasında commit ve push yapılır; push ile tetiklenen
+   GitHub Actions işlerinin sonucu kontrol edilir.
+
+Yerel yapılandırma, build veya test adımlarından biri başarısız olursa:
+
+- Commit yapılmaz.
+- Push yapılmaz.
+- Görev tamamlandı olarak raporlanmaz.
+
+Push sonrasında GitHub Actions başarısız olursa görev tamamlandı olarak
+raporlanmaz; hata giderilir ve Definition of Done akışı temiz build ile baştan
+uygulanır.
+
+## Fortran Module Development Rules
+
+Yeni bir Fortran modülü eklendiğinde aşağıdaki kurallar uygulanır:
+
+1. Kaynak dosyası ilgili hedefin `CMakeLists.txt` içindeki `target_sources`
+   listesine eklenir.
+2. Modül bağımlılık sırası sağlayıcı modülden tüketici modüle doğru kontrol
+   edilir.
+3. `use` ile alınan tüm modüllerin tüketici derlenmeden önce üretildiği, CMake
+   bağımlılık taraması ve temiz Ninja build ile doğrulanır.
+4. Yan etkisiz matematiksel yordamlar `pure`, eleman bazında uygulanabilenler
+   uygun olduğunda `elemental` olarak tanımlanır. Saf yordamlar I/O yapmaz ve
+   global durum değiştirmez.
+5. Her yeni fiziksel veya matematiksel hesap için analitik referanslı otomatik
+   test eklenir ve CTest'e kaydedilir.
+
 ## GitHub Workflow Automation
 
 Tüm geliştirme görevlerinde aşağıdaki sıra uygulanacaktır:

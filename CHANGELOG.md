@@ -7,6 +7,15 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+### Değiştirildi
+
+- Geliştirme görevleri için temiz Debug build, tam derleme, CTest ve commit
+  sonrası GitHub Actions kontrolünü zorunlu kılan Definition of Done eklendi.
+- Yeni Fortran modülleri için CMake kaydı, bağımlılık sırası, `pure` matematik
+  yordamı ve fizik testi kuralları standartlaştırıldı.
+- Annüler elastomer polar alan momenti geometri testinde doğrudan analitik
+  referansla doğrulanacak şekilde test kapsamı güçlendirildi.
+
 ## [0.2.1] - 2026-08-23
 
 ### Eklendi

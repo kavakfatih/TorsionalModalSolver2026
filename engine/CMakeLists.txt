@@ -4,6 +4,8 @@ add_library(tms26_engine STATIC)
 target_sources(
   tms26_engine
   PRIVATE
+    # Fortran modülleri sağlayıcıdan tüketiciye doğru listelenir. Gerçek
+    # derleme bağımlılıkları CMake Fortran tarayıcısı tarafından oluşturulur.
     src/core/tms_kinds.f90
     src/core/tms_constants.f90
     src/core/tms_units.f90

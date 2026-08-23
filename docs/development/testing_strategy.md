@@ -44,3 +44,24 @@ pull request'lerde aşağıdaki işlemleri yapar:
 
 Bir CI işi başarısız olursa değişiklik birleştirilmeden önce hata yerelde
 tekrar üretilmeli, düzeltilmeli ve ilgili test eklenmelidir.
+
+## Definition of Done doğrulaması
+
+Her geliştirme görevi, önceden üretilmiş modül ve nesne dosyalarının sonucu
+gizlemesini önlemek için temiz bir Debug build ile doğrulanır:
+
+```sh
+rm -rf build
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+Yerel kalite kapıları geçmeden commit veya push yapılmaz. Push sonrasında macOS
+ve Windows GitHub Actions sonuçları commit SHA ile eşleştirilerek kontrol edilir;
+CI başarısızsa görev tamamlanmış sayılmaz.
+
+Yeni Fortran modüllerinde kaynak kaydı, modül bağımlılık sırası ve üretilen
+`.mod` dosyalarının tüketici hedeflere erişimi temiz build çıktısıyla
+doğrulanır. Saf matematik yordamlarının `pure` niteliği korunur ve yeni fizik
+hesapları analitik CTest kapsamına alınır.

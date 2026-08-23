@@ -87,7 +87,8 @@ Bir değişikliği commit etmeden önce, temiz bir `build/` dizininde aşağıda
 komutlar çalıştırılmalıdır:
 
 ```sh
-cmake -S . -B build -G Ninja
+rm -rf build
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
 ctest --test-dir build --output-on-failure
 ```

@@ -10,7 +10,9 @@ Tek modül, tür veya yordam izole olarak doğrulanır. `test_kinds`,
 `test_constants`, `test_units`, `test_geometry`, `test_material` ve
 `test_dynamic_modulus` bu kategoridedir. `test_dynamic_modulus`, G' ile G''
 değerlerinin SI biriminde saklanmasını, çoklu çalışma noktası altyapısını ve
-`tan(delta) = G'' / G'` hesabını doğrular.
+`tan(delta) = G'' / G'` hesabını doğrular. `test_geometry`, geometri veri
+alanlarının yanında annüler elastomer polar alan momentini bağımsız analitik
+değerle sınar.
 
 ## Physics validation
 

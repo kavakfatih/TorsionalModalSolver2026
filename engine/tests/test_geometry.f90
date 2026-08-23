@@ -1,10 +1,15 @@
 program test_geometry
   use tms_kinds, only : dp
   use tms_geometry, only : rubber_geometry_t, inertia_ring_geometry_t, &
-    hub_geometry_t, tvd_geometry_t
+    hub_geometry_t, tvd_geometry_t, calculate_rubber_polar_area_moment
   implicit none
 
+  real(dp), parameter :: maximum_relative_error = 1.0e-12_dp
+  real(dp), parameter :: expected_polar_area_moment_m4 = &
+    1.2692034320502767e-4_dp
+
   type(tvd_geometry_t) :: geometry
+  real(dp) :: polar_area_moment_m4
 
   ! Temel TVD bileşenlerinin SI tabanlı geometrik verilerini oluşturur.
   geometry%rubber = rubber_geometry_t( &
@@ -35,5 +40,14 @@ program test_geometry
     error stop "Göbek geometrisi veri ataması başarısız."
   end if
 
-  print *, "TVD geometri veri türleri doğrulandı."
+  ! Annüler kesit için Jp = pi/2*(ro^4-ri^4) analitik sonucunu doğrular.
+  polar_area_moment_m4 = &
+    calculate_rubber_polar_area_moment(geometry%rubber)
+
+  if (abs(polar_area_moment_m4 - expected_polar_area_moment_m4) / &
+      expected_polar_area_moment_m4 >= maximum_relative_error) then
+    error stop "Elastomer polar alan momenti analitik sonuçla uyuşmuyor."
+  end if
+
+  print *, "TVD geometri veri türleri ve polar alan momenti doğrulandı."
 end program test_geometry
