@@ -7,6 +7,24 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.2.0] - 2026-08-23
+
+### Eklendi
+
+- Kompleks dinamik kayma modülünün G', G'', frekans ve sıcaklık bileşenlerini
+  saklayan `dynamic_shear_modulus` veri türü.
+- DMA ve modal test verilerine hazırlanmak için `material_frequency_point`
+  veri türü ve malzeme içinde çoklu çalışma noktası altyapısı.
+- Boyutsuz `tan(delta) = G'' / G'` kayıp faktörü hesabı ve CTest birim testi.
+- Dinamik elastomer matematik modeli, kompleks burulma rijitliği hazırlık
+  belgesi, mimari karar kaydı ve EPDM referans benchmark'ı.
+
+### Değiştirildi
+
+- `dynamic_rubber_material_t`, mevcut tek noktalı alanları korunarak dinamik
+  frekans-sıcaklık veri noktalarını saklayacak şekilde genişletildi.
+- Proje sürümü `0.2.0` olarak güncellendi ve CTest kapsamı dokuz teste çıkarıldı.
+
 ## [0.1.3] - 2026-08-23
 
 ### Eklendi

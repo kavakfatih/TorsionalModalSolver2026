@@ -1,5 +1,6 @@
 module tms_material
   use tms_kinds, only : dp
+  use tms_material_frequency, only : material_frequency_point
   implicit none
   private
 
@@ -16,6 +17,11 @@ module tms_material
     real(dp) :: loss_shear_modulus_pa = 0.0_dp
     real(dp) :: temperature_k = 0.0_dp
     real(dp) :: frequency_hz = 0.0_dp
+
+    !> Malzemenin farklı frekans ve sıcaklıklardaki dinamik modül veri
+    !! noktaları. Eski tek noktalı alanlar geriye uyumluluk için korunur;
+    !! bu dizi ile otomatik eşzamanlama bu sürümde yapılmaz.
+    type(material_frequency_point), allocatable :: frequency_points(:)
   end type dynamic_rubber_material_t
 
 end module tms_material

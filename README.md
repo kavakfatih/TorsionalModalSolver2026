@@ -4,18 +4,20 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.1.3`, V0.2.0 modal çözücü çalışması öncesinde
-mühendislik altyapısını, dokümantasyonu, test sınıflandırmasını ve CI akışını
-kararlı hale getirir. Bu sürüm yeni bir fizik çözümü eklemez. FEM, nonlinear
-elastomer, eigen çözümü, kullanıcı arayüzü ve DXF desteği henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.2.0`, elastomerlerin frekans ve sıcaklığa bağlı
+kompleks kayma modülü verilerini temsil edecek mühendislik temelini sağlar.
+Bu sürüm veri saklama ve kayıp faktörü hesabıyla sınırlıdır; interpolasyon,
+eğri uydurma ve kompleks burulma rijitliği çözümü henüz uygulanmamıştır.
 
-## V0.1.3 çekirdek kapsamı
+## V0.2.0 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
 - `tms_units`: mm → m, MPa → Pa ve derece → radyan dönüşümleri
 - `tms_geometry`: elastomer, atalet halkası, göbek ve bileşik TVD geometrisi
-- `tms_material`: dinamik elastomer malzemenin çalışma noktası verileri
+- `tms_dynamic_modulus`: G', G'', frekans ve sıcaklık ile kayıp faktörü hesabı
+- `tms_material_frequency`: frekans-sıcaklık bağımlı malzeme veri noktası
+- `tms_material`: tek çalışma noktası alanları ve dinamik veri noktaları
 - `tms_inertia`: homojen annüler halkanın kütlesi ve polar kütle ataleti
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
@@ -27,14 +29,16 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.1.3 aşamasındadır. Hesap motorunun temel veri sözleşmesi ve
-ilk analitik torsional hesap zinciri kullanılabilir; dokümantasyon ve doğrulama
-altyapısı V0.2.0 modal çözücü geliştirmesine hazırlanmıştır.
+TMS26 şu anda V0.2.0 aşamasındadır. Hesap motorunun temel veri sözleşmesi, ilk
+analitik torsional hesap zinciri ve dinamik elastomer veri modeli kullanılabilir.
+Kompleks modül yaklaşımı bu sürümde çözüm algoritmasına bağlanmamıştır.
 
 ### Tamamlananlar
 
 - Fortran 2018, CMake, Ninja ve CTest tabanlı derleme/test altyapısı
 - SI birim dönüşümleri ile geometri ve dinamik elastomer veri türleri
+- Frekans ve sıcaklık çalışma noktalarında G' ve G'' saklama altyapısı
+- `tan(delta) = G'' / G'` kayıp faktörü hesabı ve analitik testi
 - Homojen annüler atalet halkası için kütle ve polar kütle ataleti hesabı
 - Lineer elastomer bölgesi için burulma rijitliği hesabı
 - Tek serbestlik dereceli, sönümsüz doğal frekans hesabı
@@ -44,7 +48,8 @@ altyapısı V0.2.0 modal çözücü geliştirmesine hazırlanmıştır.
 
 ### Henüz kapsam dışında
 
-- Nonlinear veya sönümlü elastomer modeli ve G'' kullanımına dayalı çözüm
+- İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
+- Kompleks burulma rijitliği ve G'' kullanımına dayalı dinamik çözüm
 - Çok serbestlik dereceli modal/eigen çözümü
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
 
@@ -136,6 +141,10 @@ tek serbestlik dereceli frekans modeli
 [`docs/mathematics/torsional_frequency_model.md`](docs/mathematics/torsional_frequency_model.md),
 analitik referans problemi ise
 [`benchmarks/001_simple_annular_tvd/`](benchmarks/001_simple_annular_tvd/)
+altında açıklanmıştır. Dinamik elastomer veri örneği
+[`benchmarks/002_dynamic_elastomer/`](benchmarks/002_dynamic_elastomer/),
+kompleks modül modeli ise
+[`docs/mathematics/dynamic_elastomer_model.md`](docs/mathematics/dynamic_elastomer_model.md)
 altında açıklanmıştır.
 
 ## Lisans

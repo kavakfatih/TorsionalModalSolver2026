@@ -8,6 +8,8 @@ target_sources(
     src/core/tms_constants.f90
     src/core/tms_units.f90
     src/geometry/tms_geometry.f90
+    src/materials/tms_dynamic_modulus.f90
+    src/materials/tms_material_frequency.f90
     src/materials/tms_material.f90
     src/solver/tms_inertia.f90
     src/solver/tms_torsional_stiffness.f90
@@ -54,6 +56,7 @@ if(BUILD_TESTING)
   tms26_add_fortran_test(units tests/test_units.f90)
   tms26_add_fortran_test(geometry tests/test_geometry.f90)
   tms26_add_fortran_test(material tests/test_material.f90)
+  tms26_add_fortran_test(dynamic_modulus tests/test_dynamic_modulus.f90)
   tms26_add_fortran_test(inertia tests/test_inertia.f90)
   tms26_add_fortran_test(torsional_stiffness tests/test_torsional_stiffness.f90)
   tms26_add_fortran_test(frequency_solver tests/test_frequency_solver.f90)

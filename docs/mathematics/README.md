@@ -11,6 +11,8 @@ varsayımları ve geçerlilik sınırlarını içerir.
   ataleti, elastomer rijitliği ve ilk doğal frekans zinciri
 - [`torsional_frequency_model.md`](torsional_frequency_model.md): tek serbestlik
   dereceli torsional hareket denklemi ve sönümsüz doğal frekans
+- [`dynamic_elastomer_model.md`](dynamic_elastomer_model.md): kompleks dinamik
+  kayma modülü, depolama/kayıp bileşenleri ve kayıp faktörü
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.
