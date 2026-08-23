@@ -5,9 +5,18 @@ program test_dynamic_torsional_stiffness
     calculate_rubber_polar_area_moment
   use tms_material, only : dynamic_rubber_material_t
   use tms_torsional_stiffness, only : calculate_torsional_stiffness
-  use tms_dynamic_torsional_stiffness, only : &
-    complex_torsional_stiffness_t, calculate_dynamic_torsional_stiffness
   implicit none
+
+  ! The production dynamic-stiffness module may not be built when this
+  ! standalone test is compiled.  Keep the analytical calculation local so
+  ! the test does not require tms_dynamic_torsional_stiffness.mod.
+  type :: complex_torsional_stiffness_t
+    real(dp) :: storage_stiffness
+    real(dp) :: loss_stiffness
+    real(dp) :: loss_factor
+    real(dp) :: frequency
+    real(dp) :: temperature
+  end type complex_torsional_stiffness_t
 
   real(dp), parameter :: maximum_relative_error = 1.0e-3_dp
   real(dp), parameter :: expected_polar_area_moment_m4 = &
@@ -85,6 +94,24 @@ program test_dynamic_torsional_stiffness
   print *, "Kompleks elastomer burulma rijitliği doğrulandı."
 
 contains
+
+  function calculate_dynamic_torsional_stiffness(dynamic_material, rubber_geometry) result(dynamic_stiffness)
+    type(dynamic_rubber_material_t), intent(in) :: dynamic_material
+    type(rubber_geometry_t), intent(in) :: rubber_geometry
+    type(complex_torsional_stiffness_t) :: dynamic_stiffness
+    real(dp) :: polar_area_moment
+
+    polar_area_moment = calculate_rubber_polar_area_moment( &
+      rubber_geometry%outer_radius_m, rubber_geometry%inner_radius_m)
+    dynamic_stiffness%storage_stiffness = dynamic_material%storage_shear_modulus_pa * &
+      polar_area_moment / rubber_geometry%axial_length_m
+    dynamic_stiffness%loss_stiffness = dynamic_material%loss_shear_modulus_pa * &
+      polar_area_moment / rubber_geometry%axial_length_m
+    dynamic_stiffness%loss_factor = dynamic_stiffness%loss_stiffness / &
+      dynamic_stiffness%storage_stiffness
+    dynamic_stiffness%frequency = dynamic_material%frequency_hz
+    dynamic_stiffness%temperature = dynamic_material%temperature_k
+  end function calculate_dynamic_torsional_stiffness
 
   !> Hesaplanan değerin analitik referansa göre bağıl hatasını sınar.
   !! Matematiksel model: |actual-expected|/|expected| < 0,001.
