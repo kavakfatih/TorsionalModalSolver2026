@@ -44,7 +44,8 @@ program test_dynamic_torsional_stiffness
     stiffness%storage_stiffness
 
   call assert_relative_close( &
-    calculate_rubber_polar_area_moment(rubber), &
+    calculate_rubber_polar_area_moment( &
+      rubber%outer_radius_m, rubber%inner_radius_m), &
     expected_polar_area_moment_m4, &
     "Polar geometrik alan momenti beklenen değerde değil." &
   )

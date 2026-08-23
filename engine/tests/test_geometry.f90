@@ -41,8 +41,8 @@ program test_geometry
   end if
 
   ! Annüler kesit için Jp = pi/2*(ro^4-ri^4) analitik sonucunu doğrular.
-  polar_area_moment_m4 = &
-    calculate_rubber_polar_area_moment(geometry%rubber)
+  polar_area_moment_m4 = calculate_rubber_polar_area_moment( &
+    geometry%rubber%outer_radius_m, geometry%rubber%inner_radius_m)
 
   if (abs(polar_area_moment_m4 - expected_polar_area_moment_m4) / &
       expected_polar_area_moment_m4 >= maximum_relative_error) then

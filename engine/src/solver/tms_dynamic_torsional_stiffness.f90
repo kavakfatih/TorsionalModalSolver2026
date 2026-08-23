@@ -60,7 +60,8 @@ contains
 
     real(dp) :: polar_area_moment_m4
 
-    polar_area_moment_m4 = calculate_rubber_polar_area_moment(rubber)
+    polar_area_moment_m4 = calculate_rubber_polar_area_moment( &
+      rubber%outer_radius_m, rubber%inner_radius_m)
     stiffness%storage_stiffness = material%storage_shear_modulus_pa * &
       polar_area_moment_m4 / rubber%axial_length_m
     stiffness%loss_stiffness = material%loss_shear_modulus_pa * &

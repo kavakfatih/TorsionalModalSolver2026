@@ -45,19 +45,20 @@ contains
   !! Fiziksel açıklama: Polar alan momenti, kesit geometrisinin burulmaya
   !! karşı rijitlik katkısını temsil eder; polar kütle ataleti değildir.
   !! Matematiksel açıklama: Jp = pi/2 * (ro^4 - ri^4).
-  !! Girdi: rubber iç ve dış yarıçapları metre (m) cinsindedir. Eksenel
-  !! uzunluk bu geometrik kesit hesabında kullanılmaz.
-  !! Çıktı: Polar alan momenti metrenin dördüncü kuvveti (m^4) cinsindendir.
+  !! Girdiler: outer_radius dış yarıçapı, inner_radius iç yarıçapı temsil eder;
+  !! iki değer de metre (m) cinsindendir.
+  !! Çıktı: jp polar alan momentidir ve metrenin dördüncü kuvveti (m^4)
+  !! cinsindendir.
   !! Varsayımlar ve geçerlilik: Kesit eksenel simetrik ve annülerdir;
   !! 0 <= ri < ro olmalıdır. Yordam bu önkoşulları doğrulamaz.
   !! Ayrıntılar: docs/mathematics/torsional-physics-core.md.
-  pure elemental function calculate_rubber_polar_area_moment(rubber) &
-      result(polar_area_moment_m4)
-    type(rubber_geometry_t), intent(in) :: rubber
-    real(dp) :: polar_area_moment_m4
+  pure function calculate_rubber_polar_area_moment(outer_radius, &
+      inner_radius) result(jp)
+    real(dp), intent(in) :: outer_radius
+    real(dp), intent(in) :: inner_radius
+    real(dp) :: jp
 
-    polar_area_moment_m4 = 0.5_dp * pi * &
-      (rubber%outer_radius_m**4 - rubber%inner_radius_m**4)
+    jp = 0.5_dp * pi * (outer_radius**4 - inner_radius**4)
   end function calculate_rubber_polar_area_moment
 
 end module tms_geometry

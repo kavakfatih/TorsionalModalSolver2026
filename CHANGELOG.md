@@ -16,6 +16,11 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 - Annüler elastomer polar alan momenti geometri testinde doğrudan analitik
   referansla doğrulanacak şekilde test kapsamı güçlendirildi.
 
+### Düzeltildi
+
+- `calculate_rubber_polar_area_moment` yordamının public PURE arayüzü dış ve iç
+  yarıçapı metre cinsinden alan iki skaler argümanla uyumlu hale getirildi.
+
 ## [0.2.1] - 2026-08-23
 
 ### Eklendi

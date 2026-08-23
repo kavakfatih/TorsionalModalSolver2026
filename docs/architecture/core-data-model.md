@@ -51,8 +51,9 @@ Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
 
 Tüm geometrik alanlar metre cinsindedir. Sıfır başlangıç değerleri yalnızca
 deterministik ilk durumu sağlar; fiziksel olarak geçerli bir geometri anlamına
-gelmez. `calculate_rubber_polar_area_moment`, annüler elastomer için
-`Jp = π/2 (ro⁴-ri⁴)` hesabını hem statik hem dinamik solver'a sağlar.
+gelmez. `calculate_rubber_polar_area_moment(outer_radius, inner_radius)`, metre
+birimli iki skaler yarıçaptan annüler elastomer için `Jp = π/2 (ro⁴-ri⁴)`
+hesabını hem statik hem dinamik solver'a sağlar.
 
 ## Dinamik elastomer türleri
 
