@@ -4,17 +4,20 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.1.1` temel matematik ve fizik veri altyapısını
-içerir. Fiziksel çözüm algoritmaları, FEM, kullanıcı arayüzü ve DXF desteği
-henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.1.2`, temel veri altyapısına ek olarak ilk torsional
+fizik hesaplarını içerir. FEM, nonlinear elastomer, eigen çözümü, kullanıcı
+arayüzü ve DXF desteği henüz uygulanmamıştır.
 
-## V0.1.1 çekirdek kapsamı
+## V0.1.2 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
 - `tms_units`: mm → m, MPa → Pa ve derece → radyan dönüşümleri
 - `tms_geometry`: elastomer, atalet halkası, göbek ve bileşik TVD geometrisi
 - `tms_material`: dinamik elastomer malzemenin çalışma noktası verileri
+- `tms_inertia`: homojen annüler halkanın kütlesi ve polar kütle ataleti
+- `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
+- `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
 
 Hesap motorunun iç veri sözleşmesi SI birimlerini kullanır. Uzunluk metre,
 yoğunluk `kg/m³`, kayma modülleri Pa, sıcaklık K ve frekans Hz cinsinden
@@ -99,6 +102,12 @@ kurallar için [`AGENTS.md`](AGENTS.md) dosyasına bakın.
 Birim sözleşmesinin gerekçesi `docs/decisions/0001-internal-si-unit-system.md`,
 dönüşüm denklemleri ise `docs/mathematics/unit-conversions.md` altında
 belgelenmiştir.
+
+İlk torsional fizik modelinin denklemleri
+[`docs/mathematics/torsional-physics-core.md`](docs/mathematics/torsional-physics-core.md),
+analitik referans problemi ise
+[`benchmarks/001_simple_annular_tvd/`](benchmarks/001_simple_annular_tvd/)
+altında açıklanmıştır.
 
 ## Lisans
 

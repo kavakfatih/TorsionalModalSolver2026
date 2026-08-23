@@ -7,12 +7,19 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.1.2] - 2026-08-23
+
 ### Eklendi
 
 - macOS ve Windows üzerinde CMake, Ninja ve GNU Fortran ile derleme/test yapan
   GitHub Actions CI iş akışları.
 - Birim, entegrasyon, benchmark ve CI doğrulama kapsamını tanımlayan test
   stratejisi belgesi.
+- Homojen annüler halka için kütle ve polar kütle atalet momenti hesabı.
+- Lineer elastik annüler elastomer için burulma rijitliği hesabı.
+- Tek serbestlik dereceli, sönümsüz sistem için doğal frekans hesabı.
+- Üç torsional fizik yordamı için yüzde 0,1 hata sınırına sahip analitik testler.
+- Basit annüler TVD referans benchmark tanımı ve beklenen sonuçları.
 
 ## [0.1.1] - 2026-08-23
 
