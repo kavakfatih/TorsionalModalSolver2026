@@ -7,6 +7,13 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+### Eklendi
+
+- macOS ve Windows üzerinde CMake, Ninja ve GNU Fortran ile derleme/test yapan
+  GitHub Actions CI iş akışları.
+- Birim, entegrasyon, benchmark ve CI doğrulama kapsamını tanımlayan test
+  stratejisi belgesi.
+
 ## [0.1.1] - 2026-08-23
 
 ### Eklendi

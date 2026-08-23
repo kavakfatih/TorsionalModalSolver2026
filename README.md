@@ -41,6 +41,17 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+### Commit öncesi yerel kontrol
+
+Bir değişikliği commit etmeden önce, temiz bir `build/` dizininde aşağıdaki
+komutlar çalıştırılmalıdır:
+
+```sh
+cmake -S . -B build -G Ninja
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
 Birden fazla Fortran derleyicisi kuruluysa yapılandırma sırasında derleyici
 açıkça seçilebilir:
 
@@ -52,6 +63,20 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug \
 Windows PowerShell üzerinde Intel oneAPI derleyicisi kullanılacaksa komutlar,
 oneAPI ortamı etkinleştirildikten sonra `-DCMAKE_Fortran_COMPILER=ifx` seçeneği
 ile çalıştırılabilir.
+
+## Continuous Integration
+
+GitHub Actions, `main` ve `develop` dallarına yapılan her push ile tüm pull
+request'lerde derleme ve test doğrulaması yapar.
+
+- macOS iş akışı Homebrew ile GNU Fortran, CMake ve Ninja kurar; projeyi derler
+  ve CTest testlerini çalıştırır.
+- Windows iş akışı MSYS2 MinGW64 ortamında GNU Fortran, CMake ve Ninja kurar;
+  projeyi derler ve CTest testlerini çalıştırır.
+- Otomatik testler, iki platformda da `ctest --output-on-failure` ile raporlanır.
+
+İş akışı tanımları [macOS CI](.github/workflows/macos-build.yml) ve
+[Windows CI](.github/workflows/windows-build.yml) dosyalarındadır.
 
 ## Dizin yapısı
 

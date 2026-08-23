@@ -1,0 +1,48 @@
+name: macOS Derleme ve Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: macOS / GNU Fortran
+    runs-on: macos-latest
+
+    steps:
+      - name: Kaynak kodu al
+        uses: actions/checkout@v7
+
+      - name: CMake, Ninja ve GNU Fortran kur
+        run: |
+          brew update
+          brew install cmake ninja gcc
+
+      - name: GNU Fortran derleyicisini belirle
+        id: fortran
+        shell: bash
+        run: |
+          compiler_path="$(command -v gfortran || true)"
+          if [ -z "$compiler_path" ]; then
+            compiler_path="$(find "$(brew --prefix gcc)/bin" -maxdepth 1 \
+              -type f -name 'gfortran-*' | head -n 1)"
+          fi
+          test -n "$compiler_path"
+          test -x "$compiler_path"
+          "$compiler_path" --version
+          echo "path=$compiler_path" >> "$GITHUB_OUTPUT"
+
+      - name: CMake yapılandırması
+        run: >-
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_Fortran_COMPILER=${{ steps.fortran.outputs.path }}
+
+      - name: Derle
+        run: cmake --build build --parallel
+
+      - name: CTest çalıştır
+        run: ctest --test-dir build --output-on-failure

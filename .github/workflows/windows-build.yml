@@ -1,0 +1,49 @@
+name: Windows Derleme ve Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Windows / MinGW GNU Fortran
+    runs-on: windows-latest
+
+    steps:
+      - name: Kaynak kodu al
+        uses: actions/checkout@v7
+
+      - name: MinGW64, GNU Fortran, CMake ve Ninja kur
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+
+      - name: Araç zincirini doğrula
+        shell: "msys2 {0}"
+        run: |
+          gfortran --version
+          cmake --version
+          ninja --version
+
+      - name: CMake yapılandırması
+        shell: "msys2 {0}"
+        run: >-
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_Fortran_COMPILER=gfortran
+
+      - name: Derle
+        shell: "msys2 {0}"
+        run: cmake --build build --parallel
+
+      - name: CTest çalıştır
+        shell: "msys2 {0}"
+        run: ctest --test-dir build --output-on-failure
