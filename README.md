@@ -24,6 +24,30 @@ yoğunluk `kg/m³`, kayma modülleri Pa, sıcaklık K ve frekans Hz cinsinden
 saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazılmadan
 önce `tms_units` yordamlarıyla dönüştürülmelidir.
 
+## Geliştirme Durumu
+
+TMS26 şu anda V0.1.2 aşamasındadır. Hesap motorunun temel veri sözleşmesi ve
+ilk analitik torsional hesap zinciri kullanılabilir durumdadır.
+
+### Tamamlananlar
+
+- Fortran 2018, CMake, Ninja ve CTest tabanlı derleme/test altyapısı
+- SI birim dönüşümleri ile geometri ve dinamik elastomer veri türleri
+- Homojen annüler atalet halkası için kütle ve polar kütle ataleti hesabı
+- Lineer elastomer bölgesi için burulma rijitliği hesabı
+- Tek serbestlik dereceli, sönümsüz doğal frekans hesabı
+- Analitik referans testleri ve basit annüler TVD benchmark'ı
+- macOS ve Windows için GitHub Actions derleme/test iş akışları
+
+### Henüz kapsam dışında
+
+- Nonlinear veya sönümlü elastomer modeli ve G'' kullanımına dayalı çözüm
+- Çok serbestlik dereceli modal/eigen çözümü
+- FEM, DXF ve Qt tabanlı kullanıcı arayüzü
+
+Her fiziksel hesap genişletmesi, ilgili matematik belgesi, otomatik test ve
+benchmark güncellemesiyle birlikte eklenir.
+
 ## Gereksinimler
 
 - Fortran 2018 destekli bir derleyici

@@ -47,3 +47,44 @@ Bu kurallar deponun tamamı için geçerlidir.
   kapsamlı tutulmalıdır.
 - Kaynak ağacında derleme çıktısı üretilmemeli; ayrı bir `build/` dizini
   kullanılmalıdır.
+
+## GitHub Workflow Automation
+
+Tüm geliştirme görevlerinde aşağıdaki sıra uygulanacaktır:
+
+1. Kod değişikliklerini gerçekleştir.
+2. CMake configure çalıştır.
+3. Projeyi derle.
+4. CTest çalıştır.
+5. Testler başarılı ise `git status` kontrol et.
+6. Conventional Commit formatında commit oluştur.
+7. GitHub remote kontrol et.
+8. GitHub'a push yap.
+9. GitHub Actions sonuçlarını kontrol et.
+10. Sonucu raporla.
+
+### Kurallar
+
+- Build başarısızsa commit yapılmaz.
+- Test başarısızsa push yapılmaz.
+- Fiziksel veya matematiksel hesap değişikliklerinde dokümantasyon güncellenir.
+- Her commit tek bir amacı temsil eder.
+
+### Commit örnekleri
+
+- `feat: yeni özellik`
+- `fix: hata düzeltme`
+- `test: test ekleme`
+- `docs: dokümantasyon`
+- `ci: CI/CD değişikliği`
+
+### Görev sonunda rapor
+
+Görev sonunda aşağıdaki bilgiler raporlanmalıdır:
+
+- Değişen dosyalar
+- Build sonucu
+- Test sonucu
+- Commit hash
+- Push sonucu
+- GitHub Actions sonucu
