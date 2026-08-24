@@ -85,6 +85,21 @@ quotient değeri ve kütle ortogonalliği üzerinden mevcut analitik solver ile
 çapraz doğrulanır. Bu test genel eigen çözümü yapmaz ve deneysel model
 validation yerine analytical code verification sunar.
 
+`test_numerical_hardening`, V0.3.2 girdi ve sayı aralığı sağlamlaştırmasını
+doğrular. Nominal test akışı; mutlak `1e-12 m` ve bağıl `1e-9` toleranslı TVD
+geometri ara yüzlerini, uç atalet/rijitlik ölçeklerinde sonlu eşdeğer atalet ile
+doğal frekansı ve fixed-DOF için indirgenmiş `K=[k]`, `M=[J_free]` matrislerini
+sınar.
+
+Atalet, yoğunluk, yarıçap, uzunluk, rijitlik, modül, frekans ve sıcaklık
+alanlarındaki IEEE `NaN`, pozitif sonsuz ve negatif sonsuz değerleri ayrı
+`tms26.numerical_hardening.rejects_*` CTest süreçleridir. Bu süreçler yalnız
+üretim doğrulayıcısının kontrollü `error stop` sonucunu başarı kabul eder.
+Assertion yardımcıları da sonlu olmayan actual, expected veya tolerance
+değerlerinin testi yanlış biçimde geçirmesine izin vermez. Ayrıntılar
+[`../../docs/validation/numerical_robustness_validation.md`](../../docs/validation/numerical_robustness_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

@@ -22,7 +22,8 @@ contains
     real(dp), intent(in) :: tolerance
     character(len=*), intent(in) :: message
 
-    if (tolerance < 0.0_dp .or. .not. ieee_is_finite(actual) .or. &
+    if (.not. ieee_is_finite(tolerance) .or. tolerance < 0.0_dp .or. &
+        .not. ieee_is_finite(actual) .or. &
         .not. ieee_is_finite(expected)) then
       error stop "Mutlak karşılaştırma girdileri sonlu ve tolerans geçerli olmalıdır."
     end if
@@ -39,7 +40,8 @@ contains
     real(dp), intent(in) :: tolerance
     character(len=*), intent(in) :: message
 
-    if (tolerance < 0.0_dp .or. abs(expected) <= tiny(1.0_dp) .or. &
+    if (.not. ieee_is_finite(tolerance) .or. tolerance < 0.0_dp .or. &
+        abs(expected) <= tiny(1.0_dp) .or. &
         .not. ieee_is_finite(actual) .or. .not. ieee_is_finite(expected)) then
       error stop "Bağıl karşılaştırma girdileri sonlu ve referans sıfırdan farklı olmalıdır."
     end if
@@ -58,7 +60,8 @@ contains
     character(len=*), intent(in) :: message
 
     if (any(shape(actual) /= shape(expected))) error stop message
-    if (tolerance < 0.0_dp .or. .not. all(ieee_is_finite(actual)) .or. &
+    if (.not. ieee_is_finite(tolerance) .or. tolerance < 0.0_dp .or. &
+        .not. all(ieee_is_finite(actual)) .or. &
         .not. all(ieee_is_finite(expected))) then
       error stop "Matris karşılaştırma girdileri sonlu ve tolerans geçerli olmalıdır."
     end if
@@ -75,7 +78,8 @@ contains
     character(len=*), intent(in) :: message
 
     if (size(actual) /= size(expected)) error stop message
-    if (tolerance < 0.0_dp .or. .not. all(ieee_is_finite(actual)) .or. &
+    if (.not. ieee_is_finite(tolerance) .or. tolerance < 0.0_dp .or. &
+        .not. all(ieee_is_finite(actual)) .or. &
         .not. all(ieee_is_finite(expected))) then
       error stop "Vektör karşılaştırma girdileri sonlu ve tolerans geçerli olmalıdır."
     end if
@@ -96,7 +100,8 @@ contains
     if (size(matrix, 1) /= size(matrix, 2)) then
       error stop "Simetri kontrolü kare matris gerektirir."
     end if
-    if (tolerance < 0.0_dp .or. .not. all(ieee_is_finite(matrix))) then
+    if (.not. ieee_is_finite(tolerance) .or. tolerance < 0.0_dp .or. &
+        .not. all(ieee_is_finite(matrix))) then
       error stop "Simetri kontrolü sonlu matris ve geçerli tolerans gerektirir."
     end if
 
@@ -124,7 +129,8 @@ contains
         size(stiffness, 1) /= size(theta)) then
       error stop "Enerji kontrolünde matris ve dönme vektörü boyutları uyumsuz."
     end if
-    if (energy_tolerance_nm < 0.0_dp .or. &
+    if (.not. ieee_is_finite(energy_tolerance_nm) .or. &
+        energy_tolerance_nm < 0.0_dp .or. &
         .not. all(ieee_is_finite(stiffness)) .or. &
         .not. all(ieee_is_finite(theta))) then
       error stop "Enerji kontrolü sonlu girdiler ve geçerli tolerans gerektirir."
@@ -141,6 +147,8 @@ contains
 end module tms_validation_test_helpers
 
 program test_torsional_validation
+  use, intrinsic :: ieee_arithmetic, only : ieee_value, ieee_quiet_nan, &
+    ieee_positive_inf, ieee_negative_inf
   use tms_kinds, only : dp
   use tms_constants, only : pi
   use tms_local_matrix, only : local_matrix_2x2
@@ -154,9 +162,11 @@ program test_torsional_validation
     get_stiffness_matrix_values
   use tms_mass_matrix, only : mass_matrix_t, get_mass_matrix_values
   use tms_matrix_assembly, only : assemble_stiffness, assemble_inertia
+  use tms_frequency_solver, only : calculate_natural_frequency
   use tms_torsional_system, only : two_inertia_tvd_system_t, &
     two_inertia_modal_result_t, build_generalized_two_inertia_system, &
-    solve_free_free_two_inertia_modes
+    solve_free_free_two_inertia_modes, &
+    calculate_fixed_hub_natural_frequency
   use tms_validation_test_helpers, only : assert_absolute_close, &
     assert_relative_close, assert_matrix_close, assert_vector_close, &
     assert_symmetric_matrix, assert_nonnegative_strain_energy
@@ -164,17 +174,56 @@ program test_torsional_validation
 
   real(dp), parameter :: absolute_tolerance = 1.0e-10_dp
   real(dp), parameter :: relative_tolerance = 1.0e-10_dp
+  character(len=64) :: validation_case
+
+  ! CTest, sonlu olmayan toleransların assertion yordamlarınca sessizce kabul
+  ! edilmediğini ayrı WILL_FAIL süreçlerinde doğrular.
+  if (command_argument_count() > 0) then
+    call get_command_argument(1, validation_case)
+    call exercise_invalid_tolerance(trim(validation_case))
+    stop 0
+  end if
 
   call test_single_torsional_element()
   call test_rigid_body_mode()
   call test_global_assembly_regression()
   call test_two_inertia_analytic_benchmark()
+  call test_fixed_hub_reduced_matrix_regression()
   call test_dof_mapping_regression()
   call test_matrix_quality()
 
   print *, "V0.3.1 torsional analitik doğrulama kontrolleri geçti."
 
 contains
+
+  !> Assertion toleransının sonlu ve negatif olmayan bir sayı olması
+  !! sözleşmesini sınar. Girdi selector boyutsuz test kimliğidir; NaN veya
+  !! artı/eksi sonsuz tolerans üretir. Geçerli assertion girdileri aynı
+  !! boyutsuz değerdedir. Geçersiz tolerans error stop oluşturmalıdır;
+  !! bilinmeyen selector normal çıkışla WILL_FAIL yapılandırmasını kırmızı
+  !! bırakır.
+  subroutine exercise_invalid_tolerance(case_name)
+    character(len=*), intent(in) :: case_name
+
+    real(dp) :: invalid_tolerance
+
+    select case (case_name)
+      case ("nan_tolerance")
+        invalid_tolerance = ieee_value(0.0_dp, ieee_quiet_nan)
+      case ("positive_infinity_tolerance")
+        invalid_tolerance = ieee_value(0.0_dp, ieee_positive_inf)
+      case ("negative_infinity_tolerance")
+        invalid_tolerance = ieee_value(0.0_dp, ieee_negative_inf)
+      case default
+        print *, "Bilinmeyen tolerans doğrulama selector'ı: ", case_name
+        return
+    end select
+
+    call assert_absolute_close( &
+      1.0_dp, 1.0_dp, invalid_tolerance, &
+      "Sonlu olmayan tolerans beklenmedik biçimde kabul edildi.")
+    print *, "Sonlu olmayan tolerans beklenmedik biçimde kabul edildi."
+  end subroutine exercise_invalid_tolerance
 
   !> Tek lineer torsional elemanın lokal rijitlik işaret konvansiyonunu sınar.
   !! Model: k=100 N*m/rad ve K_e=k[[1,-1],[-1,1]]. Girdi üretim elemanıdır;
@@ -347,6 +396,71 @@ contains
       mass_orthogonality, 0.0_dp, absolute_tolerance, &
       "İki ataletli rijit ve elastik modlar M-ortogonal değil.")
   end subroutine test_two_inertia_analytic_benchmark
+
+  !> Göbeği homojen sıfır dönmeyle sabitlenen iki ataletli TVD'nin genel
+  !! topolojiden indirgenmiş tek-DOF matrislerini ve doğal frekansını doğrular.
+  !! Model: J_h=0.1 kg*m^2, J_r=0.2 kg*m^2 ve K'=1000 N*m/rad. Hub DOF'u
+  !! equation_id=0 ile elendiğinde K_red=[1000 N*m/rad],
+  !! M_red=[0.2 kg*m^2] ve f=sqrt(K_red/M_red)/(2*pi) olmalıdır.
+  !! Bu regresyon builder, DOF map, assembly ve mevcut fixed-hub analitik
+  !! arayüzünü yeni bir eigen solver eklemeden uçtan uca bağlar.
+  subroutine test_fixed_hub_reduced_matrix_regression()
+    real(dp), parameter :: expected_frequency_hz = &
+      11.253953951963826_dp
+    real(dp), parameter :: expected_stiffness(1, 1) = &
+      reshape([1000.0_dp], [1, 1])
+    real(dp), parameter :: expected_mass(1, 1) = &
+      reshape([0.20_dp], [1, 1])
+
+    type(two_inertia_tvd_system_t) :: source_system
+    type(torsional_system_t) :: fixed_hub_system
+    type(dof_map_t) :: mapping
+    type(stiffness_matrix_t) :: global_stiffness
+    type(mass_matrix_t) :: global_mass
+    real(dp), allocatable :: stiffness_values(:, :)
+    real(dp), allocatable :: mass_values(:, :)
+    real(dp) :: reduced_frequency_hz
+    real(dp) :: fixed_hub_frequency_hz
+
+    source_system = two_inertia_tvd_system_t( &
+      hub_polar_inertia_kg_m2=0.10_dp, &
+      ring_polar_inertia_kg_m2=0.20_dp, &
+      storage_stiffness_nm_per_rad=1000.0_dp)
+    fixed_hub_system = build_generalized_two_inertia_system( &
+      source_system, hub_constrained=.true.)
+    call initialize_dof_map(mapping, fixed_hub_system)
+
+    if (get_active_dof_count(mapping) /= 1 .or. &
+        lookup_equation_id(mapping, 1) /= 0 .or. &
+        lookup_equation_id(mapping, 2) /= 1) then
+      error stop "Fixed-hub DOF eliminasyonu [0,1] eşlemesini üretmedi."
+    end if
+
+    global_stiffness = assemble_stiffness(fixed_hub_system, mapping)
+    global_mass = assemble_inertia(fixed_hub_system, mapping)
+    stiffness_values = get_stiffness_matrix_values(global_stiffness)
+    mass_values = get_mass_matrix_values(global_mass)
+    call assert_matrix_close( &
+      stiffness_values, expected_stiffness, absolute_tolerance, &
+      "Fixed-hub indirgenmiş K matrisi [1000] değil.")
+    call assert_matrix_close( &
+      mass_values, expected_mass, absolute_tolerance, &
+      "Fixed-hub indirgenmiş M matrisi [0.2] değil.")
+
+    reduced_frequency_hz = calculate_natural_frequency( &
+      stiffness_values(1, 1), mass_values(1, 1))
+    fixed_hub_frequency_hz = &
+      calculate_fixed_hub_natural_frequency(source_system)
+    call assert_relative_close( &
+      reduced_frequency_hz, expected_frequency_hz, relative_tolerance, &
+      "İndirgenmiş M/K fixed-hub frekansı referansla uyuşmuyor.")
+    call assert_relative_close( &
+      fixed_hub_frequency_hz, expected_frequency_hz, relative_tolerance, &
+      "Mevcut fixed-hub arayüzü referans frekansla uyuşmuyor.")
+    call assert_relative_close( &
+      reduced_frequency_hz, fixed_hub_frequency_hz, relative_tolerance, &
+      "İndirgenmiş M/K ve mevcut fixed-hub frekansları farklı.")
+  end subroutine test_fixed_hub_reduced_matrix_regression
 
   !> Fiziksel düğüm kimliklerinden aktif equation ID üretimini iki sınır
   !! koşulunda doğrular. Case A: [30,10,70]->[1,2,3]. Case B: ilk düğüm

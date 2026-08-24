@@ -4,12 +4,12 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.3.1`, V0.3.0 DOF haritası ile dense global M/K
-matrix assembly altyapısını bağımsız analitik regresyonlarla sağlamlaştırır.
-Üretim solver davranışı, temel veri tipleri ve node-element mimarisi değişmez;
+Güncel geliştirme sürümü `0.3.2`, mevcut torsional fizik ve assembly
+denklemlerini değiştirmeden sonlu girdi doğrulamasını ve uç ölçeklerde numerik
+güvenilirliği güçlendirir. Temel veri tipleri ile node-element mimarisi korunur;
 genel özdeğer çözümü henüz uygulanmamıştır.
 
-## V0.3.1 doğrulama kapsamı
+## V0.3.2 numerik güvenilirlik kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -42,15 +42,17 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.3.1 aşamasındadır. Dinamik elastomer ve kompleks burulma
+TMS26 şu anda V0.3.2 aşamasındadır. Dinamik elastomer ve kompleks burulma
 rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
 TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
 eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
 boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez. Lineer
 elemanların lokal K katkıları aktif denklem uzayında global K matrisine, düğüm
 polar ataletleri ise diagonal global M matrisine birleştirilebilir.
-V0.3.1 bu davranışlara yeni fizik veya solver eklemez; V0.4 constraint
-çalışması öncesinde mevcut foundation için analitik verification sağlar.
+V0.3.2 bu davranışlara yeni fizik veya solver eklemez. IEEE `NaN` ve sonsuz
+girdilerin reddi, bileşen ara yüzlerinin toleranslı eşleşmesi, uç atalet ve
+rijitlik oranlarında kararlı frekans değerlendirmesi ile mevcut foundation
+sayısal olarak sağlamlaştırılır.
 
 ### Tamamlananlar
 
@@ -83,6 +85,13 @@ V0.3.1 bu davranışlara yeni fizik veya solver eklemez; V0.4 constraint
 - Tek eleman işareti, rijit-cisim modu, DOF mapping, üç düğümlü assembly,
   K simetrisi/enerjisi ve iki ataletli analitik frekansı birlikte doğrulayan
   V0.3.1 foundation regresyonu
+- Atalet, yoğunluk, yarıçap, uzunluk, rijitlik, modül, frekans ve sıcaklık
+  girdileri için IEEE sonluluk doğrulaması
+- Göbek-elastomer ve elastomer-atalet halkası ara yüzlerinde toleranslı geometri
+  sürekliliği doğrulaması
+- Uç atalet/rijitlik oranları için taşmaya dirençli eşdeğer atalet ve doğal
+  frekans değerlendirmesi
+- Sabitlenmiş tek uçta indirgenmiş `K=[k]` ve `M=[J_free]` regresyonu
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
@@ -219,6 +228,9 @@ kalıcı mimari karar ise
 altında bulunur. V0.3.1 analitik foundation doğrulama modeli, toleransları ve
 sonuç sözleşmesi
 [`docs/validation/torsional_validation.md`](docs/validation/torsional_validation.md)
+belgesinde açıklanır. V0.3.2 sonlu girdi, geometri ara yüzü ve uç ölçek
+doğrulamaları
+[`docs/validation/numerical_robustness_validation.md`](docs/validation/numerical_robustness_validation.md)
 belgesinde açıklanır.
 
 ## Lisans

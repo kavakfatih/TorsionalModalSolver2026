@@ -1,6 +1,7 @@
 module tms_torsional_system
+  use, intrinsic :: ieee_arithmetic, only : ieee_is_finite
   use tms_kinds, only : dp
-  use tms_geometry, only : tvd_geometry_t
+  use tms_geometry, only : tvd_geometry_t, validate_tvd_geometry
   use tms_material, only : dynamic_rubber_material_t
   use tms_inertia, only : calculate_annular_hub_properties, &
     calculate_annular_ring_properties
@@ -151,6 +152,7 @@ contains
     real(dp) :: unused_ring_mass_kg
     type(complex_torsional_stiffness_t) :: stiffness
 
+    call validate_tvd_geometry(geometry)
     call calculate_annular_hub_properties( &
       geometry%hub, hub_density_kg_m3, unused_hub_volume_m3, &
       unused_hub_mass_kg, system%hub_polar_inertia_kg_m2)
@@ -165,6 +167,7 @@ contains
     system%loss_factor = stiffness%loss_factor
     system%material_reference_frequency_hz = stiffness%frequency
     system%material_temperature_k = stiffness%temperature
+    call validate_modal_system(system)
   end function build_two_inertia_tvd_system
 
   !> Göbeği sabitlenmiş TVD sisteminin sönümsüz doğal frekansını hesaplar.
@@ -197,8 +200,9 @@ contains
   !! elastomer şekil değiştirmez. Elastik modda iki rijit gövde zıt yönde
   !! dönerek elastomeri burar.
   !! Matematiksel açıklama: omega_0 = 0 ve
-  !! omega_e^2 = K'*(1/J_h + 1/J_r). Eşdeğer atalet
-  !! J_eq = 1/(1/J_h + 1/J_r) ile mevcut doğal frekans yordamı kullanılır.
+  !! omega_e^2 = K'*(1/J_h + 1/J_r). Matematiksel olarak eşdeğer olan
+  !! J_eq = a/(1+a/b), a=min(J_h,J_r), b=max(J_h,J_r) biçimi ters alma
+  !! taşmasını azaltmak için mevcut doğal frekans yordamıyla kullanılır.
   !! DOF sırası [göbek, halka] olup modlar [1,1] ve [1,-J_h/J_r] biçiminde
   !! göbek genliğine göre normalize edilir.
   !! Girdi: J_h ve J_r kg*m^2, K' N*m/rad cinsindedir.
@@ -213,12 +217,22 @@ contains
     type(two_inertia_modal_result_t) :: modal_result
 
     real(dp) :: equivalent_inertia_kg_m2
+    real(dp) :: smaller_inertia_kg_m2
+    real(dp) :: larger_inertia_kg_m2
 
     call validate_modal_system(system)
 
-    equivalent_inertia_kg_m2 = 1.0_dp / &
-      (1.0_dp / system%hub_polar_inertia_kg_m2 + &
-       1.0_dp / system%ring_polar_inertia_kg_m2)
+    smaller_inertia_kg_m2 = min( &
+      system%hub_polar_inertia_kg_m2, system%ring_polar_inertia_kg_m2)
+    larger_inertia_kg_m2 = max( &
+      system%hub_polar_inertia_kg_m2, system%ring_polar_inertia_kg_m2)
+    equivalent_inertia_kg_m2 = smaller_inertia_kg_m2 / &
+      (1.0_dp + smaller_inertia_kg_m2 / larger_inertia_kg_m2)
+
+    if (.not. ieee_is_finite(equivalent_inertia_kg_m2) .or. &
+        equivalent_inertia_kg_m2 <= 0.0_dp) then
+      error stop "Eşdeğer polar kütle ataleti sonlu ve pozitif olmalıdır."
+    end if
 
     modal_result%rigid_body_frequency_hz = 0.0_dp
     modal_result%elastic_frequency_hz = calculate_natural_frequency( &
@@ -226,8 +240,21 @@ contains
     modal_result%rigid_body_mode_hub = 1.0_dp
     modal_result%rigid_body_mode_ring = 1.0_dp
     modal_result%elastic_mode_hub = 1.0_dp
+
+    ! Göbek genliğini bir kabul eden mevcut public normalizasyon korunur.
+    ! J_h/J_r oranı temsil aralığını aşacaksa bölme yapılmadan girdi reddedilir.
+    if (system%ring_polar_inertia_kg_m2 < 1.0_dp) then
+      if (system%hub_polar_inertia_kg_m2 > &
+          huge(1.0_dp) * system%ring_polar_inertia_kg_m2) then
+        error stop "Elastik mod genliği sonlu olarak temsil edilebilmelidir."
+      end if
+    end if
     modal_result%elastic_mode_ring = &
       -system%hub_polar_inertia_kg_m2 / system%ring_polar_inertia_kg_m2
+
+    if (.not. ieee_is_finite(modal_result%elastic_mode_ring)) then
+      error stop "Elastik mod genliği sonlu olarak temsil edilebilmelidir."
+    end if
   end function solve_free_free_two_inertia_modes
 
   !> Modal sistemin pozitif atalet ve depolama rijitliği koşullarını doğrular.
@@ -236,22 +263,47 @@ contains
   !! pozitif olmayan K' ise kararlı elastik geri çağırıcı moment varsayımını
   !! ihlal eder.
   !! Matematiksel açıklama: J_h > 0, J_r > 0 ve K' > 0 koşulları, karekök
-  !! içinin pozitif ve modal frekansın reel olması için zorunludur.
+  !! içinin pozitif ve modal frekansın reel olması için zorunludur. Saklanan
+  !! K'', kayıp faktörü, referans frekansı ve sıcaklık negatif olamaz; tüm
+  !! sayısal alanlar IEEE sonlu değerler olmalıdır.
   !! Girdi: J_h ve J_r kg*m^2, K' N*m/rad cinsindedir. Çıktı üretmez;
   !! geçersiz sistem error stop ile reddedilir.
   pure subroutine validate_modal_system(system)
     type(two_inertia_tvd_system_t), intent(in) :: system
 
-    if (system%hub_polar_inertia_kg_m2 <= 0.0_dp) then
+    if (.not. ieee_is_finite(system%hub_polar_inertia_kg_m2) .or. &
+        system%hub_polar_inertia_kg_m2 <= 0.0_dp) then
       error stop "Göbek polar kütle ataleti sıfırdan büyük olmalıdır."
     end if
 
-    if (system%ring_polar_inertia_kg_m2 <= 0.0_dp) then
+    if (.not. ieee_is_finite(system%ring_polar_inertia_kg_m2) .or. &
+        system%ring_polar_inertia_kg_m2 <= 0.0_dp) then
       error stop "Atalet halkası polar kütle ataleti sıfırdan büyük olmalıdır."
     end if
 
-    if (system%storage_stiffness_nm_per_rad <= 0.0_dp) then
+    if (.not. ieee_is_finite(system%storage_stiffness_nm_per_rad) .or. &
+        system%storage_stiffness_nm_per_rad <= 0.0_dp) then
       error stop "Depolama burulma rijitliği K' sıfırdan büyük olmalıdır."
+    end if
+
+    if (.not. ieee_is_finite(system%loss_stiffness_nm_per_rad) .or. &
+        system%loss_stiffness_nm_per_rad < 0.0_dp) then
+      error stop "Kayıp burulma rijitliği K'' sonlu ve negatif olmamalıdır."
+    end if
+
+    if (.not. ieee_is_finite(system%loss_factor) .or. &
+        system%loss_factor < 0.0_dp) then
+      error stop "Kayıp faktörü sonlu ve negatif olmamalıdır."
+    end if
+
+    if (.not. ieee_is_finite(system%material_reference_frequency_hz) .or. &
+        system%material_reference_frequency_hz < 0.0_dp) then
+      error stop "Malzeme referans frekansı sonlu ve negatif olmamalıdır."
+    end if
+
+    if (.not. ieee_is_finite(system%material_temperature_k) .or. &
+        system%material_temperature_k < 0.0_dp) then
+      error stop "Malzeme sıcaklığı sonlu ve negatif olmamalıdır."
     end if
   end subroutine validate_modal_system
 

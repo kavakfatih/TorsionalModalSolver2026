@@ -99,6 +99,90 @@ if(BUILD_TESTING)
   foreach(
     validation_case
     IN ITEMS
+      nan_tolerance
+      positive_infinity_tolerance
+      negative_infinity_tolerance
+  )
+    set(
+      validation_test
+      "tms26.torsional_validation.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_torsional_validation>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    numerical_hardening
+    tests/test_numerical_hardening.f90
+  )
+
+  foreach(
+    nonfinite_kind
+    IN ITEMS
+      nan
+      positive_infinity
+      negative_infinity
+  )
+    foreach(
+      physical_quantity
+      IN ITEMS
+        polar_inertia
+        density
+        radius
+        length
+        stiffness
+        modulus
+        frequency
+        temperature
+    )
+      set(validation_case "${nonfinite_kind}_${physical_quantity}")
+      set(
+        validation_test
+        "tms26.numerical_hardening.rejects_${validation_case}"
+      )
+      add_test(
+        NAME "${validation_test}"
+        COMMAND
+          "$<TARGET_FILE:tms26_test_numerical_hardening>"
+          "${validation_case}"
+      )
+      set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+    endforeach()
+  endforeach()
+
+  foreach(
+    validation_case
+    IN ITEMS
+      hub_rubber_interface_mismatch
+      rubber_ring_interface_mismatch
+      zero_length
+      reversed_annular_geometry
+      output_overflow_geometry
+      output_overflow_inertia
+      output_overflow_stiffness
+      output_overflow_loss_factor
+  )
+    set(
+      validation_test
+      "tms26.numerical_hardening.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_numerical_hardening>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  foreach(
+    validation_case
+    IN ITEMS
       negative_matrix_dimension
       unknown_node_lookup
       out_of_range_equation

@@ -7,6 +7,28 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.3.2] - 2026-08-25
+
+### Eklendi
+
+- Atalet, yoğunluk, yarıçap, uzunluk, rijitlik, modül, frekans ve sıcaklık
+  alanlarında IEEE `NaN`, pozitif sonsuz ve negatif sonsuz girdileri kapsayan
+  sonluluk regresyonları.
+- Göbek dış yarıçapı ile elastomer iç yarıçapı ve elastomer dış yarıçapı ile
+  atalet halkası iç yarıçapı için mutlak `1e-12 m` ve bağıl `1e-9` toleranslı
+  ara yüz sürekliliği doğrulaması.
+- Uç atalet ve rijitlik ölçeklerinde sonlu sonuç, kararlı eşdeğer atalet,
+  doğal frekans ve fixed-DOF indirgenmiş M/K regresyonları.
+- Numerik güvenilirlik modeli, test sınırları ve izlenebilirlik tablosu.
+
+### Değiştirildi
+
+- Proje sürümü `0.3.2` olarak güncellendi; fizik denklemleri ve node-element
+  assembly mimarisi değiştirilmeden girdi doğrulaması ile sayısal değerlendirme
+  sağlamlaştırıldı.
+- Test assertion yordamları, sonlu olmayan sonuç veya toleransların yanlış
+  başarı üretmesini önleyecek şekilde sıkılaştırıldı.
+
 ## [0.3.1] - 2026-08-25
 
 ### Eklendi

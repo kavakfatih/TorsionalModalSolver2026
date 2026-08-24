@@ -77,6 +77,22 @@ f_e = 1/(2 pi) sqrt(K'/J_eq)
 Bu eşdeğerlik, üretim kodunun mevcut tek-DOF doğal frekans yordamını güvenli
 biçimde yeniden kullanmasını sağlar.
 
+Pozitif ve sonlu ataletlerin ölçekleri çok farklı olduğunda V0.3.2 eşdeğer
+ataleti aynı fizik denklemini koruyan aşağıdaki biçimde değerlendirir:
+
+```text
+J_min = min(J_h,J_r)
+J_max = max(J_h,J_r)
+J_eq  = J_min/(1 + J_min/J_max)
+
+f_e = sqrt(K')/(2 pi sqrt(J_eq))
+```
+
+Bu düzenleme doğrudan `J_h*J_r` ara çarpımını ve `K'/J_eq` ara oranını
+oluşturmaz. Böylece nihai sonuç `real(dp)` aralığında temsil edilebilirken ara
+işlem taşması veya alt-taşması riski azaltılır; doğal frekansın fiziksel ve
+matematiksel tanımı değişmez.
+
 ## Mod şekilleri
 
 DOF sırası `[göbek, atalet halkası]` ve göbek genliği `1` olacak biçimde
@@ -126,6 +142,7 @@ phi_0^T M phi_e = J_h - J_h = 0
   modal hesap boyunca sabit tutulur. Hesaplanan frekans referans frekanstan
   farklı olsa bile interpolasyon veya öz-tutarlı iterasyon yapılmaz.
 - `J_h > 0`, `J_r > 0` ve `K' > 0` olmalıdır.
+- `J_h`, `J_r` ve `K'` sonlu olmalıdır.
 
 Bu nedenle V0.2.2 sonucu bir **frozen-property undamped modal estimate** olarak
 yorumlanmalıdır.
@@ -148,4 +165,6 @@ Sayısal referanslar
 [`benchmarks/004_two_inertia_tvd/`](../../benchmarks/004_two_inertia_tvd/),
 fiziksel yorum ve geçerlilik sınırları ise
 [`../physics/two_inertia_torsional_system.md`](../physics/two_inertia_torsional_system.md)
-altında verilir.
+altında verilir. Uç atalet/rijitlik oranlarının numerik doğrulaması
+[`../validation/numerical_robustness_validation.md`](../validation/numerical_robustness_validation.md)
+belgesindedir.

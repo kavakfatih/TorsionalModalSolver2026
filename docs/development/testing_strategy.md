@@ -73,6 +73,29 @@ analytical code verification niteliğindedir ve deneysel model validation
 [`../validation/torsional_validation.md`](../validation/torsional_validation.md)
 belgesindedir.
 
+V0.3.2 numerik güvenilirlik regresyonu, fizik denklemlerini değiştirmeden girdi
+ve sayı aralığı sınırlarını doğrular. `test_numerical_hardening` aşağıdaki
+başlıkları kapsar:
+
+- atalet, yoğunluk, yarıçap, uzunluk, rijitlik, modül, frekans ve sıcaklık için
+  IEEE `NaN`, pozitif sonsuz ve negatif sonsuz girdilerin reddi,
+- göbek-elastomer ve elastomer-atalet halkası ara yüzlerinde mutlak `1e-12 m`
+  ile bağıl `1e-9` birleşik toleransının iç/dış sınır vakaları,
+- uç atalet ve rijitlik oranlarında sonlu eşdeğer atalet ile doğal frekans,
+- ilk düğümü sabit iki düğümlü sistemde `K=[k]` ve `M=[J_free]` indirgemesi.
+
+`error stop` beklenen her geçersiz girdi ayrı CTest sürecinde çalışır ve
+`WILL_FAIL` olarak kaydedilir. Test seçicileri alan ile IEEE sınıfını açıkça
+adlandırır. Bilinmeyen seçici beklenen red sayılmaz; böylece CMake kaydı ile
+test programı arasındaki yazım hatası yanlış başarıya dönüşmez.
+
+Assertion yardımcıları; hesaplanan değer, beklenen değer ve toleransın sonlu
+olmasını zorunlu tutar. Tolerans ayrıca negatif olamaz. Bu sözleşme, özellikle
+`NaN` karşılaştırmalarının false dönmesi nedeniyle oluşabilecek sessiz test
+başarılarını önler. Ayrıntılı doğrulama kapsamı
+[`../validation/numerical_robustness_validation.md`](../validation/numerical_robustness_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
