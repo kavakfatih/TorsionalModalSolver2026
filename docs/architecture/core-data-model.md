@@ -2,11 +2,12 @@
 
 ## Amaç
 
-V0.3.0 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
+V0.4.0 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
 geometrik ve malzeme özelliklerini fizik yordamlarına, genel düğüm-eleman
-topolojisini ise DOF eşleme ve global M/K assembly katmanına taşır. Geometri ve
-malzeme türleri yalnız veri taşır; sistem ve matris yordamları topolojik,
-boyutsal ve temel fiziksel önkoşulları doğrular.
+topolojisini ise tam M/K assembly, constraint yönetimi ve indirgenmiş Kr/Mr
+katmanına taşır. Geometri ve malzeme türleri yalnız veri taşır; sistem, matris
+ve constraint yordamları topolojik, boyutsal ve temel fiziksel önkoşulları
+doğrular.
 
 ## Modül bağımlılıkları
 
@@ -32,18 +33,28 @@ boyutsal ve temel fiziksel önkoşulları doğrular.
   sistem katmanından bağımsız ve sabit boyutlu bir veri türünde taşır.
 - `tms_matrix_types`, private allocatable depolamalı genel dense matris türünü,
   boyut ve katsayı erişim yordamlarını sağlar.
+- `tms_dof_types`, anlamlı DOF türlerini ve `(node_id,dof_type)` Physical DOF
+  kimliğini tanımlar. İlk desteklenen tür `TORSIONAL_ROTATION` değeridir.
 - `tms_torsional_node`, yığılmış polar atalet, başlangıç açısı ve dönel sınır
   koşulu taşıyan genel düğüm türünü tanımlar.
 - `tms_torsional_element`, iki düğüm arasındaki lineer rijitlik ve eşdeğer
   viskoz sönüm bağlantısını tanımlar ve 2x2 lokal rijitlik katkısını üretir.
 - `tms_generalized_torsional_system`, private düğüm/eleman koleksiyonlarını,
   ekleme-okuma yordamlarını, aktif DOF sayımını ve sistem doğrulamasını sağlar.
-- `tms_dof_map`, fiziksel düğüm kimliklerini kısıtlara göre aktif denklem
-  kimliklerine eşler ve sistem-harita uyumunu doğrular.
+- `tms_dof_map`, Physical DOF'ları constraint durumundan bağımsız tam Equation
+  ID değerlerine eşler ve sistem-harita uyumunu doğrular.
+- `tms_constraint_types`, fixed/prescribed constraint kayıtlarını, hedef
+  Physical DOF'u ve radyan cinsindeki prescribed değeri taşır.
+- `tms_constraint_manager`, constraint kayıtlarını doğrular ve tam Equation ID
+  değerlerinden ayrı Active Equation ID haritasını üretir.
 - `tms_stiffness_matrix`, lokal 2x2 katkıları global K matrisine toplar.
 - `tms_mass_matrix`, düğüm polar ataletlerini global diagonal M matrisine ekler.
 - `tms_matrix_assembly`, sistem topolojisini ve DOF haritasını tüketerek global
-  torsional M/K matrislerini üretir.
+  tam torsional M/K matrislerini üretir.
+- `tms_matrix_reduction`, tam matrisi aktif denklem haritasıyla storage-bağımsız
+  direct elimination üzerinden indirger.
+- `tms_reduced_system`, Kr/Mr çiftini ve tam fiziksel sonuç recovery bilgisini
+  tek bir doğrulanabilir solver girdisinde birleştirir.
 - `tms_torsional_system`, bileşen sonuçlarını iki ataletli sistem türünde
   birleştirir; fixed-hub ve serbest-serbest analitik modal sonuçları üretir ve
   bu özel modeli genel topolojiye dönüştürür.
@@ -59,11 +70,16 @@ Mevcut torsional fizik akışı aşağıdaki sırayı izler:
    mevcut doğal frekans yordamına aktarır; K'' sistem üstverisinde korunur.
 6. İstenirse iki ataletli özel sistem, iki düğüm ve bir elemandan oluşan genel
    torsional topolojiye dönüştürülür; bu adım frekansı yeniden çözmez.
-7. `tms_dof_map`, fiziksel node ID değerlerini aktif equation ID değerlerine
-   dönüştürür; kısıtlı düğümleri sıfır kimliğiyle haritada korur.
-8. Elemanların lokal K katkıları denklem kimlikleri üzerinden global K
-   matrisine toplanır.
-9. Aktif düğümlerin polar ataletleri global diagonal M matrisine eklenir.
+7. `tms_dof_map`, her Physical DOF'a constraint'ten bağımsız tam Equation ID
+   verir.
+8. Elemanların lokal K katkıları tam denklem kimlikleri üzerinden global K
+   matrisine; tüm düğümlerin polar ataletleri tam diagonal M matrisine eklenir.
+9. `tms_constraint_manager`, fixed veya prescribed constraint kayıtlarını
+   doğrular ve Active Equation ID haritasını üretir.
+10. `tms_matrix_reduction`, tam K/M matrislerinden Kr/Mr aktif alt sistemini
+    çıkarır.
+11. `tms_reduced_system`, Kr/Mr ile `q=Pq_r+q_p` ve gelecekteki
+    `phi=Pphi_r` recovery bilgisini birlikte taşır.
 
 Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
 `complex_torsional_stiffness_t` derived type değeriyle taşınır.
@@ -160,8 +176,9 @@ iterasyon yapılmaz.
 ## Genel torsional topoloji türleri
 
 `torsional_node_t`, pozitif benzersiz kimlik, polar kütle ataleti (`kg·m²`),
-başlangıç açısı (`rad`) ve sabitlenmişlik bilgisi taşır. Her sabitlenmemiş düğüm
-bir aktif torsional DOF oluşturur. Düğüm kimliği doğrudan DOF indeksi değildir.
+başlangıç açısı (`rad`) ve geriye uyumlu sabitlenmişlik bilgisi taşır. Her düğüm
+bir `TORSIONAL_ROTATION` Physical DOF oluşturur; aktif olup olmadığı constraint
+katmanında belirlenir. Düğüm kimliği doğrudan DOF veya matris indeksi değildir.
 
 `torsional_element_t`, pozitif benzersiz kimlik, iki farklı uç düğüm kimliği,
 lineer rijitlik (`N·m/rad`) ve eşdeğer viskoz sönüm (`N·m·s/rad`) taşır.
@@ -174,22 +191,35 @@ Paralel elemanlar farklı kimliklerle temsil edilebilir. Elemanın saf
 
 - düğüm ve eleman ekler,
 - düğüm/eleman sayısını ve ekleme sırasındaki eleman kopyasını döndürür,
-- sabitlenmemiş düğümlerden aktif DOF sayısını belirler,
+- düğüm ve geriye uyumlu sabitlenmişlik bilgisini sorgular,
 - kimlik benzersizliğini ve bağlantı uçlarının varlığını doğrular.
 
 Eleman katmanı yalnız lokal K katkısını üretir. `tms_dof_map`, ekleme sırasındaki
-serbest düğümlere kesintisiz denklem kimliği verir; kısıtlı düğümler sıfır
-kimliğiyle indirgenmiş sistem dışında bırakılır. `tms_matrix_assembly`, lokal K
-katkılarını global K matrisine ve düğüm J değerlerini diagonal global M
-matrisine toplar. Genel C assembly veya modal çözüm yapmaz.
+tüm Physical DOF'lara kesintisiz tam Equation ID verir. `tms_matrix_assembly`,
+lokal K katkılarını tam global K matrisine ve tüm düğüm J değerlerini diagonal
+tam M matrisine toplar. Constraint manager bundan sonra ayrı Active Equation ID
+haritasını kurar; reduction katmanı Kr/Mr matrislerini üretir. Genel C assembly
+veya modal çözüm yapılmaz.
 
-Temel bağımlılık yönünde `tms_kinds`, `tms_local_matrix` ile
-`tms_matrix_types` modüllerini besler. Lokal matris dalı
+Temel bağımlılık katmanında `tms_dof_types` bağımsız fiziksel kimlikleri,
+`tms_kinds` ise `tms_local_matrix` ve `tms_matrix_types` sayısal türlerini
+besler. Lokal matris dalı
 `tms_torsional_element -> tms_generalized_torsional_system -> tms_dof_map`,
 dense dalı ise `tms_matrix_types -> {tms_stiffness_matrix,tms_mass_matrix}`
-biçimindedir. Sistem, eleman, DOF haritası ve iki global matris türü
-`tms_matrix_assembly` içinde birleşir. Private depolama sayesinde sparse
-gerçekleştirim ileride eklenebilir.
+biçimindedir. Sistem, eleman, tam DOF haritası ve iki global matris türü
+`tms_matrix_assembly` içinde birleşir. Constraint türleri ve manager aktif
+haritayı oluşturur; `tms_matrix_reduction` ile `tms_reduced_system` bu haritayı
+tam matrislere bağlar. Private depolama sayesinde sparse gerçekleştirim ileride
+eklenebilir.
+
+V0.3.0'da `equation_id=0` ile doğrudan aktif matris assembly yaklaşımı
+kullanılıyordu. V0.4.0 tam Equation ID bilgisini korur ve constraint
+eliminasyonunu assembly sonrasına taşır. Tarihsel karar
+[`../decisions/0008-global-matrix-assembly-design.md`](../decisions/0008-global-matrix-assembly-design.md),
+yeni sorumluluk ayrımı ise
+[`V0.4_constraint_foundation.md`](V0.4_constraint_foundation.md) ile
+[`../decisions/0009-constraint-reduction-architecture.md`](../decisions/0009-constraint-reduction-architecture.md)
+belgelerinde açıklanır.
 Mevcut iki ataletli dönüşüm `J_h`, `J_r` ve K' değerlerini taşır. K''
 `N·m/rad`, viskoz `c` ise `N·m·s/rad` olduğundan damping alanına doğrudan
 aktarılmaz.

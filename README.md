@@ -4,12 +4,13 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.3.2`, mevcut torsional fizik ve assembly
-denklemlerini değiştirmeden sonlu girdi doğrulamasını ve uç ölçeklerde numerik
-güvenilirliği güçlendirir. Temel veri tipleri ile node-element mimarisi korunur;
-genel özdeğer çözümü henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.4.0`, mevcut torsional fizik denklemlerini
+değiştirmeden tam sistem assembly ile constraint sonrası aktif solver sistemini
+birbirinden ayırır. Physical DOF, tam Equation ID ve Active Equation ID
+eşlemeleri korunarak indirgenmiş Kr/Mr sistemi ve result recovery altyapısı
+oluşturulur; genel özdeğer çözümü henüz uygulanmamıştır.
 
-## V0.3.2 numerik güvenilirlik kapsamı
+## V0.4.0 constraint foundation kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -24,10 +25,15 @@ genel özdeğer çözümü henüz uygulanmamıştır.
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
 - `tms_local_matrix`: iki uçlu elemanlar için 2x2 lokal matris veri taşıyıcısı
 - `tms_matrix_types`: private allocatable depolamalı genel dense matris türü
-- `tms_dof_map`: fiziksel node ID ile aktif denklem kimliği eşlemesi
+- `tms_dof_types`: anlamlı DOF türü ve `(node_id,dof_type)` Physical DOF kimliği
+- `tms_dof_map`: Physical DOF ile constraint'ten bağımsız tam Equation ID
 - `tms_stiffness_matrix`: global torsional K matrisi ve lokal katkı toplama
 - `tms_mass_matrix`: düğüm polar ataletlerinden global diagonal M matrisi
-- `tms_matrix_assembly`: topoloji, DOF haritası ve lokal katkıların birleşimi
+- `tms_matrix_assembly`: topoloji, tam DOF haritası ve full M/K assembly
+- `tms_matrix_reduction`: aktif denklem haritasıyla storage-bağımsız indirgeme
+- `tms_constraint_types`: fixed ve prescribed value constraint veri modeli
+- `tms_constraint_manager`: constraint doğrulaması ve Active Equation ID haritası
+- `tms_reduced_system`: Kr/Mr ile tam fiziksel sonuç recovery bilgisi
 - `tms_torsional_node`: genel düğüm kimliği, polar atalet ve sınır koşulu
 - `tms_torsional_element`: lineer K/c bağlantısı ve 2x2 lokal rijitlik hesabı
 - `tms_generalized_torsional_system`: koleksiyon yönetimi, aktif DOF sayımı ve
@@ -42,17 +48,18 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.3.2 aşamasındadır. Dinamik elastomer ve kompleks burulma
+TMS26 şu anda V0.4.0 aşamasındadır. Dinamik elastomer ve kompleks burulma
 rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
 TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
 eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
-boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez. Lineer
-elemanların lokal K katkıları aktif denklem uzayında global K matrisine, düğüm
-polar ataletleri ise diagonal global M matrisine birleştirilebilir.
-V0.3.2 bu davranışlara yeni fizik veya solver eklemez. IEEE `NaN` ve sonsuz
-girdilerin reddi, bileşen ara yüzlerinin toleranslı eşleşmesi, uç atalet ve
-rijitlik oranlarında kararlı frekans değerlendirmesi ile mevcut foundation
-sayısal olarak sağlamlaştırılır.
+boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez.
+
+Lineer elemanların lokal K katkıları ve düğüm polar ataletleri önce
+constraint'ten bağımsız tam Equation ID uzayında full K/M matrislerine
+birleştirilir. Constraint manager bundan sonra ayrı Active Equation ID
+haritasını kurar; direct elimination Kr/Mr matrislerini üretir. V0.4.0 bu
+davranışlara yeni fizik veya solver eklemez. Prescribed değer ve recovery
+bilgisi korunur ancak non-homogeneous RHS ya da eigen çözümü yapılmaz.
 
 ### Tamamlananlar
 
@@ -92,6 +99,15 @@ sayısal olarak sağlamlaştırılır.
 - Uç atalet/rijitlik oranları için taşmaya dirençli eşdeğer atalet ve doğal
   frekans değerlendirmesi
 - Sabitlenmiş tek uçta indirgenmiş `K=[k]` ve `M=[J_free]` regresyonu
+- `(node_id,dof_type)` Physical DOF kimliği ve `TORSIONAL_ROTATION` türü
+- Constraint'ten bağımsız tam Equation ID ile ayrı Active Equation ID haritası
+- Fixed ve prescribed value kayıtlarını doğrulayan constraint manager
+- Constraint'ten bağımsız full K/M assembly ve storage-bağımsız direct
+  elimination ile Kr/Mr üretimi
+- Tüm DOF'lar fixed olduğunda geçerli `0x0` indirgenmiş sistem
+- `q=Pq_r+q_p` durum recovery ve gelecekteki `phi=Pphi_r` modal recovery
+  eşlemeleri
+- Node sırası değişimine karşı Physical DOF tabanlı indirgeme regresyonu
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
@@ -100,9 +116,11 @@ sayısal olarak sağlamlaştırılır.
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
 - Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
-- Global C/damping assembly ve sıfırdan farklı prescribed dönme yük düzeltmesi
+- Global C/damping assembly ve sıfırdan farklı prescribed dönme için RHS
+  düzeltmesi veya yük çözümü
 - Genel çok serbestlik dereceli modal/eigen çözümü
 - LAPACK, sparse matris depolaması ve harici solver kitaplıkları
+- MPC, constraint equation, Lagrange multiplier, penalty ve contact
 - Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
 
@@ -171,7 +189,8 @@ request'lerde derleme ve test doğrulaması yapar.
 
 - `docs/`: mimari, matematik, fizik, doğrulama, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
-- `engine/src/matrix/`: lokal/global matris, DOF haritası ve assembly katmanı
+- `engine/src/constraints/`: constraint veri modeli, yönetimi ve reduced system
+- `engine/src/matrix/`: lokal/global matris, DOF haritası, assembly ve reduction
 - `engine/src/system/`: genel torsional node, element ve sistem topolojisi
 - `engine/tests/`: hesap motoru testleri
 - `benchmarks/`: performans ölçümleri
@@ -225,7 +244,13 @@ altında bulunur. DOF eşlemesi ile global M/K assembly matematiği
 [`docs/mathematics/global_matrix_assembly.md`](docs/mathematics/global_matrix_assembly.md),
 kalıcı mimari karar ise
 [`docs/decisions/0008-global-matrix-assembly-design.md`](docs/decisions/0008-global-matrix-assembly-design.md)
-altında bulunur. V0.3.1 analitik foundation doğrulama modeli, toleransları ve
+altında bulunur. V0.4.0 constraint ve reduced-system sorumlulukları
+[`docs/architecture/V0.4_constraint_foundation.md`](docs/architecture/V0.4_constraint_foundation.md),
+direct-elimination matematiği
+[`docs/mathematics/constraint_reduction.md`](docs/mathematics/constraint_reduction.md)
+ve bu mimarinin kalıcı kararı
+[`docs/decisions/0009-constraint-reduction-architecture.md`](docs/decisions/0009-constraint-reduction-architecture.md)
+altında açıklanır. V0.3.1 analitik foundation doğrulama modeli, toleransları ve
 sonuç sözleşmesi
 [`docs/validation/torsional_validation.md`](docs/validation/torsional_validation.md)
 belgesinde açıklanır. V0.3.2 sonlu girdi, geometri ara yüzü ve uç ölçek

@@ -8,7 +8,8 @@ module tms_mass_matrix
   implicit none
   private
 
-  !> Aktif torsional denklemler için global dönel atalet matrisini taşır.
+  !> Full veya active torsional denklem kümesinin global dönel atalet
+  !! matrisini taşır.
   !! Adı geleneksel hareket denklemi gösterimine uygun mass matrix olsa da
   !! katsayıları polar kütle ataleti J [kg*m^2] değerleridir.
   type, public :: mass_matrix_t
@@ -22,11 +23,12 @@ module tms_mass_matrix
   public :: get_mass_matrix_value
   public :: get_mass_matrix_values
   public :: get_mass_matrix_size
+  public :: extract_mass_principal_submatrix
 
 contains
 
   !> Global dönel atalet matrisini sıfır olarak başlatır.
-  !! Girdi negatif olmayan aktif DOF sayısıdır [-]. Çıktı n_dof x n_dof,
+  !! Girdi negatif olmayan logical equation sayısıdır [-]. Çıktı n x n,
   !! [kg*m^2] birimli mass_matrix_t değeridir; sıfır DOF 0x0 üretir.
   pure subroutine initialize_mass_matrix(matrix, dof_count)
     type(mass_matrix_t), intent(out) :: matrix
@@ -109,5 +111,56 @@ contains
     call validate_mass_matrix(matrix)
     matrix_size = get_dense_matrix_row_count(matrix%storage)
   end function get_mass_matrix_size
+
+  !> Seçilen logical equation indekslerinin principal atalet alt matrisini
+  !! storage ayrıntısını dışarı açmadan üretir.
+  !!
+  !! Fiziksel açıklama: Korunacak torsional serbestlik derecelerinin polar
+  !! atalet katkıları full denklem takımından seçilir.
+  !! Matematiksel açıklama: B(a,b)=A(indices(a),indices(b)); bu seçim
+  !! P^T*A*P indirgemesinin katsayı biçimidir.
+  !! Girdiler: Katsayıları [kg*m^2] olan matrix ve benzersiz, bir tabanlı,
+  !! boyutsuz logical equation indeksleri. Çıktı: Aynı birimde n x n
+  !! mass_matrix_t. Sıfır uzunluklu indeks dizisi 0x0 matris üretir.
+  !! Varsayımlar ve geçerlilik: İndeks sırası çıktı denklem sırasıdır; tüm
+  !! indeksler kaynak matris sınırlarında ve benzersiz olmalıdır.
+  pure function extract_mass_principal_submatrix(matrix, indices) &
+      result(submatrix)
+    type(mass_matrix_t), intent(in) :: matrix
+    integer, intent(in) :: indices(:)
+    type(mass_matrix_t) :: submatrix
+
+    integer :: column
+    integer :: first_index
+    integer :: matrix_size
+    integer :: row
+    integer :: second_index
+
+    call validate_mass_matrix(matrix)
+    matrix_size = get_mass_matrix_size(matrix)
+
+    do first_index = 1, size(indices)
+      if (indices(first_index) < 1 .or. &
+          indices(first_index) > matrix_size) then
+        error stop "Atalet alt matrisi indeksi kaynak matris sınırları dışında."
+      end if
+
+      do second_index = first_index + 1, size(indices)
+        if (indices(first_index) == indices(second_index)) then
+          error stop "Atalet alt matrisi indeksleri benzersiz olmalıdır."
+        end if
+      end do
+    end do
+
+    call initialize_mass_matrix(submatrix, size(indices))
+    do row = 1, size(indices)
+      do column = 1, size(indices)
+        call add_dense_matrix_entry( &
+          submatrix%storage, row, column, &
+          get_dense_matrix_entry( &
+          matrix%storage, indices(row), indices(column)))
+      end do
+    end do
+  end function extract_mass_principal_submatrix
 
 end module tms_mass_matrix

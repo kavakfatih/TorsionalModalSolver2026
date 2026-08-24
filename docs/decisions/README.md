@@ -23,6 +23,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
   sınırı
 - [`0008-global-matrix-assembly-design.md`](0008-global-matrix-assembly-design.md):
   fiziksel node/denklem ayrımı, dense global M/K assembly ve depolama soyutlaması
+- [`0009-constraint-reduction-architecture.md`](0009-constraint-reduction-architecture.md):
+  Physical DOF, constraint'ten bağımsız tam denklem numaralandırması, ayrı aktif
+  harita, direct elimination ve result recovery mimarisi
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

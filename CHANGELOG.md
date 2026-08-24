@@ -7,6 +7,44 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.4.0] - 2026-08-25
+
+### Eklendi
+
+- `(node_id,dof_type)` ile tanımlanan Physical DOF ve anlamlı
+  `TORSIONAL_ROTATION` türü.
+- Constraint'ten bağımsız tam Equation ID ile constraint sonrası ayrı Active
+  Equation ID eşlemesi.
+- Fixed ve prescribed value kayıtları için constraint veri modeli, hedef/DOF
+  doğrulaması ve aktif denklem yönetimi.
+- Full K/M sisteminden `Kr=K(active,active)` ve `Mr=M(active,active)` üreten
+  storage-bağımsız direct-elimination katmanı.
+- Kr/Mr, aktif Physical DOF listesi ve `q=Pq_r+q_p` / `phi=Pphi_r` result
+  recovery bilgisini taşıyan reduced-system altyapısı.
+- İki ve üç düğümlü sistem, tamamen constrained `0x0` sistem, node
+  permütasyonu, recovery ve geçersiz constraint durumları için otomatik
+  regresyon kapsamı.
+- Constraint foundation mimari belgesi, reduction matematik belgesi ve Karar
+  0009.
+
+### Değiştirildi
+
+- Proje sürümü `0.4.0` olarak güncellendi.
+- Global M/K assembly constraint uygulamasından ayrıldı; tam Equation ID
+  uzayında full matrisler üretilirken aktif Kr/Mr üretimi ayrı reduction
+  katmanına taşındı.
+- V0.3.0 Karar 0008'deki `equation_id=0` tabanlı active-only assembly yaklaşımı
+  Karar 0009 ile değiştirildi; Karar 0008 tarihsel kayıt olarak korundu.
+- Mevcut fixed-node giriş davranışı sıfır değerli constraint olarak korunurken
+  tam ve aktif denklem kimlikleri public modelde açıkça ayrıldı.
+
+### Sınırlamalar
+
+- Prescribed değerler veri ve recovery altyapısında korunur; sıfırdan farklı
+  değerler için RHS düzeltmesi veya yük çözümü yapılmaz.
+- Eigen solver, LAPACK, sparse/CSR backend, MPC, Lagrange multiplier, penalty
+  yöntemi ve contact bu sürümün kapsamında değildir.
+
 ## [0.3.2] - 2026-08-25
 
 ### Eklendi

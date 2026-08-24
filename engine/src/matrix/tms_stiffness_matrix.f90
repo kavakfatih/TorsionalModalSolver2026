@@ -8,7 +8,8 @@ module tms_stiffness_matrix
   implicit none
   private
 
-  !> Aktif torsional denklemler için global rijitlik matrisini taşır.
+  !> Full veya active torsional denklem kümesinin global rijitlik matrisini
+  !! taşır.
   !! Katsayılar [N*m/rad] SI birimindedir. Dense depolama private olduğundan
   !! gelecekte sparse gerçekleştirim üst seviye assembly API'sini bozmadan
   !! eklenebilir.
@@ -23,11 +24,12 @@ module tms_stiffness_matrix
   public :: get_stiffness_matrix_value
   public :: get_stiffness_matrix_values
   public :: get_stiffness_matrix_size
+  public :: extract_stiffness_principal_submatrix
 
 contains
 
   !> Global torsional rijitlik matrisini sıfır olarak başlatır.
-  !! Girdi negatif olmayan aktif DOF sayısıdır [-]. Çıktı n_dof x n_dof,
+  !! Girdi negatif olmayan logical equation sayısıdır [-]. Çıktı n x n,
   !! [N*m/rad] birimli stiffness_matrix_t değeridir; sıfır DOF 0x0 üretir.
   pure subroutine initialize_stiffness_matrix(matrix, dof_count)
     type(stiffness_matrix_t), intent(out) :: matrix
@@ -121,5 +123,56 @@ contains
     call validate_stiffness_matrix(matrix)
     matrix_size = get_dense_matrix_row_count(matrix%storage)
   end function get_stiffness_matrix_size
+
+  !> Seçilen logical equation indekslerinin principal rijitlik alt matrisini
+  !! storage ayrıntısını dışarı açmadan üretir.
+  !!
+  !! Fiziksel açıklama: Aynı torsional denklem kümesinin korunacak serbestlik
+  !! derecelerine ait rijitlik katsayıları seçilir; yeni fizik modeli eklenmez.
+  !! Matematiksel açıklama: B(a,b)=A(indices(a),indices(b)). Bu seçim, sabit
+  !! DOF eliminasyonunda kullanılan P^T*A*P işleminin katsayı biçimidir.
+  !! Girdiler: Katsayıları [N*m/rad] olan matrix ve benzersiz, bir tabanlı,
+  !! boyutsuz logical equation indeksleri. Çıktı: Aynı birimde n x n
+  !! stiffness_matrix_t. Sıfır uzunluklu indeks dizisi 0x0 matris üretir.
+  !! Varsayımlar ve geçerlilik: İndeks sırası çıktı denklem sırasıdır; tüm
+  !! indeksler kaynak matris sınırlarında ve benzersiz olmalıdır.
+  pure function extract_stiffness_principal_submatrix(matrix, indices) &
+      result(submatrix)
+    type(stiffness_matrix_t), intent(in) :: matrix
+    integer, intent(in) :: indices(:)
+    type(stiffness_matrix_t) :: submatrix
+
+    integer :: column
+    integer :: first_index
+    integer :: matrix_size
+    integer :: row
+    integer :: second_index
+
+    call validate_stiffness_matrix(matrix)
+    matrix_size = get_stiffness_matrix_size(matrix)
+
+    do first_index = 1, size(indices)
+      if (indices(first_index) < 1 .or. &
+          indices(first_index) > matrix_size) then
+        error stop "Rijitlik alt matrisi indeksi kaynak matris sınırları dışında."
+      end if
+
+      do second_index = first_index + 1, size(indices)
+        if (indices(first_index) == indices(second_index)) then
+          error stop "Rijitlik alt matrisi indeksleri benzersiz olmalıdır."
+        end if
+      end do
+    end do
+
+    call initialize_stiffness_matrix(submatrix, size(indices))
+    do row = 1, size(indices)
+      do column = 1, size(indices)
+        call add_dense_matrix_entry( &
+          submatrix%storage, row, column, &
+          get_dense_matrix_entry( &
+          matrix%storage, indices(row), indices(column)))
+      end do
+    end do
+  end function extract_stiffness_principal_submatrix
 
 end module tms_stiffness_matrix

@@ -100,6 +100,30 @@ değerlerinin testi yanlış biçimde geçirmesine izin vermez. Ayrıntılar
 [`../../docs/validation/numerical_robustness_validation.md`](../../docs/validation/numerical_robustness_validation.md)
 belgesindedir.
 
+`test_constraint_foundation`, V0.4.0 tam sistemden constraint-aware aktif
+sisteme geçişini doğrular. Test, iki düğümlü tek elemanda ilk düğüm fixed iken
+`Kr=[k]` ve `Mr=[J_free]` sonucunu; üç düğümlü zincirde iki aktif DOF'u ve tüm
+DOF'lar fixed olduğunda geçerli `0x0` Kr/Mr matrislerini sınar. Physical DOF,
+tam Equation ID ve Active Equation ID değerleri ayrı kontrol edilir.
+
+Node ekleme sırası değiştirilmiş eşdeğer model, katsayıları ortak Physical DOF
+sırasına aldıktan sonra aynı indirgenmiş fizik ve fiziksel kimlik tabanlı
+recovery sonucunu vermelidir. Recovery testi genel durum için `q=Pq_r+q_p`,
+homojen modal vektör için `phi=Pphi_r` eşlemesini doğrular; prescribed değer
+Kr/Mr katsayılarına eklenmez ve eigen çözümü yapılmaz. Assertion yardımcıları
+ile recovery girdileri IEEE `NaN` değerini kabul etmez.
+
+Olmayan node, aynı Physical DOF için yinelenen constraint ve geçersiz DOF türü
+ayrı `tms26.constraint_foundation.rejects_*` CTest süreçleridir. Bu süreçlerde
+yalnız üretim doğrulayıcısının kontrollü `error stop` sonucu başarı kabul
+edilir. Farklı node sırasındaki başka bir sisteme ait full DOF haritası da
+yanlış K/M satır eliminasyonunu önlemek için reddedilir. Ayrıntılı mimari ve
+matematik sözleşmeleri
+[`../../docs/architecture/V0.4_constraint_foundation.md`](../../docs/architecture/V0.4_constraint_foundation.md)
+ve
+[`../../docs/mathematics/constraint_reduction.md`](../../docs/mathematics/constraint_reduction.md)
+belgelerindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

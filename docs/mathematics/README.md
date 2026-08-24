@@ -24,6 +24,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
   global assembly öncesi invariantları
 - [`global_matrix_assembly.md`](global_matrix_assembly.md): fiziksel düğüm ile
   denklem kimliği ayrımı, lokal-global rijitlik toplama ve dönel atalet matrisi
+- [`constraint_reduction.md`](constraint_reduction.md): tam M/K sisteminden
+  aktif Kr/Mr sistemine direct elimination, seçim matrisi, prescribed değer ve
+  result recovery bağıntıları
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

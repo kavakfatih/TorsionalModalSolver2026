@@ -9,6 +9,7 @@ target_sources(
     src/core/tms_kinds.f90
     src/core/tms_constants.f90
     src/core/tms_units.f90
+    src/system/tms_dof_types.f90
     src/matrix/tms_matrix_types.f90
     src/matrix/tms_local_matrix.f90
     src/geometry/tms_geometry.f90
@@ -23,9 +24,13 @@ target_sources(
     src/system/tms_torsional_element.f90
     src/system/tms_torsional_system.f90
     src/matrix/tms_dof_map.f90
+    src/constraints/tms_constraint_types.f90
+    src/constraints/tms_constraint_manager.f90
     src/matrix/tms_stiffness_matrix.f90
     src/matrix/tms_mass_matrix.f90
+    src/matrix/tms_matrix_reduction.f90
     src/matrix/tms_matrix_assembly.f90
+    src/constraints/tms_reduced_system.f90
     src/solver/tms_torsional_system.f90
 )
 
@@ -91,6 +96,39 @@ if(BUILD_TESTING)
     tests/test_generalized_torsional_system.f90
   )
   tms26_add_fortran_test(matrix_assembly tests/test_matrix_assembly.f90)
+  tms26_add_fortran_test(
+    constraint_foundation
+    tests/test_constraint_foundation.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      missing_node
+      duplicate_physical_dof
+      duplicate_constraint_id
+      invalid_dof_type
+      invalid_constraint_type
+      nonfinite_value
+      fixed_nonzero_value
+      legacy_constraint_mismatch
+      foreign_full_dof_map
+      invalid_recovery_size
+      invalid_recovery_value
+  )
+    set(
+      validation_test
+      "tms26.constraint_foundation.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_constraint_foundation>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
   tms26_add_fortran_test(
     torsional_validation
     tests/test_torsional_validation.f90

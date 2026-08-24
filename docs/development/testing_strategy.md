@@ -96,6 +96,42 @@ başarılarını önler. Ayrıntılı doğrulama kapsamı
 [`../validation/numerical_robustness_validation.md`](../validation/numerical_robustness_validation.md)
 belgesindedir.
 
+V0.4.0 constraint foundation regresyonu, V0.3 tam fizik ve assembly
+invariantlarını korurken constraint'ten bağımsız tam denklem uzayı ile aktif
+solver uzayını ayrı doğrular. `test_constraint_foundation` aşağıdaki zinciri
+üretim yordamları üzerinden kapsar:
+
+- Physical DOF `(node_id,dof_type)` ile tam Equation ID eşlemesinin constraint
+  değiştiğinde korunması,
+- iki düğüm ve tek elemanda ilk düğüm fixed iken `Kr=[k]` ve
+  `Mr=[J_free]`,
+- üç düğümlü zincirde tam sistemden iki aktif denkleme direct elimination,
+- tüm DOF'lar fixed iken geçerli `0x0` Kr/Mr,
+- node ekleme sırası değiştiğinde ortak Physical DOF sırasındaki eşdeğer K/M
+  sonucu ve fiziksel kimlik tabanlı result recovery,
+- `q=Pq_r+q_p` ile prescribed bileşenleri içeren tam vektör recovery ve
+  `phi=Pphi_r` homojen modal recovery altyapısı,
+- sıfırdan farklı prescribed değerin recovery metadata'sında korunurken
+  principal Kr/Mr katsayılarına eklenmemesi,
+- test assertion ve recovery girdilerinde IEEE `NaN` değerinin reddedilmesi.
+
+Aynı Physical DOF kümesini farklı sırada taşıyan başka bir sisteme ait full
+DOF haritası, K/M satırlarının yanlış elenmesini önlemek için map-system
+bütünlük doğrulamasında reddedilir.
+
+Olmayan node, aynı Physical DOF için yinelenen constraint, geçersiz DOF türü
+ve geçersiz prescribed değerler ayrı
+`tms26.constraint_foundation.rejects_*` CTest süreçlerinde `WILL_FAIL` olarak
+kaydedilir. Bilinmeyen test seçicisi beklenen fiziksel red sayılmaz.
+
+Bu regresyon Kr/Mr üretimini doğrular; özdeğer aramaz, LAPACK çağırmaz ve
+sıfırdan farklı prescribed değer için RHS düzeltmesi çözmez. Direct-elimination
+matematiği
+[`../mathematics/constraint_reduction.md`](../mathematics/constraint_reduction.md),
+modül sorumlulukları ise
+[`../architecture/V0.4_constraint_foundation.md`](../architecture/V0.4_constraint_foundation.md)
+belgelerindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
@@ -108,6 +144,11 @@ Genel sistem testleri ayrıca sabitlenmemiş düğümlerin aktif DOF sayısını
 fixed-hub dönüşümünde göbek kısıtını, yinelenen kimlikleri ve tanımsız eleman
 uçlarını kapsar. Bu testler birim testlerinin yerini almaz. Global assembly
 `test_matrix_assembly` içinde ayrı doğrulanır; eigen çözümü uygulanmaz.
+
+V0.4.0 için `test_constraint_foundation`, tam M/K assembly, constraint manager,
+aktif Equation ID haritası, storage-bağımsız reduction ve result recovery
+katmanlarını birlikte doğrulayan entegrasyon testidir. Önceki V0.3 assembly ve
+validation testleri tarihsel regresyon koruması olarak çalışmayı sürdürür.
 
 ## Benchmark test
 
