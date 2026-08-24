@@ -17,6 +17,9 @@ target_sources(
     src/solver/tms_torsional_stiffness.f90
     src/solver/tms_dynamic_torsional_stiffness.f90
     src/solver/tms_frequency_solver.f90
+    src/system/tms_torsional_node.f90
+    src/system/tms_torsional_element.f90
+    src/system/tms_torsional_system.f90
     src/solver/tms_torsional_system.f90
 )
 
@@ -61,6 +64,71 @@ if(BUILD_TESTING)
   tms26_add_fortran_test(geometry tests/test_geometry.f90)
   tms26_add_fortran_test(material tests/test_material.f90)
   tms26_add_fortran_test(dynamic_modulus tests/test_dynamic_modulus.f90)
+  tms26_add_fortran_test(torsional_node tests/test_torsional_node.f90)
+  tms26_add_fortran_test(torsional_element tests/test_torsional_element.f90)
+  tms26_add_fortran_test(
+    generalized_torsional_system
+    tests/test_generalized_torsional_system.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      nonpositive_id
+      nonpositive_inertia
+      nonfinite_angle
+  )
+    set(validation_test "tms26.torsional_node.rejects_${validation_case}")
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_torsional_node>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  foreach(
+    validation_case
+    IN ITEMS
+      nonpositive_id
+      nonpositive_node_id
+      self_connection
+      nonpositive_stiffness
+      negative_damping
+      nonfinite_stiffness
+  )
+    set(validation_test "tms26.torsional_element.rejects_${validation_case}")
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_torsional_element>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  foreach(
+    validation_case
+    IN ITEMS
+      empty_system
+      duplicate_node_id
+      missing_endpoint
+      duplicate_element_id
+  )
+    set(
+      validation_test
+      "tms26.generalized_torsional_system.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_generalized_torsional_system>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
   tms26_add_fortran_test(inertia tests/test_inertia.f90)
   tms26_add_fortran_test(hub_inertia tests/test_hub_inertia.f90)
   tms26_add_fortran_test(torsional_stiffness tests/test_torsional_stiffness.f90)

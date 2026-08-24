@@ -7,6 +7,10 @@ module tms_torsional_system
   use tms_dynamic_torsional_stiffness, only : &
     complex_torsional_stiffness_t, calculate_dynamic_torsional_stiffness
   use tms_frequency_solver, only : calculate_natural_frequency
+  use tms_torsional_node, only : torsional_node_t
+  use tms_torsional_element, only : torsional_element_t
+  use tms_generalized_torsional_system, only : torsional_system_t, &
+    add_torsional_node, add_torsional_element, validate_torsional_system
   implicit none
   private
 
@@ -66,8 +70,57 @@ module tms_torsional_system
   public :: build_two_inertia_tvd_system
   public :: calculate_fixed_hub_natural_frequency
   public :: solve_free_free_two_inertia_modes
+  public :: build_generalized_two_inertia_system
 
 contains
+
+  !> Özel iki ataletli TVD verisini genel düğüm-eleman topolojisine dönüştürür.
+  !!
+  !! Fiziksel açıklama: Göbek ve atalet halkası iki yığılmış atalet düğümü,
+  !! elastomer ise aralarındaki konservatif torsional bağlantı olarak temsil
+  !! edilir. Opsiyonel sınır koşulu göbek düğümünü sabitleyebilir.
+  !! Matematiksel açıklama: Düğüm 1 için J = J_h, düğüm 2 için J = J_r ve
+  !! eleman 1 için K = K' atanır. Başlangıç açıları sıfırdır.
+  !! Girdiler: Ataletleri [kg*m^2], K' ve K'' değerlerini [N*m/rad] taşıyan
+  !! two_inertia_tvd_system_t ile boyutsuz opsiyonel hub_constrained bilgisidir.
+  !! Çıktı: İki düğüm ve bir eleman taşıyan torsional_system_t topolojisidir.
+  !! Varsayımlar ve geçerlilik: J_h > 0, J_r > 0 ve K' > 0 olmalıdır. K''
+  !! kayıp rijitliği [N*m/rad], viskoz c [N*m*s/rad] ile boyutsal olarak aynı
+  !! değildir; bu nedenle damping alanına aktarılmaz ve c = 0 kullanılır.
+  !! Matris assembly veya modal çözüm yapılmaz. Ayrıntılar:
+  !! docs/physics/generalized_torsional_system.md.
+  pure function build_generalized_two_inertia_system( &
+      source_system, hub_constrained) result(generalized_system)
+    type(two_inertia_tvd_system_t), intent(in) :: source_system
+    logical, intent(in), optional :: hub_constrained
+    type(torsional_system_t) :: generalized_system
+
+    logical :: constrain_hub
+
+    call validate_modal_system(source_system)
+
+    constrain_hub = .false.
+    if (present(hub_constrained)) constrain_hub = hub_constrained
+
+    call add_torsional_node(generalized_system, torsional_node_t( &
+      id=1, &
+      polar_inertia_kg_m2=source_system%hub_polar_inertia_kg_m2, &
+      initial_angle_rad=0.0_dp, &
+      constrained=constrain_hub))
+    call add_torsional_node(generalized_system, torsional_node_t( &
+      id=2, &
+      polar_inertia_kg_m2=source_system%ring_polar_inertia_kg_m2, &
+      initial_angle_rad=0.0_dp, &
+      constrained=.false.))
+    call add_torsional_element(generalized_system, torsional_element_t( &
+      id=1, &
+      node_i_id=1, &
+      node_j_id=2, &
+      stiffness_nm_per_rad=source_system%storage_stiffness_nm_per_rad, &
+      damping_nms_per_rad=0.0_dp))
+
+    call validate_torsional_system(generalized_system)
+  end function build_generalized_two_inertia_system
 
   !> Bileşen geometrisi ve dinamik malzemeden iki ataletli TVD sistemi kurar.
   !!

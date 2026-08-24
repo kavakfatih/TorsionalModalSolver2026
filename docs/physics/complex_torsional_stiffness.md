@@ -71,6 +71,12 @@ dışındadır; frozen-property sınırı
 [`two_inertia_torsional_system.md`](two_inertia_torsional_system.md) belgesinde
 açıklanır.
 
+K'' kayıp rijitliği `N·m/rad`, genel torsional elemandaki eşdeğer viskoz sönüm
+katsayısı ise `N·m·s/rad` birimindedir. V0.2.3 bu iki büyüklüğü doğrudan
+eşlemez; ayrım
+[`generalized_torsional_system.md`](generalized_torsional_system.md) belgesinde
+açıklanır.
+
 ## Girdi doğrulaması
 
 Hesabın sonlu ve fiziksel anlamlı bir kompleks rijitlik üretmesi için aşağıdaki

@@ -3,10 +3,11 @@
 Bu dizin, TMS26 içindeki matematiksel denklemlerin temsil ettiği fiziksel
 sistemleri, idealizasyonları ve mühendislik geçerlilik sınırlarını açıklar.
 
-V0.2.2 fizik kapsamı; homojen annüler göbek ve atalet halkası, lineer elastik
-elastomer, kompleks dinamik elastomer rijitliği ile fixed-hub ve serbest-serbest
-analitik torsional sistem modellerini içerir. Modal tahmin frozen-property ve
-sönümsüzdür; yalnız K' kullanılır, K'' kompleks özdeğer hesabına bağlanmaz.
+V0.2.3 fizik kapsamı; homojen annüler göbek ve atalet halkası, lineer elastik
+elastomer, kompleks dinamik elastomer rijitliği, fixed-hub/serbest-serbest
+analitik modeller ve genel torsional düğüm-eleman topolojisini içerir. Modal
+tahmin frozen-property ve sönümsüzdür; genel topoloji henüz matris veya
+özdeğer çözümü yapmaz.
 Ayrıntılı denklemler [`../mathematics/`](../mathematics/) altında; tek-DOF ve
 iki ataletli referans modeller sırasıyla
 [`Benchmark 001`](../../benchmarks/001_simple_annular_tvd/) ve
@@ -21,6 +22,9 @@ iki ataletli referans modeller sırasıyla
 - [`two_inertia_torsional_system.md`](two_inertia_torsional_system.md):
   fixed-hub ve serbest-serbest TVD sınır koşulları, iki analitik mod ve
   frozen-property geçerlilik sınırı
+- [`generalized_torsional_system.md`](generalized_torsional_system.md):
+  genel torsional düğüm, eleman, aktif DOF, sistem doğrulaması ve iki-ataletli
+  TVD topoloji köprüsü
 
 Yeni fizik modeli eklenirken modelin fiziksel anlamı, kabulleri, geçerlilik
 aralığı ve kapsam dışı davranışları bu dizinde belgelenmelidir.

@@ -26,6 +26,22 @@ Bu benchmark yalnız `K'` kullanan frozen-property sönümsüz modal tahmindir.
 `K''` sistem üstverisinde tutulabilir fakat sönüm veya kompleks özdeğer hesabına
 katılmaz.
 
+## V0.2.3 genel topoloji gösterimi
+
+Aynı referans fizik, çözüm formülü değiştirilmeden genel sistem veri modeline
+şu şekilde aktarılır:
+
+```text
+Node 1: J_h = 0.10 kg·m², serbest veya fixed-hub için constrained
+Node 2: J_r = 0.20 kg·m², serbest
+Element 1: node 1–2, K = K' = 1000 N·m/rad, c = 0 N·m·s/rad
+```
+
+Serbest-serbest gösterim `2`, fixed-hub gösterim `1` aktif DOF taşır. K''
+kayıp rijitliği viskoz `c` ile aynı birimde olmadığından genel elemanın damping
+alanına aktarılmaz. Bu topoloji regresyonu matris assembly veya yeni bir modal
+çözüm içermez; aşağıdaki analitik sonuçlar değişmeden kalır.
+
 - [Girdi açıklaması](input_description.md)
 - [Beklenen sonuç](expected_result.md)
 - [Matematik modeli](../../docs/mathematics/two_inertia_modal_model.md)

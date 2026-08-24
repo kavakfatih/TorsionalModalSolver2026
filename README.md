@@ -4,14 +4,13 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.2.2`, homojen rijit göbek, tam bağlı annüler
-elastomer ve atalet halkasını tek bir TVD sistem modelinde birleştirir.
-Fixed-hub tek-DOF ve serbest-serbest iki-DOF doğal frekansları ile mod şekilleri
-analitik olarak çözülür. Modal tahmin yalnız K' kullanan frozen-property,
-sönümsüz bir yaklaşımdır; frekans interpolasyonu ve kompleks özdeğer çözümü
-henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.2.3`, mevcut fixed-hub ve serbest-serbest iki
+ataletli TVD fiziğini korurken genel torsional düğüm-eleman topolojisini ekler.
+Yığılmış polar atalet düğümleri, lineer rijitlik/viskoz sönüm elemanları, aktif
+DOF sayımı ve sistem doğrulaması gelecekteki M/K matrix assembly altyapısına
+hazırdır. Bu sürümde matris veya genel özdeğer çözümü uygulanmamıştır.
 
-## V0.2.2 çekirdek kapsamı
+## V0.2.3 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -24,8 +23,12 @@ henüz uygulanmamıştır.
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
 - `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
+- `tms_torsional_node`: genel düğüm kimliği, polar atalet ve sınır koşulu
+- `tms_torsional_element`: iki düğümlü lineer torsional K/c bağlantısı
+- `tms_generalized_torsional_system`: koleksiyon yönetimi, aktif DOF sayımı ve
+  topoloji doğrulaması
 - `tms_torsional_system`: TVD builder'ı ile fixed-hub ve serbest-serbest
-  analitik modal çözüm
+  analitik modal çözüm ve genel topolojiye geriye uyumlu dönüşüm
 
 Hesap motorunun iç veri sözleşmesi SI birimlerini kullanır. Uzunluk metre,
 yoğunluk `kg/m³`, kayma modülleri Pa, sıcaklık K ve frekans Hz cinsinden
@@ -34,11 +37,11 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.2.2 aşamasındadır. Hesap motorunun temel veri sözleşmesi,
-dinamik elastomer ve kompleks burulma rijitliği hesabı, annüler rijit gövde
-ataletleri ve iki sınır koşullu analitik TVD sistem modeli kullanılabilir.
-K'' sistem verisinde korunur; doğal frekans hesabı yalnız referans çalışma
-noktasında sabitlenmiş K' değerini kullanır.
+TMS26 şu anda V0.2.3 aşamasındadır. Dinamik elastomer ve kompleks burulma
+rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
+TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
+eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
+boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez.
 
 ### Tamamlananlar
 
@@ -58,6 +61,9 @@ noktasında sabitlenmiş K' değerini kullanır.
 - Fixed-hub 1-DOF doğal frekansı ve serbest-serbest iki analitik mod
 - `[1,1]` rijit-cisim ve `[1,-J_h/J_r]` elastik mod şekilleri
 - K', atalet ve büyük göbek ataleti limit regresyonları
+- Genel torsional node/element veri türleri ve private sistem koleksiyonları
+- Sabitlenmemiş düğümlerden aktif DOF sayımı ve topoloji doğrulaması
+- İki ataletli TVD için serbest-serbest ve fixed-hub genel topoloji köprüsü
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
@@ -66,6 +72,7 @@ noktasında sabitlenmiş K' değerini kullanır.
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
 - Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
+- M/K/C matrix assembly ve sınır koşulu eliminasyonu
 - Genel çok serbestlik dereceli modal/eigen çözümü
 - Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
@@ -135,6 +142,7 @@ request'lerde derleme ve test doğrulaması yapar.
 
 - `docs/`: mimari, matematik, fizik, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
+- `engine/src/system/`: genel torsional node, element ve sistem topolojisi
 - `engine/tests/`: hesap motoru testleri
 - `benchmarks/`: performans ölçümleri
 - `examples/`: örnek kullanım senaryoları
@@ -173,7 +181,13 @@ fiziksel sistem sınırları
 [`docs/physics/two_inertia_torsional_system.md`](docs/physics/two_inertia_torsional_system.md)
 ve sayısal referans
 [`benchmarks/004_two_inertia_tvd/`](benchmarks/004_two_inertia_tvd/)
-altında açıklanmıştır.
+altında açıklanmıştır. Genel torsional sistemin fiziksel sözleşmesi
+[`docs/physics/generalized_torsional_system.md`](docs/physics/generalized_torsional_system.md),
+gelecekteki M/K bağlantısı
+[`docs/mathematics/generalized_torsional_system_model.md`](docs/mathematics/generalized_torsional_system_model.md)
+ve kalıcı mimari karar
+[`docs/decisions/0006-generalized-torsional-topology.md`](docs/decisions/0006-generalized-torsional-topology.md)
+altında bulunur.
 
 ## Lisans
 

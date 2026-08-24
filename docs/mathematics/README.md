@@ -16,6 +16,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`two_inertia_modal_model.md`](two_inertia_modal_model.md): fixed-hub ve
   serbest-serbest iki ataletli TVD sisteminin analitik frekansları ile mod
   şekilleri
+- [`generalized_torsional_system_model.md`](generalized_torsional_system_model.md):
+  düğüm ataleti, eleman rijitlik/sönüm bağlantıları, aktif DOF ve gelecekteki
+  M/K formülasyonunun veri temeli
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

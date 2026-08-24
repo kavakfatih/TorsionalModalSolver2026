@@ -15,6 +15,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
   kompleks rijitlik sonuç türü, ortak geometri hesabı ve çalışma noktası seçimi
 - [`0005-bonded-annular-rubber-torsion-model.md`](0005-bonded-annular-rubber-torsion-model.md):
   TVD elastomer rijitliği için tam bağlı eş merkezli silindirik burç modeli
+- [`0006-generalized-torsional-topology.md`](0006-generalized-torsional-topology.md):
+  genel düğüm-eleman topolojisi, mevcut iki-atalet API uyumluluğu ve K''/viskoz
+  sönüm ayrımı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

@@ -2,10 +2,11 @@
 
 ## Amaç
 
-V0.2.2 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
-geometrik ve malzeme özelliklerini fizik yordamlarına taşır. Veri türleri
-doğrulama veya hesap yapmaz; fizik davranışı `engine/src/solver/` altındaki
-modüllerde tutulur.
+V0.2.3 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
+geometrik ve malzeme özelliklerini fizik yordamlarına, genel düğüm-eleman
+topolojisini ise gelecekteki sistem analiz katmanlarına taşır. Geometri ve
+malzeme türleri yalnız veri taşır; genel sistem yönetim yordamları topolojik ve
+temel fiziksel önkoşulları doğrular.
 
 ## Modül bağımlılıkları
 
@@ -27,8 +28,15 @@ modüllerde tutulur.
 - `tms_dynamic_torsional_stiffness`, aynı girdilerden K', K'', kayıp faktörü
   ve çalışma noktası üstverisini üretir.
 - `tms_frequency_solver`, hesaplanan rijitlik ve ataletten doğal frekansı bulur.
+- `tms_torsional_node`, yığılmış polar atalet, başlangıç açısı ve dönel sınır
+  koşulu taşıyan genel düğüm türünü tanımlar.
+- `tms_torsional_element`, iki düğüm arasındaki lineer rijitlik ve eşdeğer
+  viskoz sönüm bağlantısını tanımlar.
+- `tms_generalized_torsional_system`, private düğüm/eleman koleksiyonlarını,
+  ekleme-okuma yordamlarını, aktif DOF sayımını ve sistem doğrulamasını sağlar.
 - `tms_torsional_system`, bileşen sonuçlarını iki ataletli sistem türünde
-  birleştirir; fixed-hub ve serbest-serbest analitik modal sonuçları üretir.
+  birleştirir; fixed-hub ve serbest-serbest analitik modal sonuçları üretir ve
+  bu özel modeli genel topolojiye dönüştürür.
 
 Mevcut torsional fizik akışı aşağıdaki sırayı izler:
 
@@ -39,6 +47,8 @@ Mevcut torsional fizik akışı aşağıdaki sırayı izler:
 4. Sistem builder'ı bu sonuçları `two_inertia_tvd_system_t` içinde birleştirir.
 5. Fixed-hub ve serbest-serbest modal yordamlar yalnız K' depolama rijitliğini
    mevcut doğal frekans yordamına aktarır; K'' sistem üstverisinde korunur.
+6. İstenirse iki ataletli özel sistem, iki düğüm ve bir elemandan oluşan genel
+   torsional topolojiye dönüştürülür; bu adım frekansı yeniden çözmez.
 
 Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
 `complex_torsional_stiffness_t` derived type değeriyle taşınır.
@@ -131,3 +141,25 @@ Sistem builder'ı atalet ve dinamik rijitlik denklemlerini yinelemez; mevcut
 sönüm veya kompleks özdeğer türetmez. G' ve K', malzeme referans çalışma
 noktasında sabitlenir; hesaplanan doğal frekansa göre interpolasyon veya
 iterasyon yapılmaz.
+
+## Genel torsional topoloji türleri
+
+`torsional_node_t`, pozitif benzersiz kimlik, polar kütle ataleti (`kg·m²`),
+başlangıç açısı (`rad`) ve sabitlenmişlik bilgisi taşır. Her sabitlenmemiş düğüm
+bir aktif torsional DOF oluşturur. Düğüm kimliği doğrudan DOF indeksi değildir.
+
+`torsional_element_t`, pozitif benzersiz kimlik, iki farklı uç düğüm kimliği,
+lineer rijitlik (`N·m/rad`) ve eşdeğer viskoz sönüm (`N·m·s/rad`) taşır.
+Paralel elemanlar farklı kimliklerle temsil edilebilir.
+
+`torsional_system_t` içindeki koleksiyonlar private'dır. Public saf yordamlar:
+
+- düğüm ve eleman ekler,
+- düğüm/eleman sayısını ve ekleme sırasındaki eleman kopyasını döndürür,
+- sabitlenmemiş düğümlerden aktif DOF sayısını belirler,
+- kimlik benzersizliğini ve bağlantı uçlarının varlığını doğrular.
+
+Genel sistem katmanı M, K veya C matrisi oluşturmaz ve modal çözüm yapmaz.
+Mevcut iki ataletli dönüşüm `J_h`, `J_r` ve K' değerlerini taşır. K''
+`N·m/rad`, viskoz `c` ise `N·m·s/rad` olduğundan damping alanına doğrudan
+aktarılmaz.

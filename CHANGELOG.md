@@ -7,6 +7,27 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.2.3] - 2026-08-24
+
+### Eklendi
+
+- V0.2.3 — Generalized Torsional System Foundation kapsamında polar atalet,
+  başlangıç açısı ve sınır koşulu taşıyan genel torsional düğüm türü.
+- İki düğüm arasında K rijitliği ve eşdeğer viskoz c katsayısı taşıyan genel
+  torsional eleman türü.
+- Private düğüm/eleman koleksiyonları, güvenli ekleme-okuma yordamları, aktif
+  DOF sayımı ve sistem bütünlüğü doğrulaması sağlayan genel sistem modülü.
+- Mevcut iki ataletli TVD sistemini serbest-serbest veya fixed-hub genel
+  topolojiye dönüştüren geriye uyumlu köprü.
+- Node, element, topoloji, geçersiz girdi ve Benchmark 004 dönüşüm regresyonları
+  ile genel sistem fizik/matematik belgeleri ve Karar 0006.
+
+### Değiştirildi
+
+- Proje sürümü `0.2.3` olarak güncellendi; CTest kapsamı 44 teste çıkarıldı.
+- Benchmark 004, sayısal sonuçları değişmeden genel iki-düğüm/bir-eleman
+  gösterimini de belgeleyecek şekilde genişletildi.
+
 ## [0.2.2] - 2026-08-24
 
 ### Eklendi

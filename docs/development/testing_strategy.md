@@ -33,9 +33,15 @@ değişmezliği kontrolleri `1e-10` bağıl hata sınırıyla uygulanır:
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
-Örneğin gelecekte geometri, malzeme ve modal çözüm bileşenlerinin aynı modelde
-etkileşimini test eder. Bu testler yalnızca modüller arası davranış oluştuğunda
-eklenir; birim testlerinin yerini almaz.
+`test_generalized_torsional_system`, node/element koleksiyon yönetimini ve
+mevcut iki ataletli TVD'nin konservatif alt modelinin genel topolojiye kayıpsız
+dönüşümünü sınar. Benchmark 004 için `J_h`, `J_r` ve K' aktarılır; boyutsal
+olarak farklı K'' değerinin viskoz `c` alanına aktarılmadığı doğrulanır.
+
+Genel sistem testleri ayrıca sabitlenmemiş düğümlerin aktif DOF sayısını,
+fixed-hub dönüşümünde göbek kısıtını, yinelenen kimlikleri ve tanımsız eleman
+uçlarını kapsar. Bu testler birim testlerinin yerini almaz ve matris assembly
+veya eigen çözümü uygulamaz.
 
 ## Benchmark test
 

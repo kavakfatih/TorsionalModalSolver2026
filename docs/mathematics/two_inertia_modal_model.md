@@ -130,6 +130,12 @@ phi_0^T M phi_e = J_h - J_h = 0
 Bu nedenle V0.2.2 sonucu bir **frozen-property undamped modal estimate** olarak
 yorumlanmalıdır.
 
+V0.2.3, aynı `J_h`, `J_r` ve K' verilerini iki düğüm ile bir elemandan oluşan
+genel topolojiye aktarabilir; bu dönüşüm yukarıdaki analitik denklemleri
+yeniden çözmez. Genel veri sözleşmesi
+[`generalized_torsional_system_model.md`](generalized_torsional_system_model.md)
+belgesinde tanımlanır.
+
 ## Kaynak notu ve doğrulama
 
 İki rijit rotorun tek torsional yayla bağlandığı bu ayrık-parametreli model,

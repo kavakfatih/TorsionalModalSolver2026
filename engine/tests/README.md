@@ -7,8 +7,9 @@ kapsanmalıdır.
 ## Unit test
 
 Tek modül, tür veya yordam izole olarak doğrulanır. `test_kinds`,
-`test_constants`, `test_units`, `test_geometry`, `test_material` ve
-`test_dynamic_modulus` bu kategoridedir. `test_dynamic_modulus`, G' ile G''
+`test_constants`, `test_units`, `test_geometry`, `test_material`,
+`test_dynamic_modulus`, `test_torsional_node` ve `test_torsional_element` bu
+kategoridedir. `test_dynamic_modulus`, G' ile G''
 değerlerinin SI biriminde saklanmasını, çoklu çalışma noktası altyapısını ve
 `tan(delta) = G'' / G'` hesabını doğrular. `test_geometry`, geometri veri
 alanlarının yanında annüler kesit polar alan momentini ve tam bağlı kauçuk
@@ -47,6 +48,18 @@ sonucu değiştirmediği de ayrı bir regresyonla korunur. Pozitif olmayan atale
 K' ve yoğunluklar ile geçersiz göbek/halka geometrileri ayrı `WILL_FAIL`
 regresyonlarıdır.
 
+`test_torsional_node`, kimlik, polar atalet, başlangıç açısı ve sınır koşulu
+alanlarını; `test_torsional_element`, uç düğüm kimlikleri, K rijitliği ve
+eşdeğer viskoz c alanını doğrular. Pozitif olmayan veya sonlu olmayan
+büyüklükler, self-connection ve negatif sönüm ayrı `WILL_FAIL` vakalarıdır.
+
+`test_generalized_torsional_system`, private koleksiyonların public yönetim
+yordamlarını, aktif DOF sayımını ve Benchmark 004 iki-ataletli sisteminin genel
+iki-düğüm/bir-eleman gösterimini doğrular. K'' kayıp rijitliğinin viskoz sönüm
+alanına aktarılmadığı, serbest-serbest gösterimin iki ve fixed-hub gösteriminin
+bir aktif DOF taşıdığı sınanır. Boş sistem, yinelenen kimlik ve tanımsız eleman
+ucu hata regresyonlarıdır.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman
@@ -59,7 +72,8 @@ ilgili testler aynı commit içinde güncellenir.
 `benchmarks/003_dynamic_torsional_stiffness/` ise bu noktanın annüler geometri
 üzerindeki kompleks rijitlik sonucunu tanımlar.
 `benchmarks/004_two_inertia_tvd/`, fixed-hub ve serbest-serbest iki ataletli
-sistemin analitik frekansları ile mod şekillerini tanımlar.
+sistemin analitik frekansları ile mod şekillerini ve V0.2.3 genel topoloji
+eşlemesini tanımlar.
 
 ## Test ekleme
 

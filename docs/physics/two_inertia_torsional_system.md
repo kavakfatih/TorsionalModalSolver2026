@@ -88,6 +88,15 @@ Sonuç bu nedenle **frozen-property undamped modal estimate** niteliğindedir.
 Frekans bağımlı malzeme interpolasyonu ve iteratif bağlaşım ileriki bir sürümün
 konusudur.
 
+## V0.2.3 genel topoloji bağlantısı
+
+İki ataletli özel sistem, mevcut analitik solver değiştirilmeden genel torsional
+topolojide Hub Node, Inertia Ring Node ve aralarındaki Rubber Element olarak
+temsil edilebilir. Köprü K' değerini eleman rijitliğine aktarır; K'' kayıp
+rijitliğini boyutsal olarak farklı viskoz damping alanına aktarmaz. Ayrıntılar
+[`generalized_torsional_system.md`](generalized_torsional_system.md)
+belgesindedir.
+
 ## Geçerlilik koşulları ve SI birimleri
 
 - `J_h` ve `J_r` pozitif olmalı ve `kg·m²` cinsinden verilmelidir.
