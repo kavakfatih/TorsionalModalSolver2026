@@ -17,8 +17,9 @@ burç `Cθ` faktörünü ayrı bağımsız analitik değerlerle sınar.
 ## Physics validation
 
 Fiziksel veya matematiksel yordam, bağımsız analitik sonuç ve açık bir hata
-sınırıyla doğrulanır. `test_inertia`, `test_torsional_stiffness`,
-`test_dynamic_torsional_stiffness` ve `test_frequency_solver` bu kategoridedir.
+sınırıyla doğrulanır. `test_inertia`, `test_hub_inertia`,
+`test_torsional_stiffness`, `test_dynamic_torsional_stiffness`,
+`test_frequency_solver` ve `test_torsional_system` bu kategoridedir.
 Genel fizik doğrulamalarında bağıl hata yüzde `0,1`'den küçük olmalıdır;
 dinamik burulma rijitliği testi `1e-10` bağıl hata sınırı kullanır. Bu test
 üretim `tms_dynamic_torsional_stiffness` modülünü doğrudan çağırarak Cθ,
@@ -37,6 +38,15 @@ ayrı CTest vakalarıdır.
 Bu vakalarda üretim yordamının `error stop` ile sonlanması beklenir ve
 `WILL_FAIL` özelliği beklenen reddi test başarısına dönüştürür.
 
+`test_hub_inertia`, homojen annüler göbeğin hacim, kütle ve polar kütle
+ataletini bağımsız analitik sabitlerle doğrular. `test_torsional_system`,
+builder entegrasyonunu, fixed-hub eşdeğerliğini, serbest-serbest sıfır ve
+elastik modları, normalize mod şekillerini, K'/atalet ölçeklemelerini ve büyük
+göbek ataleti limitini sınar. K'' ve kayıp faktörü değişiminin sönümsüz modal
+sonucu değiştirmediği de ayrı bir regresyonla korunur. Pozitif olmayan atalet,
+K' ve yoğunluklar ile geçersiz göbek/halka geometrileri ayrı `WILL_FAIL`
+regresyonlarıdır.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman
@@ -48,6 +58,8 @@ ilgili testler aynı commit içinde güncellenir.
 `benchmarks/002_dynamic_elastomer/` dinamik modül veri noktasını,
 `benchmarks/003_dynamic_torsional_stiffness/` ise bu noktanın annüler geometri
 üzerindeki kompleks rijitlik sonucunu tanımlar.
+`benchmarks/004_two_inertia_tvd/`, fixed-hub ve serbest-serbest iki ataletli
+sistemin analitik frekansları ile mod şekillerini tanımlar.
 
 ## Test ekleme
 

@@ -7,8 +7,29 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.2.2] - 2026-08-24
+
+### Eklendi
+
+- V0.2.2 — Torsional System Model Foundation kapsamında geometri, rijit gövde
+  ataletleri ve kompleks elastomer rijitliğini birleştiren iki ataletli TVD
+  sistem türü ile builder yordamı.
+- Mevcut doğal frekans yordamını yeniden kullanan fixed-hub çözümü ve sıfır
+  frekanslı rijit-cisim modu ile elastik bağıl modu analitik çözen
+  serbest-serbest iki ataletli sistem yordamı.
+- Homojen annüler göbek için hacim, kütle ve polar kütle ataleti hesabı.
+- Fixed-hub ve serbest-serbest frekansları, `[1,1]` ile `[1,-J_h/J_r]` mod
+  şekillerini, ölçekleme davranışlarını ve büyük göbek ataleti limitini
+  doğrulayan testler ile Benchmark 004.
+- İki ataletli modal denklemleri ve frozen-property sönümsüz yaklaşımın fiziksel
+  sınırlarını açıklayan matematik, fizik ve mimari dokümantasyonu.
+
 ### Değiştirildi
 
+- Proje sürümü `0.2.2` olarak güncellendi; CTest kapsamı 28 teste çıkarıldı.
+- Annüler halka ve göbek kütle özellikleri ortak özel `pure` yardımcı yordamda
+  birleştirildi; pozitif yoğunluk ve geçerli rijit gövde geometrisi zorunlu
+  hale getirildi.
 - Geliştirme görevleri için temiz Debug build, tam derleme, CTest ve commit
   sonrası GitHub Actions kontrolünü zorunlu kılan Definition of Done eklendi.
 - Yeni Fortran modülleri için CMake kaydı, bağımlılık sırası, `pure` matematik

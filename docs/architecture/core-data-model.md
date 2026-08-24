@@ -2,7 +2,7 @@
 
 ## Amaç
 
-V0.2.1 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
+V0.2.2 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
 geometrik ve malzeme özelliklerini fizik yordamlarına taşır. Veri türleri
 doğrulama veya hesap yapmaz; fizik davranışı `engine/src/solver/` altındaki
 modüllerde tutulur.
@@ -20,22 +20,25 @@ modüllerde tutulur.
   olarak genişletir.
 - `tms_material`, geriye uyumlu elastomer türü içinde sıfır veya daha fazla
   frekans-sıcaklık çalışma noktası saklar.
-- `tms_inertia`, `inertia_ring_geometry_t` ile halka kütlesi ve ataletini
-  hesaplar.
+- `tms_inertia`, `hub_geometry_t` ve `inertia_ring_geometry_t` ile göbek ve
+  halka kütle özelliklerini ortak annüler rijit gövde hesabından üretir.
 - `tms_torsional_stiffness`, `rubber_geometry_t` ve
   `dynamic_rubber_material_t` ile lineer burulma rijitliğini hesaplar.
 - `tms_dynamic_torsional_stiffness`, aynı girdilerden K', K'', kayıp faktörü
   ve çalışma noktası üstverisini üretir.
 - `tms_frequency_solver`, hesaplanan rijitlik ve ataletten doğal frekansı bulur.
+- `tms_torsional_system`, bileşen sonuçlarını iki ataletli sistem türünde
+  birleştirir; fixed-hub ve serbest-serbest analitik modal sonuçları üretir.
 
 Mevcut torsional fizik akışı aşağıdaki sırayı izler:
 
 1. Mühendislik birimleri `tms_units` ile SI birimlerine dönüştürülür.
 2. SI değerleri mevcut geometri ve malzeme türlerine yazılır.
-3. Atalet ile statik veya kompleks burulma rijitliği birbirinden bağımsız
-   hesaplanır.
-4. Statik skaler rijitlik ve atalet mevcut doğal frekans yordamına verilebilir.
-   Kompleks rijitlik sonucu bu sürümde doğal frekans yordamına bağlanmaz.
+3. Göbek ve halka ataletleri ile kompleks burulma rijitliği mevcut bileşen
+   yordamlarında birbirinden bağımsız hesaplanır.
+4. Sistem builder'ı bu sonuçları `two_inertia_tvd_system_t` içinde birleştirir.
+5. Fixed-hub ve serbest-serbest modal yordamlar yalnız K' depolama rijitliğini
+   mevcut doğal frekans yordamına aktarır; K'' sistem üstverisinde korunur.
 
 Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
 `complex_torsional_stiffness_t` derived type değeriyle taşınır.
@@ -107,3 +110,24 @@ veya interpolasyon henüz yapılmaz.
 Bu sonuç türü solver katmanında tanımlıdır. Geometri ve malzeme veri türleri
 solver sonuçlarına bağımlı değildir; bağımlılık yönü çekirdek veriden solver'a
 doğrudur.
+
+## Torsional sistem ve modal sonuç türleri
+
+`two_inertia_tvd_system_t`, aşağıdaki SI alanlarıyla bileşen hesaplarını tek bir
+modal sistem durumunda birleştirir:
+
+- göbek ve atalet halkası polar kütle ataletleri (`kg·m²`)
+- K' depolama ve K'' kayıp burulma rijitlikleri (`N·m/rad`)
+- boyutsuz kayıp faktörü
+- dinamik malzemenin referans frekansı (`Hz`) ve sıcaklığı (`K`)
+
+`two_inertia_modal_result_t`, DOF sırası `[göbek, atalet halkası]` olacak
+biçimde rijit-cisim ve elastik mod frekanslarını (`Hz`) ve normalize mod
+şekillerini taşır. Rijit-cisim modu `[1,1]`, elastik mod ise
+`[1,-J_h/J_r]` biçimindedir.
+
+Sistem builder'ı atalet ve dinamik rijitlik denklemlerini yinelemez; mevcut
+üretim yordamlarını çağırıp sonuçlarını aktarır. Modal katman K'' değerinden
+sönüm veya kompleks özdeğer türetmez. G' ve K', malzeme referans çalışma
+noktasında sabitlenir; hesaplanan doğal frekansa göre interpolasyon veya
+iterasyon yapılmaz.

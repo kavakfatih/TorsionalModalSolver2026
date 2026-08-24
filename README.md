@@ -4,13 +4,14 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.2.1`, elastomerlerin kompleks kayma modülünü
-rijit göbek ile dış atalet halkasına tam bağlı annüler kauçuk burcun
-kompleks burulma rijitliğine bağlar. K', K'', kayıp faktörü, frekans ve
-sıcaklık aynı sonuç türünde sunulur. Frekans interpolasyonu ve kompleks
-doğal frekans çözümü henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.2.2`, homojen rijit göbek, tam bağlı annüler
+elastomer ve atalet halkasını tek bir TVD sistem modelinde birleştirir.
+Fixed-hub tek-DOF ve serbest-serbest iki-DOF doğal frekansları ile mod şekilleri
+analitik olarak çözülür. Modal tahmin yalnız K' kullanan frozen-property,
+sönümsüz bir yaklaşımdır; frekans interpolasyonu ve kompleks özdeğer çözümü
+henüz uygulanmamıştır.
 
-## V0.2.1 çekirdek kapsamı
+## V0.2.2 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -19,10 +20,12 @@ doğal frekans çözümü henüz uygulanmamıştır.
 - `tms_dynamic_modulus`: G', G'', frekans ve sıcaklık ile kayıp faktörü hesabı
 - `tms_material_frequency`: frekans-sıcaklık bağımlı malzeme veri noktası
 - `tms_material`: tek çalışma noktası alanları ve dinamik veri noktaları
-- `tms_inertia`: homojen annüler halkanın kütlesi ve polar kütle ataleti
+- `tms_inertia`: homojen annüler göbek ve halkanın kütle özellikleri
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
 - `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
+- `tms_torsional_system`: TVD builder'ı ile fixed-hub ve serbest-serbest
+  analitik modal çözüm
 
 Hesap motorunun iç veri sözleşmesi SI birimlerini kullanır. Uzunluk metre,
 yoğunluk `kg/m³`, kayma modülleri Pa, sıcaklık K ve frekans Hz cinsinden
@@ -31,10 +34,11 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.2.1 aşamasındadır. Hesap motorunun temel veri sözleşmesi, ilk
-analitik torsional hesap zinciri, dinamik elastomer veri modeli ve kompleks
-burulma rijitliği hesabı kullanılabilir. Kompleks rijitlik henüz modal veya
-doğal frekans solver'ına bağlanmamıştır.
+TMS26 şu anda V0.2.2 aşamasındadır. Hesap motorunun temel veri sözleşmesi,
+dinamik elastomer ve kompleks burulma rijitliği hesabı, annüler rijit gövde
+ataletleri ve iki sınır koşullu analitik TVD sistem modeli kullanılabilir.
+K'' sistem verisinde korunur; doğal frekans hesabı yalnız referans çalışma
+noktasında sabitlenmiş K' değerini kullanır.
 
 ### Tamamlananlar
 
@@ -46,10 +50,15 @@ doğal frekans solver'ına bağlanmamıştır.
 - Tam bağlı annüler TVD kauçuk burcu için `Cθ` geometri faktörü
 - `K' = G'Cθ` ve `K'' = G''Cθ` kompleks rijitlik bileşenleri
 - `G''/G' = K''/K'` eşitliğinin analitik doğrulaması
-- Homojen annüler atalet halkası için kütle ve polar kütle ataleti hesabı
+- Homojen annüler göbek ve atalet halkası için kütle ve polar kütle ataleti
+  hesabı
 - Lineer elastomer bölgesi için burulma rijitliği hesabı
 - Tek serbestlik dereceli, sönümsüz doğal frekans hesabı
-- Analitik referans testleri ve basit annüler TVD benchmark'ı
+- Geometri, yoğunluk ve dinamik malzemeyi birleştiren iki ataletli TVD builder'ı
+- Fixed-hub 1-DOF doğal frekansı ve serbest-serbest iki analitik mod
+- `[1,1]` rijit-cisim ve `[1,-J_h/J_r]` elastik mod şekilleri
+- K', atalet ve büyük göbek ataleti limit regresyonları
+- Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
 
@@ -57,7 +66,8 @@ doğal frekans solver'ına bağlanmamıştır.
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
 - Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
-- Çok serbestlik dereceli modal/eigen çözümü
+- Genel çok serbestlik dereceli modal/eigen çözümü
+- Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
 
 Her fiziksel hesap genişletmesi, ilgili matematik belgesi, otomatik test ve
@@ -157,7 +167,13 @@ altında açıklanmıştır. Kompleks rijitlik fiziksel modeli
 [`docs/physics/complex_torsional_stiffness.md`](docs/physics/complex_torsional_stiffness.md),
 EPDM analitik örneği ise
 [`benchmarks/003_dynamic_torsional_stiffness/`](benchmarks/003_dynamic_torsional_stiffness/)
-altında bulunur.
+altında bulunur. İki ataletli analitik modal türetim
+[`docs/mathematics/two_inertia_modal_model.md`](docs/mathematics/two_inertia_modal_model.md),
+fiziksel sistem sınırları
+[`docs/physics/two_inertia_torsional_system.md`](docs/physics/two_inertia_torsional_system.md)
+ve sayısal referans
+[`benchmarks/004_two_inertia_tvd/`](benchmarks/004_two_inertia_tvd/)
+altında açıklanmıştır.
 
 ## Lisans
 

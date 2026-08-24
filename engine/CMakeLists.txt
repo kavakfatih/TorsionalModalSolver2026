@@ -17,6 +17,7 @@ target_sources(
     src/solver/tms_torsional_stiffness.f90
     src/solver/tms_dynamic_torsional_stiffness.f90
     src/solver/tms_frequency_solver.f90
+    src/solver/tms_torsional_system.f90
 )
 
 set_target_properties(
@@ -61,6 +62,7 @@ if(BUILD_TESTING)
   tms26_add_fortran_test(material tests/test_material.f90)
   tms26_add_fortran_test(dynamic_modulus tests/test_dynamic_modulus.f90)
   tms26_add_fortran_test(inertia tests/test_inertia.f90)
+  tms26_add_fortran_test(hub_inertia tests/test_hub_inertia.f90)
   tms26_add_fortran_test(torsional_stiffness tests/test_torsional_stiffness.f90)
   add_test(
     NAME "tms26.torsional_stiffness.rejects_nonpositive_modulus"
@@ -105,4 +107,28 @@ if(BUILD_TESTING)
   endforeach()
 
   tms26_add_fortran_test(frequency_solver tests/test_frequency_solver.f90)
+  tms26_add_fortran_test(torsional_system tests/test_torsional_system.f90)
+
+  # Sistem katmanının doğrudan modal girdileri ile builder yoğunluk ve
+  # geometri önkoşullarını error stop üzerinden reddettiğini doğrular.
+  foreach(
+    validation_case
+    IN ITEMS
+      nonpositive_hub_inertia
+      nonpositive_ring_inertia
+      nonpositive_storage_stiffness
+      nonpositive_hub_density
+      nonpositive_ring_density
+      invalid_hub_geometry
+      invalid_ring_geometry
+  )
+    set(validation_test "tms26.torsional_system.rejects_${validation_case}")
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_torsional_system>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
 endif()

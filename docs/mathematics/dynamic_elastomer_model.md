@@ -77,6 +77,13 @@ geçerlidir. `calculate_dynamic_torsional_stiffness`, malzemenin mevcut tek
 yapmaz. Hesap, `ri <= 0`, `ro <= ri`, `L <= 0`, `G' <= 0` ve `G'' < 0`
 girdilerini kabul etmez.
 
+V0.2.2 sistem builder'ı K', K'', kayıp faktörü, referans frekansı ve sıcaklığı
+iki ataletli TVD sistemine birlikte aktarır. Sönümsüz modal tahmin yalnız K'
+kullanır; K'' kompleks özdeğer hesabına katılmaz ve hesaplanan frekansa göre
+yeni bir G' seçimi veya iterasyon yapılmaz. Bu frozen-property sınırı
+[`two_inertia_modal_model.md`](two_inertia_modal_model.md) belgesinde
+ayrıntılandırılır.
+
 Annüler bir milin eksen boyunca Saint-Venant burulmasına ait
 `K = GJp/ℓ` denklemi farklı sınır koşullarına dayanır ve TVD burç solver'larında
 kullanılmaz. İki modelin ayrıntılı ayrımı

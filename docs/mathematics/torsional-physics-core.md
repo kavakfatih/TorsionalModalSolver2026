@@ -3,15 +3,16 @@
 ## Amaç ve kapsam
 
 Bu belge, eksenel simetrik annüler bir TVD için analitik hesap zincirini
-tanımlar. Model; homojen atalet halkası, lineer elastik elastomer ve tek
-serbestlik dereceli sönümsüz doğal frekans kabulüne dayanır. V0.2.1.2 fizik
-düzeltmesi, TVD elastomerini tam bağlı silindirik kauçuk burç olarak ele alır.
-Tüm girdiler hesap yordamlarına SI birimleriyle verilmelidir.
+tanımlar. Model; homojen annüler göbek ve atalet halkası, lineer elastik
+elastomer ve analitik sönümsüz doğal frekans kabullerine dayanır. V0.2.1.2
+fizik düzeltmesi TVD elastomerini tam bağlı silindirik kauçuk burç olarak ele
+alır; V0.2.2 aynı rijit gövde hesabını göbek için de kullanır. Tüm girdiler
+hesap yordamlarına SI birimleriyle verilmelidir.
 
-## Annüler halkanın kütlesi ve polar ataleti
+## Annüler rijit gövdenin kütlesi ve polar ataleti
 
 İç yarıçapı `ri`, dış yarıçapı `ro` ve eksenel genişliği `b` olan homojen
-halkanın hacmi ve kütlesi:
+rijit gövdenin hacmi ve kütlesi:
 
 ```text
 V = π (ro² - ri²) b
@@ -25,8 +26,10 @@ J = 1/2 m (ro² + ri²)
 ```
 
 `ri`, `ro` ve `b` metre; yoğunluk `ρ` kg/m³; kütle `m` kg; polar kütle atalet
-momenti `J` kg·m² cinsindendir. Model homojen yoğunluk ve eksenel simetri kabul
-eder. Geçerli girdiler `0 <= ri < ro`, `b > 0` ve `ρ > 0` koşullarını sağlar.
+momenti `J` kg·m² cinsindendir. Aynı denklemde göbek için `ri` delik yarıçapı,
+atalet halkası için iç yarıçaptır. Model homojen yoğunluk ve eksenel simetri
+kabul eder. Geçerli girdiler `0 <= ri < ro`, `b > 0` ve `ρ > 0` koşullarını
+sağlar.
 
 ## Annüler burulma modellerinin ayrımı
 
@@ -93,8 +96,10 @@ fn = ωn / (2π)
 ```
 
 `kθ` N·m/rad, `J` kg·m², `ωn` rad/s ve `fn` Hz cinsindendir. Model `kθ > 0`
-ve `J > 0` koşullarını gerektirir. Sönüm, nonlinear elastomer davranışı, bağlı
-çoklu ataletler ve eigen çözümü kapsam dışındadır.
+ve `J > 0` koşullarını gerektirir. V0.2.2 fixed-hub ve bağlı iki ataletli
+serbest-serbest sistemi analitik olarak ekler; ayrıntılar
+[`two_inertia_modal_model.md`](two_inertia_modal_model.md) belgesindedir.
+Sönüm, nonlinear elastomer davranışı ve genel özdeğer çözümü kapsam dışındadır.
 
 ## Sayısal doğrulama
 
@@ -102,5 +107,6 @@ Her fizik yordamı bağımsız analitik değerle sınanır. Kabul ölçütü, he
 değer ile referans değer arasındaki bağıl hatanın `0,001` değerinden, yani yüzde
 `0,1`'den küçük olması temel mühendislik kabulüdür. Dinamik burulma
 rijitliği analitik doğrulamasında daha sıkı `1e-10` bağıl hata sınırı
-uygulanır. Ortak referans model `benchmarks/001_simple_annular_tvd/` altında
+uygulanır. Tek-DOF ortak referansı `benchmarks/001_simple_annular_tvd/`,
+iki ataletli sistem referansı `benchmarks/004_two_inertia_tvd/` altında
 tanımlanmıştır.

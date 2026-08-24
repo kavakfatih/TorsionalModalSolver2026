@@ -5,8 +5,8 @@ katman sınırlarını açıklar.
 
 ## Mevcut belgeler
 
-- [`core-data-model.md`](core-data-model.md): çekirdek geometri, malzeme ve
-  torsional fizik modüllerinin veri modeli
+- [`core-data-model.md`](core-data-model.md): çekirdek geometri, malzeme,
+  torsional fizik ve iki ataletli sistem modüllerinin veri modeli
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

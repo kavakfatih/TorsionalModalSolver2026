@@ -13,6 +13,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
   dereceli torsional hareket denklemi ve sönümsüz doğal frekans
 - [`dynamic_elastomer_model.md`](dynamic_elastomer_model.md): kompleks dinamik
   kayma modülü, kompleks burulma rijitliği bağlantısı ve kayıp faktörü
+- [`two_inertia_modal_model.md`](two_inertia_modal_model.md): fixed-hub ve
+  serbest-serbest iki ataletli TVD sisteminin analitik frekansları ile mod
+  şekilleri
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

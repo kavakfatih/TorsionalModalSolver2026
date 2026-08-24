@@ -62,10 +62,14 @@ fn ≈ 1/(2π) sqrt(K'/Jmass)
 ```
 
 K'' ise sönüm ve faz davranışını etkiler; frekans cevabındaki rezonans genliği,
-fazı ve sönümlü rezonans konumu değerlendirilirken dikkate alınır. V0.2.1
-`tms_frequency_solver` yordamını değiştirmez: bu yordam gerçek skaler rijitlikle
-sönümsüz doğal frekans hesaplamayı sürdürür. Kompleks eigen veya frekans cevabı
-çözümü bu sürümün kapsamı dışındadır.
+fazı ve sönümlü rezonans konumu değerlendirilirken dikkate alınır. V0.2.2
+`tms_torsional_system`, fixed-hub ve serbest-serbest analitik modal tahminlerde
+kompleks sonuçtan yalnız K' bileşenini mevcut `tms_frequency_solver` yordamına
+aktarır. K'' sistem verisinde korunur ancak sönümsüz özdeğer denklemine dahil
+edilmez. Kompleks özdeğer veya frekans cevabı çözümü bu sürümün kapsamı
+dışındadır; frozen-property sınırı
+[`two_inertia_torsional_system.md`](two_inertia_torsional_system.md) belgesinde
+açıklanır.
 
 ## Girdi doğrulaması
 
