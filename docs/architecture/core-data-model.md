@@ -12,8 +12,8 @@ modüllerde tutulur.
 - `tms_kinds`, proje genelindeki çift hassasiyetli `dp` türünü tanımlar.
 - `tms_constants`, `tms_kinds` türüyle matematik ve dönüşüm sabitlerini tanımlar.
 - `tms_units`, `tms_constants` çarpanlarını kullanan birim dönüşümlerini sunar.
-- `tms_geometry`, TVD geometri türlerini ve annüler elastomer için ortak polar
-  alan momenti hesabını tanımlar.
+- `tms_geometry`, TVD geometri türlerini, annüler kesit polar alan momentini
+  ve tam bağlı annüler kauçuk burç geometri faktörünü tanımlar.
 - `tms_dynamic_modulus`, G', G'', frekans ve sıcaklık alanlarıyla kompleks
   kayma modülü veri türünü ve kayıp faktörü hesabını tanımlar.
 - `tms_material_frequency`, dinamik modül türünü bir malzeme çalışma noktası
@@ -51,9 +51,16 @@ Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
 
 Tüm geometrik alanlar metre cinsindedir. Sıfır başlangıç değerleri yalnızca
 deterministik ilk durumu sağlar; fiziksel olarak geçerli bir geometri anlamına
-gelmez. `calculate_rubber_polar_area_moment(outer_radius, inner_radius)`, metre
-birimli iki skaler yarıçaptan annüler elastomer için `Jp = π/2 (ro⁴-ri⁴)`
-hesabını hem statik hem dinamik solver'a sağlar.
+gelmez. Geometri modülü iki ayrı fizik modelini karıştırmayan yardımcı
+yordamlar sunar:
+
+- `calculate_rubber_polar_area_moment`, eksen boyunca Saint-Venant burulması
+  uygulanacak annüler kesit için `Jp = π/2 (ro⁴-ri⁴)` değerini (`m⁴`)
+  hesaplar. TVD rijitlik solver'ları bu yordamı kullanmaz.
+- `calculate_annular_bush_torsion_geometry_factor`, rijit iç göbek ve dış
+  halkaya tam bağlı elastomer için
+  `Cθ = 4πLri²ro²/(ro²-ri²)` değerini (`m³`) hesaplar. Statik ve
+  dinamik TVD rijitlik solver'ları bu faktörü kullanır.
 
 ## Dinamik elastomer türleri
 

@@ -11,12 +11,14 @@ ayrıntılandırılır.
 
 ## Kompleks burulma rijitliği
 
-Lineer kayma idealizasyonunda kompleks burulma rijitliği şöyledir:
+Tam bağlı eş merkezli silindirik elastomer tabakanın lineer kayma
+idealizasyonunda kompleks burulma rijitliği şöyledir:
 
 ```text
 K* = K' + iK''
-K' = G'Jp/L
-K'' = G''Jp/L
+Cθ = 4πLri²ro²/(ro²-ri²)
+K' = G'Cθ
+K'' = G''Cθ
 ```
 
 `K'`, elastik olarak enerji depolayan burulma rijitliği bileşenidir. `K''`,
@@ -29,21 +31,27 @@ bileşen de kullanılan G' ve G'' verilerinin frekans ve sıcaklığına bağlı
 | --- | --- | --- |
 | `G'` | Depolama kayma modülü | `Pa = N/m²` |
 | `G''` | Kayıp kayma modülü | `Pa = N/m²` |
-| `Jp` | Elastomer kesitinin polar alan momenti | `m⁴` |
-| `L` | Elastomerin etkin burulma uzunluğu | `m` |
+| `ri` | İç silindirik bağ yüzeyi yarıçapı | `m` |
+| `ro` | Dış silindirik bağ yüzeyi yarıçapı | `m` |
+| `L` | Bağlı elastomerin eksenel genişliği | `m` |
+| `Cθ` | Annüler kauçuk burç geometri faktörü | `m³` |
 | `K'` | Depolama burulma rijitliği | `N·m/rad` |
 | `K''` | Kayıp burulma rijitliği | `N·m/rad` |
 
-Buradaki `Jp`, geometriye ait polar **alan** momentidir; doğal frekans
-denkleminde kullanılan `kg·m²` birimli polar **kütle** ataletiyle aynı büyüklük
-değildir. Radyan SI boyut analizinde boyutsuz kabul edilse de mühendislik
-anlamını açık tutmak için rijitlik birimi `N·m/rad` olarak yazılır.
+`Cθ`, polar alan momenti veya polar kütle ataleti değildir. Pa birimli kayma
+modülüyle çarpıldığında `N·m/rad` birimli rijitlik üretir. Radyan SI boyut
+analizinde boyutsuz kabul edilse de mühendislik anlamını açık tutmak için
+rijitlik biriminde gösterilir.
 
 ## Varsayımlar ve sınırlar
 
-- Elastomer lineer viskoelastik ve geometri küçük deformasyon bölgesindedir.
-- G', G'', Jp ve L kullanılan çalışma noktası için geçerli kabul edilir.
-- Hesapta `0 <= ri < ro`, `L > 0`, `G' > 0` ve `G'' >= 0` koşulları
+- Elastomer lineer viskoelastik, silindirik yüzeylere tam bağlı ve geometri
+  küçük deformasyon bölgesindedir; uç etkileri ihmal edilir.
+- G', G'', ri, ro ve L kullanılan çalışma noktası için geçerli kabul edilir.
+- Hesapta `0 < ri < ro`, `L > 0`, `G' > 0` ve `G'' >= 0` koşulları
   doğrulanır; geçersiz girdiler reddedilir.
+- `ri = 0`, bağlı iç silindirik yüzey bulunmadığı için kapsam dışıdır.
+- Annüler milin eksen boyunca burulmasına ait `GJp/ℓ` modeli ayrıdır ve
+  TVD solver'larında kullanılmaz.
 - Geometrik nonlinearite, hiperelastisite ve frekanslar arası interpolasyon
   bu modelin kapsamı dışındadır.

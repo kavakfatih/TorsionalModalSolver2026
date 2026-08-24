@@ -1,7 +1,7 @@
 module tms_dynamic_torsional_stiffness
   use tms_kinds, only : dp
   use tms_geometry, only : rubber_geometry_t, &
-    calculate_rubber_polar_area_moment
+    calculate_annular_bush_torsion_geometry_factor
   use tms_material, only : dynamic_rubber_material_t
   implicit none
   private
@@ -34,19 +34,21 @@ module tms_dynamic_torsional_stiffness
 
 contains
 
-  !> Annüler elastomer bölgenin kompleks burulma rijitliğini hesaplar.
+  !> Tam bağlı annüler TVD elastomerinin kompleks rijitliğini hesaplar.
   !!
-  !! Fiziksel açıklama: K' elastomerin bağıl dönmeye karşı elastik ve enerji
-  !! depolayan tepkisini, K'' ise faz dışı ve enerji kaybettiren tepkisini
-  !! temsil eder. Frekans ve sıcaklık malzemenin çalışma noktasından aktarılır.
-  !! Matematiksel açıklama: Jp = pi/2*(ro^4-ri^4), K' = G'*Jp/L,
-  !! K'' = G''*Jp/L ve tan(delta) = K''/K' bağıntıları uygulanır.
+  !! Fiziksel açıklama: Rijit iç göbek ve rijit dış atalet halkasına
+  !! tam bağlı eş merkezli silindirik elastomer tabakasında K' enerji
+  !! depolayan, K'' ise enerji kaybettiren moment tepkisidir. Frekans ve
+  !! sıcaklık malzemenin çalışma noktasından aktarılır.
+  !! Matematiksel açıklama: C_theta =
+  !! 4*pi*L*ri^2*ro^2/(ro^2-ri^2), K' = G'*C_theta,
+  !! K'' = G''*C_theta ve tan(delta) = K''/K' bağıntıları uygulanır.
   !! Girdiler: material içindeki G' ve G'' Pa, frekans Hz, sıcaklık K;
-  !! rubber içindeki ri, ro ve etkin uzunluk L metre (m) cinsindendir.
+  !! rubber içindeki ri, ro ve bağlı eksenel genişlik L metre (m) cinsindendir.
   !! Çıktı: K' ve K'' N*m/rad, kayıp faktörü boyutsuz, frekans Hz ve
   !! sıcaklık K alanlarından oluşan complex_torsional_stiffness_t değeridir.
   !! Varsayımlar ve geçerlilik: Elastomer homojen, lineer viskoelastik ve
-  !! küçük deformasyon bölgesindedir; 0 <= ri < ro, L > 0, G' > 0 ve
+  !! küçük deformasyon bölgesindedir; 0 < ri < ro, L > 0, G' > 0 ve
   !! G'' >= 0 olmalıdır. Yordam bu fiziksel önkoşulları doğrular ve
   !! geçersiz girdide error stop ile sonlanır. frequency_points dizisinde
   !! seçim veya interpolasyon yapmaz; mevcut tek çalışma noktası alanlarını
@@ -59,11 +61,7 @@ contains
     type(rubber_geometry_t), intent(in) :: rubber
     type(complex_torsional_stiffness_t) :: stiffness
 
-    real(dp) :: polar_area_moment_m4
-
-    if (rubber%axial_length_m <= 0.0_dp) then
-      error stop "Elastomer etkin uzunluğu sıfırdan büyük olmalıdır."
-    end if
+    real(dp) :: geometry_factor_m3
 
     if (material%storage_shear_modulus_pa <= 0.0_dp) then
       error stop "Depolama kayma modülü G' sıfırdan büyük olmalıdır."
@@ -73,12 +71,14 @@ contains
       error stop "Kayıp kayma modülü G'' negatif olamaz."
     end if
 
-    polar_area_moment_m4 = calculate_rubber_polar_area_moment( &
-      rubber%outer_radius_m, rubber%inner_radius_m)
+    geometry_factor_m3 = calculate_annular_bush_torsion_geometry_factor( &
+      inner_radius=rubber%inner_radius_m, &
+      outer_radius=rubber%outer_radius_m, &
+      axial_length=rubber%axial_length_m)
     stiffness%storage_stiffness = material%storage_shear_modulus_pa * &
-      polar_area_moment_m4 / rubber%axial_length_m
+      geometry_factor_m3
     stiffness%loss_stiffness = material%loss_shear_modulus_pa * &
-      polar_area_moment_m4 / rubber%axial_length_m
+      geometry_factor_m3
     stiffness%loss_factor = stiffness%loss_stiffness / &
       stiffness%storage_stiffness
     stiffness%frequency = material%frequency_hz

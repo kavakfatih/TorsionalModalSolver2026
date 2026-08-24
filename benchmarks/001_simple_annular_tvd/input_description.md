@@ -11,7 +11,7 @@
 
 - İç yarıçap: `90 mm` (`0,090 m`)
 - Dış yarıçap: `110 mm` (`0,110 m`)
-- Efektif uzunluk: `50 mm` (`0,050 m`)
+- Bağlı eksenel genişlik: `50 mm` (`0,050 m`)
 - Storage shear modulus G': `1,25 MPa` (`1 250 000 Pa`)
 - Sıcaklık: `293,15 K`
 - Frekans çalışma noktası: `25 Hz`

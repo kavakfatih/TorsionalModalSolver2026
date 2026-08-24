@@ -1,7 +1,7 @@
 module tms_torsional_stiffness
   use tms_kinds, only : dp
   use tms_geometry, only : rubber_geometry_t, &
-    calculate_rubber_polar_area_moment
+    calculate_annular_bush_torsion_geometry_factor
   use tms_material, only : dynamic_rubber_material_t
   implicit none
   private
@@ -10,32 +10,42 @@ module tms_torsional_stiffness
 
 contains
 
-  !> Annüler elastomer bölgenin lineer burulma rijitliğini hesaplar.
+  !> Tam bağlı annüler TVD elastomerinin burulma rijitliğini hesaplar.
   !!
-  !! Fiziksel açıklama: Burulma rijitliği, elastomer bölgenin göbek ile atalet
-  !! halkası arasındaki bağıl dönmeye karşı ürettiği geri çağırıcı momenti
-  !! temsil eder. Dinamik malzeme çalışma noktasındaki storage shear modulus
-  !! G' değeri, lineer elastik kayma modülü olarak kullanılır.
-  !! Matematiksel açıklama: Annüler kesit için Jp = pi/2 * (ro^4 - ri^4) ve
-  !! k_theta = G' * Jp / L bağıntıları uygulanır.
-  !! Girdiler: ri, ro ve efektif uzunluk L metre (m); G' paskal (Pa) cinsindedir.
+  !! Fiziksel açıklama: Model, bağıl dönme altındaki tam bağlı eş
+  !! merkezli silindirik kauçuk tabakayı (bonded concentric cylindrical
+  !! rubber layer under relative rotation) temsil eder. Rijit iç göbek ve
+  !! rijit dış atalet halkası arasındaki elastomer geri çağırıcı moment
+  !! üretir. Malzemenin storage shear modulus G' değeri bu statik lineer
+  !! modelde kayma modülü G olarak kullanılır.
+  !! Matematiksel açıklama: C_theta =
+  !! 4*pi*L*ri^2*ro^2/(ro^2-ri^2) ve k_theta = G'*C_theta uygulanır.
+  !! Girdiler: ri ve ro metre (m), bağlı eksenel genişlik L metre (m),
+  !! G' paskal (Pa) cinsindendir.
   !! Çıktı: Burulma rijitliği k_theta newton-metre/radyan (N*m/rad) cinsindendir.
-  !! Varsayımlar ve geçerlilik: Elastomer homojen, izotrop, küçük şekil
-  !! değiştirmeli ve lineer elastiktir; 0 <= ri < ro, L > 0 ve G' > 0
-  !! olmalıdır. Yordam bu önkoşulları doğrulamaz. Kayıp modülü G'' bu ilk
-  !! modelde kullanılmaz. Ayrıntılar: docs/mathematics/torsional-physics-core.md.
+  !! Varsayımlar ve geçerlilik: Elastomer homojen, izotrop, ara yüzlerde
+  !! kaymasız, küçük deformasyonlu ve lineer elastiktir; ri > 0, ro > ri,
+  !! L > 0 ve G' > 0 olmalıdır. Yordam bu önkoşulları doğrular. Kayıp
+  !! modülü G'' bu statik modelde kullanılmaz. Ayrıntılar:
+  !! docs/mathematics/torsional-physics-core.md.
   pure function calculate_torsional_stiffness(rubber, material) &
       result(stiffness_nm_per_rad)
     type(rubber_geometry_t), intent(in) :: rubber
     type(dynamic_rubber_material_t), intent(in) :: material
     real(dp) :: stiffness_nm_per_rad
 
-    real(dp) :: polar_area_moment_m4
+    real(dp) :: geometry_factor_m3
 
-    polar_area_moment_m4 = calculate_rubber_polar_area_moment( &
-      rubber%outer_radius_m, rubber%inner_radius_m)
-    stiffness_nm_per_rad = material%storage_shear_modulus_pa * &
-      polar_area_moment_m4 / rubber%axial_length_m
+    if (material%storage_shear_modulus_pa <= 0.0_dp) then
+      error stop "Kayma modülü G sıfırdan büyük olmalıdır."
+    end if
+
+    geometry_factor_m3 = calculate_annular_bush_torsion_geometry_factor( &
+      inner_radius=rubber%inner_radius_m, &
+      outer_radius=rubber%outer_radius_m, &
+      axial_length=rubber%axial_length_m)
+    stiffness_nm_per_rad = &
+      material%storage_shear_modulus_pa * geometry_factor_m3
   end function calculate_torsional_stiffness
 
 end module tms_torsional_stiffness

@@ -1,6 +1,6 @@
 # Karar 0004: Kompleks Rijitlik Arayüzü
 
-- Durum: Kabul edildi
+- Durum: Kısmen geçersiz kılındı; geometri kararı için Karar 0005 geçerlidir
 - Tarih: 2026-08-23
 
 ## Bağlam
@@ -30,3 +30,11 @@ bilgisini açıkça taşıması gerekir.
   gerekir.
 - Kompleks doğal frekans, eigen çözümü veya frekans cevabı bu arayüzün kapsamında
   değildir.
+
+## Sonraki düzeltme
+
+Bu kayıttaki sonuç türü ve ayrı statik/dinamik API kararları geçerliliğini
+korur. Annüler `Jp` değerinin iki TVD rijitlik solver'ı tarafından kullanılması
+kararı, fiziksel sınır koşullarını düzelten
+[`0005-bonded-annular-rubber-torsion-model.md`](0005-bonded-annular-rubber-torsion-model.md)
+ile geçersiz kılınmıştır.

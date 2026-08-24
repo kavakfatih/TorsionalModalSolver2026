@@ -20,6 +20,13 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ### Düzeltildi
 
+- TVD elastomer rijitliğinde eksen boyunca Saint-Venant burulmasına ait
+  `GJp/ℓ` denklemi yerine, rijit göbek ve dış halkaya tam bağlı annüler
+  kauçuk burç için `4πGLri²ro²/(ro²-ri²)` denklemi uygulanmaya başlandı.
+- Statik ve dinamik solver'lar `m³` birimli ortak `Cθ` geometri faktörüne
+  bağlandı; Benchmark 001/003 ve doğal frekans referansları düzeltildi.
+- `ri = 0` değerinin tam bağlı silindirik burç modeli için fiziksel olarak
+  geçersiz olduğu belgelenerek girdi doğrulamasına eklendi.
 - `calculate_rubber_polar_area_moment` yordamının public PURE arayüzü dış ve iç
   yarıçapı metre cinsinden alan iki skaler argümanla uyumlu hale getirildi.
 - Dinamik rijitlik testinin üretim yordamı yerine yerel bir hesap kopyasını

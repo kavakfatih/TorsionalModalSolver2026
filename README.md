@@ -5,9 +5,10 @@ mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 201
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
 Güncel geliştirme sürümü `0.2.1`, elastomerlerin kompleks kayma modülünü
-annüler kesitin kompleks burulma rijitliğine bağlar. K', K'', kayıp faktörü,
-frekans ve sıcaklık aynı sonuç türünde sunulur. Frekans interpolasyonu ve
-kompleks doğal frekans çözümü henüz uygulanmamıştır.
+rijit göbek ile dış atalet halkasına tam bağlı annüler kauçuk burcun
+kompleks burulma rijitliğine bağlar. K', K'', kayıp faktörü, frekans ve
+sıcaklık aynı sonuç türünde sunulur. Frekans interpolasyonu ve kompleks
+doğal frekans çözümü henüz uygulanmamıştır.
 
 ## V0.2.1 çekirdek kapsamı
 
@@ -41,8 +42,9 @@ doğal frekans solver'ına bağlanmamıştır.
 - SI birim dönüşümleri ile geometri ve dinamik elastomer veri türleri
 - Frekans ve sıcaklık çalışma noktalarında G' ve G'' saklama altyapısı
 - `tan(delta) = G'' / G'` kayıp faktörü hesabı ve analitik testi
-- Annüler elastomer için ortak polar alan momenti hesabı
-- `K' = G'Jp/L` ve `K'' = G''Jp/L` kompleks rijitlik bileşenleri
+- Annüler mil/end-face burulması için ayrı polar alan momenti hesabı
+- Tam bağlı annüler TVD kauçuk burcu için `Cθ` geometri faktörü
+- `K' = G'Cθ` ve `K'' = G''Cθ` kompleks rijitlik bileşenleri
 - `G''/G' = K''/K'` eşitliğinin analitik doğrulaması
 - Homojen annüler atalet halkası için kütle ve polar kütle ataleti hesabı
 - Lineer elastomer bölgesi için burulma rijitliği hesabı

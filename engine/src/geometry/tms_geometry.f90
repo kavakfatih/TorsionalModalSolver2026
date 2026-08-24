@@ -37,6 +37,7 @@ module tms_geometry
   end type tvd_geometry_t
 
   public :: calculate_rubber_polar_area_moment
+  public :: calculate_annular_bush_torsion_geometry_factor
 
 contains
 
@@ -70,5 +71,53 @@ contains
 
     jp = 0.5_dp * pi * (outer_radius**4 - inner_radius**4)
   end function calculate_rubber_polar_area_moment
+
+  !> Tam bağlı annüler kauçuk burcun burulma geometri faktörünü hesaplar.
+  !!
+  !! Fiziksel açıklama: Faktör, rijit iç göbek ile rijit dış halka
+  !! arasındaki eş merkezli elastomer tabakanın bağıl dönmeye karşı geometri
+  !! katkısıdır. Elastomer iki silindirik yüzeye tam bağlıdır.
+  !! Matematiksel açıklama:
+  !! C_theta = 4*pi*L*ri^2*ro^2/(ro^2-ri^2).
+  !! Girdiler: inner_radius iç yarıçap ri, outer_radius dış yarıçap ro
+  !! ve axial_length bağlı eksenel genişlik L'dir; tümü metre (m)
+  !! cinsindendir.
+  !! Çıktı: geometry_factor_m3, metreküp (m^3) cinsindedir ve kayma
+  !! modülüyle çarpıldığında N*m/rad birimli burulma rijitliği verir.
+  !! Varsayımlar ve geçerlilik: Silindirler eş merkezli ve rijit, elastomer
+  !! homojen, lineer, küçük deformasyon bölgesinde ve ara yüzlerde kaymasızdır.
+  !! ri > 0, ro > ri ve L > 0 olmalıdır. ri = 0, bağlı iç silindirik
+  !! yüzey bulunmadığından bu burç modelinin kapsamı dışındadır.
+  !! Ayrıntılar: docs/mathematics/torsional-physics-core.md.
+  pure function calculate_annular_bush_torsion_geometry_factor( &
+      inner_radius, outer_radius, axial_length) result(geometry_factor_m3)
+    real(dp), intent(in) :: inner_radius
+    real(dp), intent(in) :: outer_radius
+    real(dp), intent(in) :: axial_length
+    real(dp) :: geometry_factor_m3
+
+    real(dp) :: radius_square_difference_m2
+
+    if (inner_radius < 0.0_dp .or. outer_radius < 0.0_dp) then
+      error stop "Elastomer yarıçapları negatif olamaz."
+    end if
+
+    if (inner_radius == 0.0_dp) then
+      error stop "Annüler kauçuk burç iç yarıçapı pozitif olmalıdır."
+    end if
+
+    if (outer_radius <= inner_radius) then
+      error stop "Elastomer dış yarıçapı iç yarıçapından büyük olmalıdır."
+    end if
+
+    if (axial_length <= 0.0_dp) then
+      error stop "Elastomer eksenel genişliği sıfırdan büyük olmalıdır."
+    end if
+
+    radius_square_difference_m2 = &
+      (outer_radius - inner_radius) * (outer_radius + inner_radius)
+    geometry_factor_m3 = 4.0_dp * pi * axial_length * inner_radius**2 * &
+      outer_radius**2 / radius_square_difference_m2
+  end function calculate_annular_bush_torsion_geometry_factor
 
 end module tms_geometry

@@ -10,17 +10,23 @@ rijitliği ile gösterilir:
 K* = K' + iK''
 ```
 
-Annüler elastomer için geometrik dönüşüm şöyledir:
+Rijit iç göbek ve rijit dış atalet halkasına tam bağlı annüler elastomer
+burç için geometrik dönüşüm şöyledir:
 
 ```text
-Jp = π/2 (ro⁴ - ri⁴)
-K' = G' Jp / L
-K'' = G'' Jp / L
+Cθ = 4π L ri² ro² / (ro² - ri²)
+K' = G' Cθ
+K'' = G'' Cθ
 ```
 
-Burada `Jp` kauçuk kesitin polar alan momenti (`m⁴`), `L` etkin elastomer
-uzunluğu (`m`), G' ve G'' ise sırasıyla depolama ve kayıp kayma modülleridir
-(`Pa`). K' ve K'' birimi `N·m/rad` değeridir.
+Burada `ri` ve `ro` silindirik bağ yüzeylerinin yarıçapları (`m`), `L`
+bağlı yüzeyin eksenel genişliği (`m`) ve `Cθ` burç geometri faktörüdür
+(`m³`). G' ve G'' sırasıyla depolama ve kayıp kayma modülleridir (`Pa`).
+K' ve K'' birimi `N·m/rad` değeridir.
+
+Bu modelde moment, elastomerin uç yüzeylerinden değil iç ve dış silindirik
+bağ yüzeylerinden aktarılır. Bu nedenle annüler milin eksen boyunca
+burulmasına ait `GJp/ℓ` denklemi TVD solver'ında kullanılmaz.
 
 ## Elastomer enerji depolama davranışı
 
@@ -36,7 +42,7 @@ her çevrimde ısıya dönüşmesiyle ilişkilidir.
 
 ## Kayıp faktörü
 
-Aynı çalışma noktasında G' ve G'' bileşenlerine aynı `Jp/L` katsayısı
+Aynı çalışma noktasında G' ve G'' bileşenlerine aynı `Cθ` faktörü
 uygulandığından iki kayıp faktörü tanımı eşittir:
 
 ```text
@@ -66,21 +72,24 @@ sönümsüz doğal frekans hesaplamayı sürdürür. Kompleks eigen veya frekans
 Hesabın sonlu ve fiziksel anlamlı bir kompleks rijitlik üretmesi için aşağıdaki
 önkoşullar zorunludur:
 
-- İç ve dış yarıçaplar negatif olamaz.
+- İç yarıçap pozitif olmalıdır; `ri = 0` bağlı iç silindirik yüzey
+  oluşturmadığından bu modelin kapsamı dışındadır.
 - Annüler kesitte `ro > ri` olmalıdır.
-- Etkin elastomer uzunluğu için `L > 0` olmalıdır.
+- Bağlı eksenel genişlik için `L > 0` olmalıdır.
 - Depolama modülü için `G' > 0` olmalıdır.
 - Pasif kayıp modeli için `G'' >= 0` olmalıdır.
 
-`calculate_dynamic_torsional_stiffness` ve ortak polar alan momenti yordamı bu
-koşulları `pure` niteliklerini koruyarak denetler; geçersiz girdide hesap
-`error stop` ile sonlanır. Frekans ve sıcaklık bu modelde hesap girdisi olarak
-dönüştürülmez, malzeme çalışma noktasından sonuca aynen aktarılır.
+`calculate_dynamic_torsional_stiffness` ve
+`calculate_annular_bush_torsion_geometry_factor` bu koşulları `pure`
+niteliklerini koruyarak denetler; geçersiz girdide hesap `error stop` ile
+sonlanır. Frekans ve sıcaklık bu modelde hesap girdisi olarak dönüştürülmez,
+malzeme çalışma noktasından sonuca aynen aktarılır.
 
 ## Uygulama sınırları
 
 - Malzeme homojen ve lineer viskoelastik kabul edilir.
-- Geometri eksenel simetrik annüler kesit ve küçük deformasyon kabulüne dayanır.
+- Geometri eş merkezli rijit silindirler, tam bağlı annüler elastomer,
+  küçük deformasyon ve ihmal edilen uç etkileri kabulüne dayanır.
 - Solver, `dynamic_rubber_material_t` içindeki tek çalışma noktası alanlarını
   kullanır; `frequency_points` dizisinde seçim veya interpolasyon yapmaz.
 - FEM, nonlinear hiperelastisite ve Prony serisi uygulanmaz.

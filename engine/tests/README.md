@@ -11,8 +11,8 @@ Tek modül, tür veya yordam izole olarak doğrulanır. `test_kinds`,
 `test_dynamic_modulus` bu kategoridedir. `test_dynamic_modulus`, G' ile G''
 değerlerinin SI biriminde saklanmasını, çoklu çalışma noktası altyapısını ve
 `tan(delta) = G'' / G'` hesabını doğrular. `test_geometry`, geometri veri
-alanlarının yanında annüler elastomer polar alan momentini bağımsız analitik
-değerle sınar.
+alanlarının yanında annüler kesit polar alan momentini ve tam bağlı kauçuk
+burç `Cθ` faktörünü ayrı bağımsız analitik değerlerle sınar.
 
 ## Physics validation
 
@@ -21,13 +21,17 @@ sınırıyla doğrulanır. `test_inertia`, `test_torsional_stiffness`,
 `test_dynamic_torsional_stiffness` ve `test_frequency_solver` bu kategoridedir.
 Genel fizik doğrulamalarında bağıl hata yüzde `0,1`'den küçük olmalıdır;
 dinamik burulma rijitliği testi `1e-10` bağıl hata sınırı kullanır. Bu test
-üretim `tms_dynamic_torsional_stiffness` modülünü doğrudan çağırarak Jp,
+üretim `tms_dynamic_torsional_stiffness` modülünü doğrudan çağırarak Cθ,
 K', K'', frekans, sıcaklık ve
 `G''/G' = K''/K' = tan(delta)` eşitliğini birlikte doğrular. Ayrıca K'
-bileşeninin mevcut statik solver sonucuyla aynı kaldığını sınar.
+bileşeninin statik solver sonucuyla aynı kaldığını, `G'' = 0` için kayıp
+bileşenlerinin sıfırlandığını ve `ri`, `ro` değerine yaklaştıkça ideal
+model rijitliğinin kuvvetli biçimde arttığını sınar. Statik test, G ve L iki
+katına çıkarıldığında K değerinin de iki katına çıktığını doğrular.
 
-Negatif yarıçap, sırasız veya eşit yarıçaplar, sıfır etkin uzunluk,
-sıfır depolama modülü ve negatif kayıp modülü ayrı CTest vakalarıdır.
+Negatif veya sıfır iç yarıçap, sırasız/eşit yarıçaplar, pozitif olmayan
+eksenel genişlik, pozitif olmayan depolama modülü ve negatif kayıp modülü
+ayrı CTest vakalarıdır.
 Bu vakalarda üretim yordamının `error stop` ile sonlanması beklenir ve
 `WILL_FAIL` özelliği beklenen reddi test başarısına dönüştürür.
 

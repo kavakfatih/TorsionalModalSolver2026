@@ -17,7 +17,8 @@
 | --- | --- | ---: | --- |
 | İç yarıçap | `ri` | 0.02 | m |
 | Dış yarıçap | `ro` | 0.05 | m |
-| Etkin uzunluk | `L` | 0.01 | m |
+| Bağlı eksenel genişlik | `L` | 0.01 | m |
 
-Elastomer homojen, lineer viskoelastik ve küçük deformasyon bölgesinde kabul
-edilir. Tüm değerler aynı çalışma noktasına aittir.
+Elastomer homojen, lineer viskoelastik, küçük deformasyon bölgesinde ve iç/dış
+silindirik yüzeylere tam bağlı kabul edilir. Tüm değerler aynı çalışma
+noktasına aittir.

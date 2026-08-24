@@ -62,6 +62,16 @@ if(BUILD_TESTING)
   tms26_add_fortran_test(dynamic_modulus tests/test_dynamic_modulus.f90)
   tms26_add_fortran_test(inertia tests/test_inertia.f90)
   tms26_add_fortran_test(torsional_stiffness tests/test_torsional_stiffness.f90)
+  add_test(
+    NAME "tms26.torsional_stiffness.rejects_nonpositive_modulus"
+    COMMAND
+      "$<TARGET_FILE:tms26_test_torsional_stiffness>"
+      "nonpositive_modulus"
+  )
+  set_tests_properties(
+    "tms26.torsional_stiffness.rejects_nonpositive_modulus"
+    PROPERTIES WILL_FAIL TRUE
+  )
   tms26_add_fortran_test(
     dynamic_torsional_stiffness
     tests/test_dynamic_torsional_stiffness.f90
@@ -73,9 +83,11 @@ if(BUILD_TESTING)
     validation_case
     IN ITEMS
       negative_radius
+      zero_inner_radius
       unordered_radii
       equal_radii
       zero_length
+      negative_length
       nonpositive_storage_modulus
       negative_loss_modulus
   )

@@ -13,6 +13,8 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
   dinamik modül çalışma noktaları ve geriye uyumlu malzeme genişletmesi
 - [`0004-complex-stiffness-interface.md`](0004-complex-stiffness-interface.md):
   kompleks rijitlik sonuç türü, ortak geometri hesabı ve çalışma noktası seçimi
+- [`0005-bonded-annular-rubber-torsion-model.md`](0005-bonded-annular-rubber-torsion-model.md):
+  TVD elastomer rijitliği için tam bağlı eş merkezli silindirik burç modeli
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

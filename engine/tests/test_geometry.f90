@@ -1,15 +1,19 @@
 program test_geometry
   use tms_kinds, only : dp
   use tms_geometry, only : rubber_geometry_t, inertia_ring_geometry_t, &
-    hub_geometry_t, tvd_geometry_t, calculate_rubber_polar_area_moment
+    hub_geometry_t, tvd_geometry_t, calculate_rubber_polar_area_moment, &
+    calculate_annular_bush_torsion_geometry_factor
   implicit none
 
   real(dp), parameter :: maximum_relative_error = 1.0e-12_dp
   real(dp), parameter :: expected_polar_area_moment_m4 = &
     1.2692034320502767e-4_dp
+  real(dp), parameter :: expected_bush_geometry_factor_m3 = &
+    1.53953747989168e-2_dp
 
   type(tvd_geometry_t) :: geometry
   real(dp) :: polar_area_moment_m4
+  real(dp) :: bush_geometry_factor_m3
 
   ! Temel TVD bileşenlerinin SI tabanlı geometrik verilerini oluşturur.
   geometry%rubber = rubber_geometry_t( &
@@ -49,5 +53,18 @@ program test_geometry
     error stop "Elastomer polar alan momenti analitik sonuçla uyuşmuyor."
   end if
 
-  print *, "TVD geometri veri türleri ve polar alan momenti doğrulandı."
+  ! Tam bağlı eş merkezli kauçuk burç için C_theta analitik sonucunu
+  ! polar alan momentinden bağımsız olarak doğrular.
+  bush_geometry_factor_m3 = &
+    calculate_annular_bush_torsion_geometry_factor( &
+      inner_radius=geometry%rubber%inner_radius_m, &
+      outer_radius=geometry%rubber%outer_radius_m, &
+      axial_length=geometry%rubber%axial_length_m)
+
+  if (abs(bush_geometry_factor_m3 - expected_bush_geometry_factor_m3) / &
+      expected_bush_geometry_factor_m3 >= maximum_relative_error) then
+    error stop "Annüler kauçuk burç geometri faktörü analitik sonuçla uyuşmuyor."
+  end if
+
+  print *, "TVD geometri yordamları analitik sonuçlarla doğrulandı."
 end program test_geometry

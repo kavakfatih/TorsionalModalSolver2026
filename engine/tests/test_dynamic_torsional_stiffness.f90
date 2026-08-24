@@ -2,7 +2,7 @@ program test_dynamic_torsional_stiffness
   use tms_kinds, only : dp
   use tms_units, only : mpa_to_pa
   use tms_geometry, only : rubber_geometry_t, &
-    calculate_rubber_polar_area_moment
+    calculate_annular_bush_torsion_geometry_factor
   use tms_material, only : dynamic_rubber_material_t
   use tms_torsional_stiffness, only : calculate_torsional_stiffness
   use tms_dynamic_torsional_stiffness, only : &
@@ -11,17 +11,23 @@ program test_dynamic_torsional_stiffness
   implicit none
 
   real(dp), parameter :: maximum_relative_error = 1.0e-10_dp
-  real(dp), parameter :: expected_polar_area_moment_m4 = &
-    9.56614963018092e-6_dp
+  real(dp), parameter :: maximum_absolute_error = 1.0e-12_dp
+  real(dp), parameter :: expected_geometry_factor_m3 = &
+    5.98398600683770e-5_dp
   real(dp), parameter :: expected_storage_stiffness = &
-    956.614963018092_dp
+    59.8398600683770_dp
   real(dp), parameter :: expected_loss_stiffness = &
-    95.6614963018092_dp
+    5.98398600683770_dp
   real(dp), parameter :: expected_loss_factor = 0.1_dp
+  real(dp), parameter :: near_gap_growth_factor = 100.0_dp
 
   type(rubber_geometry_t) :: rubber
+  type(rubber_geometry_t) :: near_gap_rubber
   type(dynamic_rubber_material_t) :: material
+  type(dynamic_rubber_material_t) :: zero_loss_material
   type(complex_torsional_stiffness_t) :: stiffness
+  type(complex_torsional_stiffness_t) :: near_gap_stiffness
+  type(complex_torsional_stiffness_t) :: zero_loss_stiffness
   real(dp) :: modulus_loss_factor
   real(dp) :: static_stiffness
   real(dp) :: stiffness_loss_factor
@@ -53,11 +59,25 @@ program test_dynamic_torsional_stiffness
   stiffness_loss_factor = stiffness%loss_stiffness / &
     stiffness%storage_stiffness
 
+  zero_loss_material = material
+  zero_loss_material%loss_shear_modulus_pa = 0.0_dp
+  zero_loss_stiffness = calculate_dynamic_torsional_stiffness( &
+    zero_loss_material, rubber)
+
+  ! Dış yarıçap sabitken ince radyal boşluğa yaklaşmak, ideal tam bağlı
+  ! burç modelinde rijitliği kuvvetli biçimde artırmalıdır.
+  near_gap_rubber = rubber
+  near_gap_rubber%inner_radius_m = 0.049_dp
+  near_gap_stiffness = calculate_dynamic_torsional_stiffness( &
+    material, near_gap_rubber)
+
   call assert_relative_close( &
-    calculate_rubber_polar_area_moment( &
-      rubber%outer_radius_m, rubber%inner_radius_m), &
-    expected_polar_area_moment_m4, &
-    "Polar geometrik alan momenti beklenen değerde değil." &
+    calculate_annular_bush_torsion_geometry_factor( &
+      inner_radius=rubber%inner_radius_m, &
+      outer_radius=rubber%outer_radius_m, &
+      axial_length=rubber%axial_length_m), &
+    expected_geometry_factor_m3, &
+    "Annüler kauçuk burç geometri faktörü beklenen değerde değil." &
   )
   call assert_relative_close( &
     stiffness%storage_stiffness, expected_storage_stiffness, &
@@ -87,6 +107,20 @@ program test_dynamic_torsional_stiffness
     stiffness%loss_factor, stiffness_loss_factor, &
     "Sonuç kayıp faktörü K''/K' oranına eşit değil." &
   )
+  call assert_absolute_close( &
+    zero_loss_stiffness%loss_stiffness, 0.0_dp, &
+    "G'' sıfırken K'' sıfır olmadı." &
+  )
+  call assert_absolute_close( &
+    zero_loss_stiffness%loss_factor, 0.0_dp, &
+    "G'' sıfırken kayıp faktörü sıfır olmadı." &
+  )
+
+  if (near_gap_stiffness%storage_stiffness <= &
+      near_gap_growth_factor * stiffness%storage_stiffness) then
+    error stop "ri, ro değerine yaklaştığında rijitlik yeterince artmadı."
+  end if
+
   call assert_relative_close( &
     stiffness%frequency, material%frequency_hz, &
     "Frekans çalışma noktasına aktarılamadı." &
@@ -102,7 +136,7 @@ contains
 
   !> Geçersiz fiziksel girdinin ilgili saf üretim yordamında reddedildiğini
   !! sınamak için seçilen hata durumunu çalıştırır.
-  !! Model ve birimler: Yarıçaplar ile etkin uzunluk m, G' ve G'' Pa
+  !! Model ve birimler: Yarıçaplar ile bağlı eksenel genişlik m, G' ve G'' Pa
   !! cinsindedir. Geçersiz durum error stop üretmelidir; yordam normal
   !! dönerse CTest'in WILL_FAIL özelliği regresyon testini başarısız sayar.
   subroutine exercise_invalid_case(case_name)
@@ -111,7 +145,7 @@ contains
     type(rubber_geometry_t) :: invalid_rubber
     type(dynamic_rubber_material_t) :: invalid_material
     type(complex_torsional_stiffness_t) :: rejected_stiffness
-    real(dp) :: rejected_polar_area_moment
+    real(dp) :: rejected_geometry_factor
 
     invalid_rubber = rubber_geometry_t( &
       inner_radius_m=0.02_dp, &
@@ -122,20 +156,35 @@ contains
     invalid_material%loss_shear_modulus_pa = mpa_to_pa(0.1_dp)
     invalid_material%frequency_hz = 100.0_dp
     invalid_material%temperature_k = 293.15_dp
-    rejected_polar_area_moment = 0.0_dp
+    rejected_geometry_factor = 0.0_dp
 
     select case (case_name)
       case ("negative_radius")
-        rejected_polar_area_moment = &
-          calculate_rubber_polar_area_moment(0.05_dp, -0.01_dp)
+        rejected_geometry_factor = &
+          calculate_annular_bush_torsion_geometry_factor( &
+            inner_radius=-0.01_dp, outer_radius=0.05_dp, &
+            axial_length=0.01_dp)
+      case ("zero_inner_radius")
+        rejected_geometry_factor = &
+          calculate_annular_bush_torsion_geometry_factor( &
+            inner_radius=0.0_dp, outer_radius=0.05_dp, &
+            axial_length=0.01_dp)
       case ("unordered_radii")
-        rejected_polar_area_moment = &
-          calculate_rubber_polar_area_moment(0.02_dp, 0.05_dp)
+        rejected_geometry_factor = &
+          calculate_annular_bush_torsion_geometry_factor( &
+            inner_radius=0.05_dp, outer_radius=0.02_dp, &
+            axial_length=0.01_dp)
       case ("equal_radii")
-        rejected_polar_area_moment = &
-          calculate_rubber_polar_area_moment(0.05_dp, 0.05_dp)
+        rejected_geometry_factor = &
+          calculate_annular_bush_torsion_geometry_factor( &
+            inner_radius=0.05_dp, outer_radius=0.05_dp, &
+            axial_length=0.01_dp)
       case ("zero_length")
         invalid_rubber%axial_length_m = 0.0_dp
+        rejected_stiffness = calculate_dynamic_torsional_stiffness( &
+          invalid_material, invalid_rubber)
+      case ("negative_length")
+        invalid_rubber%axial_length_m = -0.01_dp
         rejected_stiffness = calculate_dynamic_torsional_stiffness( &
           invalid_material, invalid_rubber)
       case ("nonpositive_storage_modulus")
@@ -151,7 +200,7 @@ contains
     end select
 
     print *, "Geçersiz girdi beklenmedik biçimde kabul edildi: ", &
-      case_name, rejected_polar_area_moment, &
+      case_name, rejected_geometry_factor, &
       rejected_stiffness%storage_stiffness
   end subroutine exercise_invalid_case
 
@@ -169,5 +218,18 @@ contains
       error stop message
     end if
   end subroutine assert_relative_close
+
+  !> Sıfır referanslı bir sonucun mutlak hata sınırını denetler.
+  !! Girdiler aynı fiziksel birimdedir; |actual-expected| <= 1e-12 koşulu
+  !! uygulanır ve sınır aşılırsa test hata ile sonlanır.
+  subroutine assert_absolute_close(actual, expected, message)
+    real(dp), intent(in) :: actual
+    real(dp), intent(in) :: expected
+    character(len=*), intent(in) :: message
+
+    if (abs(actual - expected) > maximum_absolute_error) then
+      error stop message
+    end if
+  end subroutine assert_absolute_close
 
 end program test_dynamic_torsional_stiffness

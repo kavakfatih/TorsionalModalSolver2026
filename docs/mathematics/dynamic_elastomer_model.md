@@ -51,29 +51,36 @@ dinamik burulma rijitliği solver'ı ise kendi hesabından önce `G' > 0` ve
 
 ## Kompleks burulma rijitliğine bağlantı
 
-V0.2.1, aynı çalışma noktasındaki kompleks kayma modülünü annüler elastomer
-geometrisine aşağıdaki şekilde uygular:
+V0.2.1 ana TVD modeli, aynı çalışma noktasındaki kompleks kayma modülünü
+rijit iç göbek ve rijit dış halkaya tam bağlı annüler elastomer burca
+aşağıdaki şekilde uygular:
 
 ```text
-Jp = π/2 (ro⁴ - ri⁴)
+Cθ = 4π L ri² ro² / (ro² - ri²)
 K* = K' + iK''
-K' = G' Jp / L
-K'' = G'' Jp / L
+K' = G' Cθ
+K'' = G'' Cθ
 ```
 
-`Jp` annüler kauçuk kesitinin `m⁴` birimli polar alan momenti, `L` ise `m`
-birimli etkin burulma uzunluğudur. K' ve K'' değerleri `N·m/rad` birimindedir.
-Aynı geometri katsayısı iki modül bileşenine de uygulandığı için:
+`ri` ve `ro` metre birimli iç/dış yarıçap, `L` bağlı silindirik
+yüzeyin metre birimli eksenel genişliğidir. `Cθ` birimi `m³`, K' ve K''
+birimleri `N·m/rad` değeridir. Aynı geometri faktörü iki modül bileşenine de
+uygulandığı için:
 
 ```text
 tan(delta) = G''/G' = K''/K'
 ```
 
-Bu eşitlik `G' > 0`, geçerli annüler geometri ve `L > 0` koşullarında
+Bu eşitlik `G' > 0`, `G'' >= 0`, `0 < ri < ro` ve `L > 0` koşullarında
 geçerlidir. `calculate_dynamic_torsional_stiffness`, malzemenin mevcut tek
 çalışma noktası alanlarını kullanır; frekans noktası seçimi veya interpolasyon
-yapmaz. Hesap, negatif yarıçapı, `ro <= ri`, `L <= 0`, `G' <= 0` ve
-`G'' < 0` girdilerini kabul etmez.
+yapmaz. Hesap, `ri <= 0`, `ro <= ri`, `L <= 0`, `G' <= 0` ve `G'' < 0`
+girdilerini kabul etmez.
+
+Annüler bir milin eksen boyunca Saint-Venant burulmasına ait
+`K = GJp/ℓ` denklemi farklı sınır koşullarına dayanır ve TVD burç solver'larında
+kullanılmaz. İki modelin ayrıntılı ayrımı
+[`torsional-physics-core.md`](torsional-physics-core.md) belgesindedir.
 
 ## Birimler
 
@@ -81,6 +88,7 @@ yapmaz. Hesap, negatif yarıçapı, `ro <= ri`, `L <= 0`, `G' <= 0` ve
 | --- | --- | --- |
 | Depolama modülü | `G'` | `Pa` |
 | Kayıp modülü | `G''` | `Pa` |
+| Burç geometri faktörü | `Cθ` | `m³` |
 | Frekans | `f` | `Hz` |
 | Mutlak sıcaklık | `T` | `K` |
 | Kayıp faktörü | `tan(delta)` | boyutsuz |

@@ -4,9 +4,9 @@ program test_frequency_solver
   implicit none
 
   real(dp), parameter :: maximum_relative_error = 1.0e-3_dp
-  real(dp), parameter :: stiffness_nm_per_rad = 3173.00858012569_dp
+  real(dp), parameter :: stiffness_nm_per_rad = 19244.2184986460_dp
   real(dp), parameter :: polar_inertia_kg_m2 = 0.220441786591211_dp
-  real(dp), parameter :: expected_frequency_hz = 19.0945221235414_dp
+  real(dp), parameter :: expected_frequency_hz = 47.0244051144727_dp
 
   real(dp) :: frequency_hz
 
