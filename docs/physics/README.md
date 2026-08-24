@@ -3,11 +3,12 @@
 Bu dizin, TMS26 içindeki matematiksel denklemlerin temsil ettiği fiziksel
 sistemleri, idealizasyonları ve mühendislik geçerlilik sınırlarını açıklar.
 
-V0.2.4 fizik kapsamı; homojen annüler göbek ve atalet halkası, lineer elastik
+V0.3.0 fizik kapsamı; homojen annüler göbek ve atalet halkası, lineer elastik
 elastomer, kompleks dinamik elastomer rijitliği, fixed-hub/serbest-serbest
 analitik modeller, genel torsional düğüm-eleman topolojisi ve 2x2 lokal eleman
-rijitlik katkısını içerir. Modal tahmin frozen-property ve sönümsüzdür; genel
-topoloji henüz global matris assembly veya özdeğer çözümü yapmaz.
+rijitlik katkısını içerir. DOF eşleme ile dense global dönel M/K assembly
+uygulanmıştır. Modal tahmin frozen-property ve sönümsüzdür; genel özdeğer
+çözümü henüz yoktur.
 Ayrıntılı denklemler [`../mathematics/`](../mathematics/) altında; tek-DOF ve
 iki ataletli referans modeller sırasıyla
 [`Benchmark 001`](../../benchmarks/001_simple_annular_tvd/) ve

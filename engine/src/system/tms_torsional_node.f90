@@ -18,7 +18,7 @@ module tms_torsional_node
     real(dp) :: polar_inertia_kg_m2 = 0.0_dp
 
     !> Analiz başlangıcındaki açısal konum theta_0 [rad]. Matematiksel olarak
-    !! başlangıç koşulu bileşenidir; V0.2.3 statik veri modeli bunu çözmez.
+    !! başlangıç koşulu bileşenidir; V0.3.0 M/K assembly bunu çözmez.
     real(dp) :: initial_angle_rad = 0.0_dp
 
     !> Düğüm dönmesinin kinematik olarak sabitlenip sabitlenmediğini gösteren

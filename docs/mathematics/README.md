@@ -17,11 +17,13 @@ varsayımları ve geçerlilik sınırlarını içerir.
   serbest-serbest iki ataletli TVD sisteminin analitik frekansları ile mod
   şekilleri
 - [`generalized_torsional_system_model.md`](generalized_torsional_system_model.md):
-  düğüm ataleti, eleman rijitlik/sönüm bağlantıları, aktif DOF ve gelecekteki
-  M/K formülasyonunun veri temeli
+  düğüm ataleti, eleman rijitlik/sönüm bağlantıları, aktif DOF eşlemesi ve
+  global M/K formülasyonunun veri temeli
 - [`local_torsional_element_matrix.md`](local_torsional_element_matrix.md):
   iki uçlu lineer torsional elemanın lokal rijitlik matrisi, enerji türetimi ve
   global assembly öncesi invariantları
+- [`global_matrix_assembly.md`](global_matrix_assembly.md): fiziksel düğüm ile
+  denklem kimliği ayrımı, lokal-global rijitlik toplama ve dönel atalet matrisi
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

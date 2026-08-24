@@ -7,6 +7,28 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.3.0] - 2026-08-24
+
+### Eklendi
+
+- Fiziksel torsional düğüm kimliklerini aktif solver denklem kimliklerinden
+  ayıran, kısıtlı düğümlerde sıfır sentinel kullanan DOF haritası.
+- Private allocatable depolama, boyut denetimi ve güvenli katsayı erişimi
+  sağlayan genel dense matris türü.
+- Lokal eleman katkılarını toplayan global torsional rijitlik matrisi ile düğüm
+  polar ataletlerini diagonal yerleştiren global dönel atalet matrisi.
+- Açık `node_id -> equation_id -> local -> global` dönüşümü kullanan saf
+  stiffness ve inertia assembly yordamları.
+- Tek eleman, üç düğümlü zincir, serbest sistem invariantları, kısıt eliminasyonu,
+  0x0 tam kısıtlı sistem ve geçersiz girdi regresyonları.
+- Global M/K assembly matematik belgesi ve Karar 0008 tasarım kaydı.
+
+### Değiştirildi
+
+- Proje sürümü `0.3.0` olarak güncellendi; CTest kapsamı 52 teste çıkarıldı.
+- Mevcut `calculate_local_stiffness` korunarak standart eleman arayüzü için saf
+  `get_local_stiffness` sarmalayıcısı eklendi.
+
 ## [0.2.4] - 2026-08-24
 
 ### Eklendi

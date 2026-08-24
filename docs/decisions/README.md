@@ -21,6 +21,8 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0007-local-element-matrix-design.md`](0007-local-element-matrix-design.md):
   sabit boyutlu lokal matris taşıyıcısı, eleman bağımlılığı ve global assembly
   sınırı
+- [`0008-global-matrix-assembly-design.md`](0008-global-matrix-assembly-design.md):
+  fiziksel node/denklem ayrımı, dense global M/K assembly ve depolama soyutlaması
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

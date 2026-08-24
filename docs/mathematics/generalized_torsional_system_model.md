@@ -9,8 +9,9 @@ theta = [theta_1, theta_2, ..., theta_n]^T
 ```
 
 Sabitlenmiş düğümler topolojide korunur fakat aktif koordinat vektörüne
-katılmaz. Düğüm kimlikleri topolojik etiketlerdir; gelecekteki DOF eşlemesi
-ekleme sırasından veya ayrı bir eşleme tablosundan üretilecektir.
+katılmaz. Düğüm kimlikleri topolojik etiketlerdir; V0.3.0 DOF haritası fiziksel
+kimlikleri ekleme sırasındaki aktif `1..n` denklem kimliklerine dönüştürür.
+Kısıtlı düğümler haritada `equation_id=0` ile korunur.
 
 ## Düğüm ataletinin enerji anlamı
 
@@ -20,14 +21,14 @@ ekleme sırasından veya ayrı bir eşleme tablosundan üretilecektir.
 T_i = 1/2 J_i theta_i'^2
 ```
 
-Gelecekteki kütle matrisi assembly işleminde düğümün kavramsal katkısı:
+Global dönel atalet matrix assembly işleminde düğümün katkısı:
 
 ```text
 M_ii += J_i
 ```
 
-V0.2.4 bu matrisi oluşturmaz; yalnız gerekli `J_i` verisini ve topolojik
-sözleşmeyi sağlar.
+V0.3.0 aktif düğümlerin bu katkılarını diagonal global M matrisinde toplar.
+Kısıtlı düğümün ataleti indirgenmiş aktif matrise eklenmez.
 
 ## Eleman rijitliği ve sönümü
 
@@ -40,8 +41,8 @@ U_e = 1/2 k_e delta_theta_e^2
 ```
 
 Elemanın iki ucundaki geri çağırıcı momentler eşit büyüklükte ve zıt işaretlidir.
-V0.2.4'te elemanın ürettiği, gelecekteki global rijitlik assembly işlemine
-girdi olacak yerel katkı:
+Elemanın ürettiği ve V0.3.0 global rijitlik assembly işlemine girdi olan yerel
+katkı:
 
 ```text
           [ 1  -1 ]
@@ -59,8 +60,9 @@ c_e [ 1  -1 ]
     [-1   1 ]
 ```
 
-Rijitlik için lokal K katkısı uygulanmıştır. Viskoz sönüm ifadesi gelecekteki
-assembly arayüzünü tanımlar; V0.2.4 lokal C, global M/K/C matrisi üretmez.
+Rijitlik için lokal ve global K katkıları uygulanmıştır. Viskoz sönüm ifadesi
+gelecekteki assembly arayüzünü tanımlar; V0.3.0 lokal veya global C matrisi
+üretmez.
 
 ## Gelecekteki hareket denklemi
 
@@ -76,11 +78,13 @@ Sönümsüz, dış zorlamasız hedef formülasyon:
 [M] theta'' + [C] theta' + [K] theta = 0
 ```
 
-V0.2.4 veri topolojisini ve lokal eleman K katkısını kurar. Global matris
-assembly, sınır koşulu eliminasyonu ve özdeğer çözümü kapsam dışıdır. Lokal
-matrisin ayrıntılı türetimi
+V0.3.0 veri topolojisini, aktif DOF eşlemesini ve dense global M/K assembly
+katmanını kurar. Homojen sıfır dönme kısıtları indirgenmiş denklem matrisinde
+uygulanır; sıfırdan farklı prescribed dönme ve özdeğer çözümü kapsam dışıdır.
+Lokal matrisin ayrıntılı türetimi
 [`local_torsional_element_matrix.md`](local_torsional_element_matrix.md)
-belgesindedir.
+belgesinde, global toplama ise
+[`global_matrix_assembly.md`](global_matrix_assembly.md) belgesindedir.
 
 ## Kompleks kayıp rijitliği ile viskoz sönüm ayrımı
 

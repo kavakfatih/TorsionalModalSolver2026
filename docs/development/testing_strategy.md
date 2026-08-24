@@ -41,6 +41,19 @@ katsayıları doğrudan doğrular. Ek fizik invariantları şunlardır:
 Bu test global assembly veya özdeğer çözümü yapmaz; yalnız elemanın lokal
 fiziksel katkısını sınar.
 
+Global matrix assembly regresyonu, fiziksel node ID değerlerini matris indisi
+olarak kullanmadan aşağıdaki davranışları `1e-10` mutlak toleransla doğrular:
+
+- `k=100 N·m/rad` tek elemanın 2x2 global K matrisi,
+- `k1=100`, `k2=200 N·m/rad` üç düğümlü zincirin analitik global K matrisi,
+- serbest sistemde K simetrisi, sıfır satır toplamı ve rijit-cisim null modu,
+- `J=[0.1,0.2,0.3] kg·m²` için diagonal global dönel M matrisi,
+- kısıtlı düğümün equation ID sıfır ile homojen eliminasyonu,
+- tamamen kısıtlı geçerli sistemde 0x0 M/K matrisleri.
+
+Negatif matris boyutu, bilinmeyen node lookup, aralık dışı equation ID, negatif
+atalet ve başka sisteme ait DOF haritası ayrı `WILL_FAIL` vakalarıdır.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
@@ -51,8 +64,8 @@ olarak farklı K'' değerinin viskoz `c` alanına aktarılmadığı doğrulanır
 
 Genel sistem testleri ayrıca sabitlenmemiş düğümlerin aktif DOF sayısını,
 fixed-hub dönüşümünde göbek kısıtını, yinelenen kimlikleri ve tanımsız eleman
-uçlarını kapsar. Bu testler birim testlerinin yerini almaz ve global matris
-assembly veya eigen çözümü uygulamaz.
+uçlarını kapsar. Bu testler birim testlerinin yerini almaz. Global assembly
+`test_matrix_assembly` içinde ayrı doğrulanır; eigen çözümü uygulanmaz.
 
 ## Benchmark test
 

@@ -33,6 +33,7 @@ module tms_torsional_element
 
   public :: validate_torsional_element
   public :: calculate_local_stiffness
+  public :: get_local_stiffness
 
 contains
 
@@ -100,5 +101,21 @@ contains
     local_stiffness%value(2, 1) = -stiffness
     local_stiffness%value(2, 2) = stiffness
   end function calculate_local_stiffness
+
+  !> Torsional elemanın lokal rijitlik katkısını standart eleman arayüzüyle
+  !! döndürür.
+  !!
+  !! Fiziksel ve matematiksel model, birimler, girdiler, çıktı ve geçerlilik
+  !! koşulları calculate_local_stiffness ile aynıdır: Yerel [theta_i,theta_j]
+  !! sırası için K_e=k[[1,-1],[-1,1]] ve katsayılar [N*m/rad] birimindedir.
+  !! Bu geriye uyumlu sarmalayıcı gelecekteki get_local_inertia ve
+  !! get_local_damping arayüzleri için adlandırma temelidir; bu iki gelecek
+  !! davranış bu sürümde uygulanmaz.
+  pure function get_local_stiffness(element) result(local_stiffness)
+    type(torsional_element_t), intent(in) :: element
+    type(local_matrix_2x2) :: local_stiffness
+
+    local_stiffness = calculate_local_stiffness(element)
+  end function get_local_stiffness
 
 end module tms_torsional_element

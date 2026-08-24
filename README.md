@@ -4,13 +4,12 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.2.4`, mevcut fixed-hub ve serbest-serbest iki
-ataletli TVD fiziğini korurken genel torsional elemanların 2x2 lokal rijitlik
-matrisi katkısını üretmesini sağlar. Yığılmış polar atalet düğümleri, lineer
-elemanlar ve lokal K katkısı gelecekteki global M/K assembly altyapısına
-hazırdır. Bu sürümde global assembly veya genel özdeğer çözümü uygulanmamıştır.
+Güncel geliştirme sürümü `0.3.0`, fiziksel düğüm kimliklerini solver denklem
+numaralarından ayıran DOF haritasını ve torsional sistemlerin dense global M/K
+matris assembly altyapısını ekler. Mevcut analitik solver'lar ve lokal eleman
+fiziği korunur; genel özdeğer çözümü henüz uygulanmamıştır.
 
-## V0.2.4 çekirdek kapsamı
+## V0.3.0 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -24,6 +23,11 @@ hazırdır. Bu sürümde global assembly veya genel özdeğer çözümü uygulan
 - `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
 - `tms_local_matrix`: iki uçlu elemanlar için 2x2 lokal matris veri taşıyıcısı
+- `tms_matrix_types`: private allocatable depolamalı genel dense matris türü
+- `tms_dof_map`: fiziksel node ID ile aktif denklem kimliği eşlemesi
+- `tms_stiffness_matrix`: global torsional K matrisi ve lokal katkı toplama
+- `tms_mass_matrix`: düğüm polar ataletlerinden global diagonal M matrisi
+- `tms_matrix_assembly`: topoloji, DOF haritası ve lokal katkıların birleşimi
 - `tms_torsional_node`: genel düğüm kimliği, polar atalet ve sınır koşulu
 - `tms_torsional_element`: lineer K/c bağlantısı ve 2x2 lokal rijitlik hesabı
 - `tms_generalized_torsional_system`: koleksiyon yönetimi, aktif DOF sayımı ve
@@ -38,12 +42,13 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.2.4 aşamasındadır. Dinamik elastomer ve kompleks burulma
+TMS26 şu anda V0.3.0 aşamasındadır. Dinamik elastomer ve kompleks burulma
 rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
 TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
 eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
-boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez. Her
-lineer eleman, global sisteme henüz birleştirilmeyen lokal K matrisini üretir.
+boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez. Lineer
+elemanların lokal K katkıları aktif denklem uzayında global K matrisine, düğüm
+polar ataletleri ise diagonal global M matrisine birleştirilebilir.
 
 ### Tamamlananlar
 
@@ -68,6 +73,11 @@ lineer eleman, global sisteme henüz birleştirilmeyen lokal K matrisini üretir
 - İki ataletli TVD için serbest-serbest ve fixed-hub genel topoloji köprüsü
 - `Ke = k[[1,-1],[-1,1]]` biçiminde 2x2 lokal eleman rijitlik katkısı
 - Lokal matris simetrisi, sıfır satır toplamı ve pozitif yarı-tanımlılık testleri
+- Fiziksel düğüm kimliklerinden bağımsız, kısıtları destekleyen DOF haritası
+- Private dense depolama ile boyut ve sonlu katsayı doğrulaması
+- Açık lokal→denklem→global dönüşümüyle dense global torsional K assembly
+- Düğümde yığılmış polar ataletlerden diagonal global M assembly
+- Homojen sıfır dönme kısıtı için indirgenmiş aktif M/K matrisleri
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
@@ -76,8 +86,9 @@ lineer eleman, global sisteme henüz birleştirilmeyen lokal K matrisini üretir
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
 - Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
-- Global M/K/C matrix assembly ve sınır koşulu eliminasyonu
+- Global C/damping assembly ve sıfırdan farklı prescribed dönme yük düzeltmesi
 - Genel çok serbestlik dereceli modal/eigen çözümü
+- LAPACK, sparse matris depolaması ve harici solver kitaplıkları
 - Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
 
@@ -146,7 +157,7 @@ request'lerde derleme ve test doğrulaması yapar.
 
 - `docs/`: mimari, matematik, fizik, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
-- `engine/src/matrix/`: küçük lokal matris veri türleri
+- `engine/src/matrix/`: lokal/global matris, DOF haritası ve assembly katmanı
 - `engine/src/system/`: genel torsional node, element ve sistem topolojisi
 - `engine/tests/`: hesap motoru testleri
 - `benchmarks/`: performans ölçümleri
@@ -188,7 +199,7 @@ ve sayısal referans
 [`benchmarks/004_two_inertia_tvd/`](benchmarks/004_two_inertia_tvd/)
 altında açıklanmıştır. Genel torsional sistemin fiziksel sözleşmesi
 [`docs/physics/generalized_torsional_system.md`](docs/physics/generalized_torsional_system.md),
-gelecekteki M/K bağlantısı
+genel M/K bağlantısının matematiksel temeli
 [`docs/mathematics/generalized_torsional_system_model.md`](docs/mathematics/generalized_torsional_system_model.md)
 ve kalıcı mimari karar
 [`docs/decisions/0006-generalized-torsional-topology.md`](docs/decisions/0006-generalized-torsional-topology.md)
@@ -196,6 +207,10 @@ altında bulunur. Lokal eleman rijitlik türetimi
 [`docs/mathematics/local_torsional_element_matrix.md`](docs/mathematics/local_torsional_element_matrix.md),
 matris taşıyıcısı ve bağımlılık kararı ise
 [`docs/decisions/0007-local-element-matrix-design.md`](docs/decisions/0007-local-element-matrix-design.md)
+altında bulunur. DOF eşlemesi ile global M/K assembly matematiği
+[`docs/mathematics/global_matrix_assembly.md`](docs/mathematics/global_matrix_assembly.md),
+kalıcı mimari karar ise
+[`docs/decisions/0008-global-matrix-assembly-design.md`](docs/decisions/0008-global-matrix-assembly-design.md)
 altında bulunur.
 
 ## Lisans

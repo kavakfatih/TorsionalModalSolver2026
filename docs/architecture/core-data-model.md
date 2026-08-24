@@ -2,11 +2,11 @@
 
 ## Amaç
 
-V0.2.4 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
+V0.3.0 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
 geometrik ve malzeme özelliklerini fizik yordamlarına, genel düğüm-eleman
-topolojisini ise gelecekteki sistem analiz katmanlarına taşır. Geometri ve
-malzeme türleri yalnız veri taşır; genel sistem yönetim yordamları topolojik ve
-temel fiziksel önkoşulları doğrular.
+topolojisini ise DOF eşleme ve global M/K assembly katmanına taşır. Geometri ve
+malzeme türleri yalnız veri taşır; sistem ve matris yordamları topolojik,
+boyutsal ve temel fiziksel önkoşulları doğrular.
 
 ## Modül bağımlılıkları
 
@@ -30,12 +30,20 @@ temel fiziksel önkoşulları doğrular.
 - `tms_frequency_solver`, hesaplanan rijitlik ve ataletten doğal frekansı bulur.
 - `tms_local_matrix`, iki uçlu bir elemanın 2x2 lokal matris katsayılarını
   sistem katmanından bağımsız ve sabit boyutlu bir veri türünde taşır.
+- `tms_matrix_types`, private allocatable depolamalı genel dense matris türünü,
+  boyut ve katsayı erişim yordamlarını sağlar.
 - `tms_torsional_node`, yığılmış polar atalet, başlangıç açısı ve dönel sınır
   koşulu taşıyan genel düğüm türünü tanımlar.
 - `tms_torsional_element`, iki düğüm arasındaki lineer rijitlik ve eşdeğer
   viskoz sönüm bağlantısını tanımlar ve 2x2 lokal rijitlik katkısını üretir.
 - `tms_generalized_torsional_system`, private düğüm/eleman koleksiyonlarını,
   ekleme-okuma yordamlarını, aktif DOF sayımını ve sistem doğrulamasını sağlar.
+- `tms_dof_map`, fiziksel düğüm kimliklerini kısıtlara göre aktif denklem
+  kimliklerine eşler ve sistem-harita uyumunu doğrular.
+- `tms_stiffness_matrix`, lokal 2x2 katkıları global K matrisine toplar.
+- `tms_mass_matrix`, düğüm polar ataletlerini global diagonal M matrisine ekler.
+- `tms_matrix_assembly`, sistem topolojisini ve DOF haritasını tüketerek global
+  torsional M/K matrislerini üretir.
 - `tms_torsional_system`, bileşen sonuçlarını iki ataletli sistem türünde
   birleştirir; fixed-hub ve serbest-serbest analitik modal sonuçları üretir ve
   bu özel modeli genel topolojiye dönüştürür.
@@ -51,6 +59,11 @@ Mevcut torsional fizik akışı aşağıdaki sırayı izler:
    mevcut doğal frekans yordamına aktarır; K'' sistem üstverisinde korunur.
 6. İstenirse iki ataletli özel sistem, iki düğüm ve bir elemandan oluşan genel
    torsional topolojiye dönüştürülür; bu adım frekansı yeniden çözmez.
+7. `tms_dof_map`, fiziksel node ID değerlerini aktif equation ID değerlerine
+   dönüştürür; kısıtlı düğümleri sıfır kimliğiyle haritada korur.
+8. Elemanların lokal K katkıları denklem kimlikleri üzerinden global K
+   matrisine toplanır.
+9. Aktif düğümlerin polar ataletleri global diagonal M matrisine eklenir.
 
 Kompleks sonuç, reel ve sanal bileşenleri açıkça adlandıran
 `complex_torsional_stiffness_t` derived type değeriyle taşınır.
@@ -153,7 +166,8 @@ bir aktif torsional DOF oluşturur. Düğüm kimliği doğrudan DOF indeksi değ
 `torsional_element_t`, pozitif benzersiz kimlik, iki farklı uç düğüm kimliği,
 lineer rijitlik (`N·m/rad`) ve eşdeğer viskoz sönüm (`N·m·s/rad`) taşır.
 Paralel elemanlar farklı kimliklerle temsil edilebilir. Elemanın saf
-`calculate_local_stiffness` yordamı, `[theta_i, theta_j]` yerel sırası için
+`calculate_local_stiffness` ve geriye uyumlu standart
+`get_local_stiffness` arayüzü, `[theta_i, theta_j]` yerel sırası için
 `Ke = k[[1,-1],[-1,1]]` matrisini `local_matrix_2x2` değeri olarak döndürür.
 
 `torsional_system_t` içindeki koleksiyonlar private'dır. Public saf yordamlar:
@@ -163,10 +177,19 @@ Paralel elemanlar farklı kimliklerle temsil edilebilir. Elemanın saf
 - sabitlenmemiş düğümlerden aktif DOF sayısını belirler,
 - kimlik benzersizliğini ve bağlantı uçlarının varlığını doğrular.
 
-Eleman katmanı yalnız lokal K katkısını üretir. Genel sistem katmanı bu katkıyı
-global K matrisine birleştirmez; M veya C matrisi oluşturmaz ve modal çözüm
-yapmaz. Bağımlılık yönü `tms_kinds -> tms_local_matrix ->
-tms_torsional_element -> tms_generalized_torsional_system` biçimindedir.
+Eleman katmanı yalnız lokal K katkısını üretir. `tms_dof_map`, ekleme sırasındaki
+serbest düğümlere kesintisiz denklem kimliği verir; kısıtlı düğümler sıfır
+kimliğiyle indirgenmiş sistem dışında bırakılır. `tms_matrix_assembly`, lokal K
+katkılarını global K matrisine ve düğüm J değerlerini diagonal global M
+matrisine toplar. Genel C assembly veya modal çözüm yapmaz.
+
+Temel bağımlılık yönünde `tms_kinds`, `tms_local_matrix` ile
+`tms_matrix_types` modüllerini besler. Lokal matris dalı
+`tms_torsional_element -> tms_generalized_torsional_system -> tms_dof_map`,
+dense dalı ise `tms_matrix_types -> {tms_stiffness_matrix,tms_mass_matrix}`
+biçimindedir. Sistem, eleman, DOF haritası ve iki global matris türü
+`tms_matrix_assembly` içinde birleşir. Private depolama sayesinde sparse
+gerçekleştirim ileride eklenebilir.
 Mevcut iki ataletli dönüşüm `J_h`, `J_r` ve K' değerlerini taşır. K''
 `N·m/rad`, viskoz `c` ise `N·m·s/rad` olduğundan damping alanına doğrudan
 aktarılmaz.

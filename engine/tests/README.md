@@ -66,6 +66,15 @@ alanına aktarılmadığı, serbest-serbest gösterimin iki ve fixed-hub göster
 bir aktif DOF taşıdığı sınanır. Boş sistem, yinelenen kimlik ve tanımsız eleman
 ucu hata regresyonlarıdır.
 
+`test_matrix_assembly`, fiziksel node ID ile equation ID ayrımını, tek eleman
+ve üç düğümlü zincir için global torsional K matrisini, K simetrisini, serbest
+sistem sıfır satır toplamını ve rijit-cisim null modunu doğrular. Global M
+matrisinde düğüm polar ataletlerinin `kg·m²` birimiyle diagonal saklandığını ve
+köşegen dışı katsayıların sıfır kaldığını sınar. Kısıtlı uç için indirgenmiş
+`K=[k]`, `M=[J_free]` ve tamamen kısıtlı sistem için 0x0 matrisler korunur.
+Geçersiz boyut, eksik node lookup, aralık dışı denklem, negatif atalet ve
+uyumsuz DOF haritası ayrı `WILL_FAIL` regresyonlarıdır.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

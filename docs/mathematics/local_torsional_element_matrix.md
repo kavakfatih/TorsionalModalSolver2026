@@ -79,18 +79,21 @@ theta_e^T K_e theta_e = k (theta_i - theta_j)^2 >= 0
 nedeniyle matris pozitif tanımlı değil, pozitif yarı-tanımlıdır. Negatif
 rijitlik pasif eleman modelini ve enerji koşulunu bozduğu için reddedilir.
 
-## Uygulama ve gelecek assembly bağlantısı
+## Uygulama ve global assembly bağlantısı
 
 `calculate_local_stiffness`, doğrulanmış `torsional_element_t` değerinden bu
-2x2 katkıyı saf bir hesapla üretir. `local_matrix_2x2` yalnız katsayıları taşır;
+2x2 katkıyı saf bir hesapla üretir. `get_local_stiffness`, aynı hesabı standart
+eleman katkı arayüzüyle sunar. `local_matrix_2x2` yalnız katsayıları taşır;
 birim, üretici yordamın fiziksel sözleşmesinden gelir.
 
-Gelecekteki global assembly, yerel `[i,j]` uç kimliklerini aktif global DOF
-indekslerine eşleyip dört katsayıyı global K matrisine ekleyecektir. V0.2.4:
+V0.3.0 global assembly, yerel `[i,j]` uç kimliklerini DOF haritasıyla aktif
+global denklem indekslerine eşler ve dört katsayıyı global K matrisine toplar.
+Lokal eleman hesabı bu harita ve sistem boyutundan bağımsız kalır. Ayrıntılar
+[`global_matrix_assembly.md`](global_matrix_assembly.md) belgesindedir.
 
-- global K assembly,
-- polar ataletlerden M matrisi,
-- sınır koşulu eliminasyonu,
-- özdeğer çözümü
+V0.3.0 aşağıdakileri uygulamaz:
 
-uygulamaz.
+- global C assembly,
+- sıfırdan farklı prescribed dönme için yük vektörü düzeltmesi,
+- sparse depolama,
+- özdeğer çözümü.

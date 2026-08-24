@@ -67,7 +67,8 @@ contains
   !! c [N*m*s/rad] alanlarını taşıyan torsional_element_t değeridir. Çıktı,
   !! güncellenmiş sistem koleksiyonudur.
   !! Varsayımlar ve geçerlilik: Aynı düğüm çifti arasında farklı kimlikli
-  !! paralel elemanlara izin verilir. Matris assembly yapılmaz.
+  !! paralel elemanlara izin verilir. Bu koleksiyon yordamı assembly yapmaz;
+  !! global M/K ayrı tms_matrix_assembly modülünde oluşturulur.
   pure subroutine add_torsional_element(system, element)
     type(torsional_system_t), intent(inout) :: system
     type(torsional_element_t), intent(in) :: element
@@ -194,7 +195,8 @@ contains
   !! reddedilir.
   !! Varsayımlar ve geçerlilik: Tek düğümlü, elemasız; tamamen sabitlenmiş;
   !! paralel elemanlı veya ayrık alt sistemli topolojiler geçerli olabilir.
-  !! Matris assembly, bağlantılılık ve rijit-cisim modu analizi yapılmaz.
+  !! Bu doğrulayıcı assembly, bağlantılılık veya rijit-cisim modu analizi
+  !! yapmaz; global M/K ayrı tms_matrix_assembly modülünde oluşturulur.
   pure subroutine validate_torsional_system(system)
     type(torsional_system_t), intent(in) :: system
 

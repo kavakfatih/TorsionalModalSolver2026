@@ -2,13 +2,14 @@
 
 ## Amaç ve kapsam
 
-V0.2.4, özel iki ataletli TVD modelini değiştirmeden gelecekteki çok düğümlü
+V0.3.0, özel iki ataletli TVD modelini değiştirmeden çok düğümlü
 torsional sistemler için genel bir topoloji veri modeli sağlar. Bu katman fiziksel
 düğümleri ve aralarındaki lineer bağlantıları saklar, aktif serbestlik derecesi
 sayısını belirler ve topolojik bütünlüğü doğrular.
 
-Her eleman 2x2 lokal rijitlik katkısını üretebilir. Bu sürüm global matris
-assembly, özdeğer çözümü veya yeni bir modal fizik algoritması içermez.
+Her eleman 2x2 lokal rijitlik katkısını üretir. V0.3.0 fiziksel node ID ile
+solver equation ID değerlerini ayırır ve dense global dönel M/K matrislerini
+oluşturur. Özdeğer çözümü veya yeni bir modal fizik algoritması içermez.
 
 ## Torsional düğüm
 
@@ -23,7 +24,7 @@ koordinat taşıyan yığılmış atalet noktasını temsil eder.
 | `constrained` | İdeal dönel kinematik sınır koşulu | boyutsuz |
 
 Düğüm kimliği bir dizi indeksi veya doğrudan DOF sıra numarası değildir.
-`initial_angle_rad` yalnız başlangıç koşulu üstverisidir; V0.2.4 bunu ön-gerilme,
+`initial_angle_rad` yalnız başlangıç koşulu üstverisidir; V0.3.0 bunu ön-gerilme,
 denge çözümü veya modal rijitlik değişimine dönüştürmez.
 
 ## Torsional eleman
@@ -67,6 +68,16 @@ aktif DOF taşır. Serbest-serbest bir sistemin rijit-cisim modu veya ayrık alt
 sistemler veri modeli açısından hata değildir. Bağlantılılık ve rijit-cisim
 modu sayısı ilerideki analiz katmanının sorumluluğudur.
 
+Fiziksel düğüm kimliği global matris indeksi değildir. `dof_map_t`, tüm düğüm
+kimliklerini saklar; serbest düğümleri kesintisiz `1..n_active` denklem
+kimliklerine, kısıtlı düğümleri `0` kimliğine eşler. Sıfır, homojen
+`theta=0` dönme kısıtını ifade eder. Haritada bulunmayan düğüm hata üretir.
+
+Global K, elemanların lokal rijitliklerini bu eşleme üzerinden toplar. Global M
+ise aktif düğümlerin `J [kg·m²]` değerlerini diagonal olarak taşır. Serbest bir
+sistemde K simetrik, sıfır satır toplamlı ve ortak dönme rijit-cisim null moduna
+sahiptir. Kısıt eliminasyonu sonrasında sıfır satır toplamı beklenmez.
+
 ## İki ataletli TVD entegrasyonu
 
 Mevcut `two_inertia_tvd_system_t`, yeni topolojide aşağıdaki gibi temsil edilir:
@@ -84,7 +95,7 @@ yeniden uygulamaz.
 
 Kompleks modeldeki `K''` kayıp rijitliği `N·m/rad`, genel elemandaki `c` ise
 `N·m·s/rad` birimindedir. Bu iki büyüklük doğrudan eşdeğer değildir. Frekansa
-bağlı bir dönüşüm veya viskoz model tanımlanmadığı için V0.2.4 köprüsü K''yi
+bağlı bir dönüşüm veya viskoz model tanımlanmadığı için mevcut köprü K''yi
 sönüm alanına aktarmaz; `c = 0` kullanır. K'', kayıp faktörü, referans frekansı
 ve sıcaklık mevcut iki ataletli veri türünde korunur.
 
@@ -98,10 +109,13 @@ ve sıcaklık mevcut iki ataletli veri türünde korunur.
 - Düğüm ve eleman kimlikleri pozitif ve kendi kümelerinde benzersizdir.
 - Her eleman sistemde bulunan iki farklı düğümü bağlar.
 
-Gelecekteki M/K bağlantısının matematiksel çerçevesi
+Genel M/K bağlantısının matematiksel çerçevesi
 [`../mathematics/generalized_torsional_system_model.md`](../mathematics/generalized_torsional_system_model.md),
 münferit eleman matrisinin türetimi
 [`../mathematics/local_torsional_element_matrix.md`](../mathematics/local_torsional_element_matrix.md),
+global assembly ayrıntıları
+[`../mathematics/global_matrix_assembly.md`](../mathematics/global_matrix_assembly.md),
 mimari karar ise
-[`../decisions/0007-local-element-matrix-design.md`](../decisions/0007-local-element-matrix-design.md)
-altında açıklanır. Genel topoloji kararı Karar 0006'da korunur.
+[`../decisions/0008-global-matrix-assembly-design.md`](../decisions/0008-global-matrix-assembly-design.md)
+altında açıklanır. Genel topoloji ve lokal matris kararları Karar 0006/0007'de
+korunur.

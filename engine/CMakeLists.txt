@@ -9,6 +9,7 @@ target_sources(
     src/core/tms_kinds.f90
     src/core/tms_constants.f90
     src/core/tms_units.f90
+    src/matrix/tms_matrix_types.f90
     src/matrix/tms_local_matrix.f90
     src/geometry/tms_geometry.f90
     src/materials/tms_dynamic_modulus.f90
@@ -21,6 +22,10 @@ target_sources(
     src/system/tms_torsional_node.f90
     src/system/tms_torsional_element.f90
     src/system/tms_torsional_system.f90
+    src/matrix/tms_dof_map.f90
+    src/matrix/tms_stiffness_matrix.f90
+    src/matrix/tms_mass_matrix.f90
+    src/matrix/tms_matrix_assembly.f90
     src/solver/tms_torsional_system.f90
 )
 
@@ -85,6 +90,26 @@ if(BUILD_TESTING)
     generalized_torsional_system
     tests/test_generalized_torsional_system.f90
   )
+  tms26_add_fortran_test(matrix_assembly tests/test_matrix_assembly.f90)
+
+  foreach(
+    validation_case
+    IN ITEMS
+      negative_matrix_dimension
+      unknown_node_lookup
+      out_of_range_equation
+      nonpositive_inertia
+      incompatible_dof_map
+  )
+    set(validation_test "tms26.matrix_assembly.rejects_${validation_case}")
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_matrix_assembly>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
 
   foreach(
     validation_case
