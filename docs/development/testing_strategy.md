@@ -15,6 +15,21 @@ davranışlar CTest üzerinden ayrı çalıştırılabilir test hedefleri olarak
 Fiziksel veya matematiksel hesap yapan yordamlar, denklemin bilinen sonuçlarını
 ve birim sözleşmesini kapsayan testlere sahip olmalıdır.
 
+## Fizik regresyon testi
+
+Fizik regresyon testleri, analitik referans değerlere ek olarak modelin
+ölçekleme davranışlarını korur. Bu kontroller üretim denklemini test kodunda
+yeniden kurmaz; yalnızca farklı girdilerle alınan üretim fonksiyonu sonuçlarını
+karşılaştırır.
+
+Tam bağlı annüler TVD kauçuk burç modeli için aşağıdaki ölçekleme
+değişmezliği kontrolleri `1e-10` bağıl hata sınırıyla uygulanır:
+
+- Modül ölçekleme: Geometri ile diğer malzeme alanları sabitken
+  `K'(2G') = 2K'(G')` olmalıdır.
+- Eksenel genişlik ölçekleme: Malzeme ve yarıçaplar sabitken
+  `K'(2L) = 2K'(L)` ve `K''(2L) = 2K''(L)` olmalıdır.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

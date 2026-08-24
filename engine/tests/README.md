@@ -26,8 +26,10 @@ K', K'', frekans, sıcaklık ve
 `G''/G' = K''/K' = tan(delta)` eşitliğini birlikte doğrular. Ayrıca K'
 bileşeninin statik solver sonucuyla aynı kaldığını, `G'' = 0` için kayıp
 bileşenlerinin sıfırlandığını ve `ri`, `ro` değerine yaklaştıkça ideal
-model rijitliğinin kuvvetli biçimde arttığını sınar. Statik test, G ve L iki
-katına çıkarıldığında K değerinin de iki katına çıktığını doğrular.
+model rijitliğinin kuvvetli biçimde arttığını sınar. Dinamik test ayrıca
+`K' ∝ G'`, `K' ∝ L` ve `K'' ∝ L` ölçekleme regresyonlarını üretim
+fonksiyonu sonuçlarını karşılaştırarak doğrular. Statik test, G ve L iki katına
+çıkarıldığında K değerinin de iki katına çıktığını doğrular.
 
 Negatif veya sıfır iç yarıçap, sırasız/eşit yarıçaplar, pozitif olmayan
 eksenel genişlik, pozitif olmayan depolama modülü ve negatif kayıp modülü

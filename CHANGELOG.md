@@ -17,6 +17,8 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
   referansla doğrulanacak şekilde test kapsamı güçlendirildi.
 - Dinamik burulma rijitliği analitik testinin bağıl hata sınırı `1e-10`
   seviyesine sıkılaştırıldı ve fiziksel girdi sınırları CTest'e eklendi.
+- V0.2.1.3 bakımında dinamik rijitlik regresyon kapsamı, `K' ∝ G'`,
+  `K' ∝ L` ve `K'' ∝ L` ölçekleme kontrolleriyle tamamlandı.
 
 ### Düzeltildi
 

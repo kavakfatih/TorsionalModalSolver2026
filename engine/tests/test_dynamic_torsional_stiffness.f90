@@ -59,6 +59,49 @@ program test_dynamic_torsional_stiffness
   stiffness_loss_factor = stiffness%loss_stiffness / &
     stiffness%storage_stiffness
 
+  block
+    type(dynamic_rubber_material_t) :: doubled_storage_material
+    type(complex_torsional_stiffness_t) :: doubled_storage_stiffness
+
+    ! G' ölçekleme regresyonu üretim formülünü testte yeniden kurmaz.
+    ! Geometri ve diğer malzeme alanları sabitken K' ∝ G' davranışını,
+    ! iki üretim fonksiyonu sonucunu karşılaştırarak doğrular.
+    doubled_storage_material = material
+    doubled_storage_material%storage_shear_modulus_pa = mpa_to_pa(2.0_dp)
+    doubled_storage_stiffness = calculate_dynamic_torsional_stiffness( &
+      doubled_storage_material, rubber)
+
+    call assert_relative_close( &
+      doubled_storage_stiffness%storage_stiffness, &
+      2.0_dp * stiffness%storage_stiffness, &
+      "G' iki katına çıktığında K' iki katına çıkmadı." &
+    )
+  end block
+
+  block
+    type(rubber_geometry_t) :: doubled_width_rubber
+    type(complex_torsional_stiffness_t) :: doubled_width_stiffness
+
+    ! Eksenel genişlik regresyonu C_theta denklemini testte yeniden hesaplamaz.
+    ! Malzeme ve yarıçaplar sabitken K' ∝ L ve K'' ∝ L davranışlarını,
+    ! iki üretim fonksiyonu sonucunu karşılaştırarak doğrular.
+    doubled_width_rubber = rubber
+    doubled_width_rubber%axial_length_m = 0.02_dp
+    doubled_width_stiffness = calculate_dynamic_torsional_stiffness( &
+      material, doubled_width_rubber)
+
+    call assert_relative_close( &
+      doubled_width_stiffness%storage_stiffness, &
+      2.0_dp * stiffness%storage_stiffness, &
+      "Eksenel genişlik iki katına çıktığında K' iki katına çıkmadı." &
+    )
+    call assert_relative_close( &
+      doubled_width_stiffness%loss_stiffness, &
+      2.0_dp * stiffness%loss_stiffness, &
+      "Eksenel genişlik iki katına çıktığında K'' iki katına çıkmadı." &
+    )
+  end block
+
   zero_loss_material = material
   zero_loss_material%loss_shear_modulus_pa = 0.0_dp
   zero_loss_stiffness = calculate_dynamic_torsional_stiffness( &
