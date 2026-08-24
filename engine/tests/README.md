@@ -75,6 +75,16 @@ köşegen dışı katsayıların sıfır kaldığını sınar. Kısıtlı uç i�
 Geçersiz boyut, eksik node lookup, aralık dışı denklem, negatif atalet ve
 uyumsuz DOF haritası ayrı `WILL_FAIL` regresyonlarıdır.
 
+`test_torsional_validation`, V0.3.0 foundation katmanlarını değiştirmeden
+uçtan uca analitik doğrulama sağlar. Tek eleman işaret konvansiyonu, serbest
+rijit-cisim modu, üç düğümlü global katkı toplamı, iki constraint durumunda
+DOF mapping sürekliliği, Frobenius simetri normu ve
+`U=1/2 theta^T K theta>=0` enerji koşulu birlikte sınanır. İki ataletli TVD
+referansı ayrıca assembled M/K modal residual, bilinen analitik modun Rayleigh
+quotient değeri ve kütle ortogonalliği üzerinden mevcut analitik solver ile
+çapraz doğrulanır. Bu test genel eigen çözümü yapmaz ve deneysel model
+validation yerine analytical code verification sunar.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

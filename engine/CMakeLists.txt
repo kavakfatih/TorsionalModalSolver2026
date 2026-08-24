@@ -91,6 +91,10 @@ if(BUILD_TESTING)
     tests/test_generalized_torsional_system.f90
   )
   tms26_add_fortran_test(matrix_assembly tests/test_matrix_assembly.f90)
+  tms26_add_fortran_test(
+    torsional_validation
+    tests/test_torsional_validation.f90
+  )
 
   foreach(
     validation_case

@@ -54,6 +54,25 @@ olarak kullanmadan aşağıdaki davranışları `1e-10` mutlak toleransla doğru
 Negatif matris boyutu, bilinmeyen node lookup, aralık dışı equation ID, negatif
 atalet ve başka sisteme ait DOF haritası ayrı `WILL_FAIL` vakalarıdır.
 
+V0.3.1 foundation doğrulaması, mevcut unit ve assembly regresyonlarının yerine
+geçmeden üretim katmanlarını tek bir analitik kanıt zincirinde birleştirir.
+`test_torsional_validation` aşağıdaki kontrolleri `1e-10` seviyesinde uygular:
+
+- tek elemanın `K_e=k[[1,-1],[-1,1]]` katsayıları, işaretleri ve simetrisi,
+- serbest iki düğüm için `K[1,1]^T=0` rijit-cisim kalıntısı,
+- farklı fiziksel node ID değerleriyle üç düğümlü global K katkı toplamı,
+- tamamen serbest ve ilk düğümü kısıtlı DOF mapping sürekliliği,
+- Frobenius normuyla K simetrisi ve `U=1/2 theta^T K theta>=0` enerji koşulu,
+- iki ataletli analitik frekansın mevcut solver, assembled M/K modal residual,
+  Rayleigh quotient ve kütle ortogonalliği ile çapraz doğrulanması.
+
+Bu test bilinmeyen özdeğer aramaz; bilinen analitik modun Rayleigh değerini
+hesaplar. Dolayısıyla yeni eigen solver davranışı oluşturmaz. Kapsam,
+analytical code verification niteliğindedir ve deneysel model validation
+çalışmasının yerine geçmez. Ayrıntılar
+[`../validation/torsional_validation.md`](../validation/torsional_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

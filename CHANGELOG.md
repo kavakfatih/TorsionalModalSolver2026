@@ -7,6 +7,25 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.3.1] - 2026-08-25
+
+### Eklendi
+
+- Tek torsional eleman işaret konvansiyonu, serbest rijit-cisim modu, üç
+  düğümlü global assembly, DOF mapping sürekliliği ve matris kalite
+  invariantlarını birlikte doğrulayan V0.3.1 regresyon testi.
+- İki ataletli analitik frekansı mevcut solver ile assembled M/K modal
+  residual, Rayleigh quotient ve kütle ortogonalliği üzerinden çapraz
+  doğrulayan foundation benchmark kapsamı.
+- Matematiksel modelleri, varsayımları, toleransları ve doğrulama sınırlarını
+  açıklayan torsional validation belgesi ve doğrulama dizini indeksi.
+
+### Değiştirildi
+
+- Proje sürümü `0.3.1` olarak güncellendi; production solver API'leri ve
+  V0.3.0 node-element/assembly mimarisi değiştirilmeden CTest kapsamı 53 teste
+  çıkarıldı.
+
 ## [0.3.0] - 2026-08-24
 
 ### Eklendi

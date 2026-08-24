@@ -4,12 +4,12 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.3.0`, fiziksel düğüm kimliklerini solver denklem
-numaralarından ayıran DOF haritasını ve torsional sistemlerin dense global M/K
-matris assembly altyapısını ekler. Mevcut analitik solver'lar ve lokal eleman
-fiziği korunur; genel özdeğer çözümü henüz uygulanmamıştır.
+Güncel geliştirme sürümü `0.3.1`, V0.3.0 DOF haritası ile dense global M/K
+matrix assembly altyapısını bağımsız analitik regresyonlarla sağlamlaştırır.
+Üretim solver davranışı, temel veri tipleri ve node-element mimarisi değişmez;
+genel özdeğer çözümü henüz uygulanmamıştır.
 
-## V0.3.0 çekirdek kapsamı
+## V0.3.1 doğrulama kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -42,13 +42,15 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.3.0 aşamasındadır. Dinamik elastomer ve kompleks burulma
+TMS26 şu anda V0.3.1 aşamasındadır. Dinamik elastomer ve kompleks burulma
 rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
 TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
 eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
 boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez. Lineer
 elemanların lokal K katkıları aktif denklem uzayında global K matrisine, düğüm
 polar ataletleri ise diagonal global M matrisine birleştirilebilir.
+V0.3.1 bu davranışlara yeni fizik veya solver eklemez; V0.4 constraint
+çalışması öncesinde mevcut foundation için analitik verification sağlar.
 
 ### Tamamlananlar
 
@@ -78,6 +80,9 @@ polar ataletleri ise diagonal global M matrisine birleştirilebilir.
 - Açık lokal→denklem→global dönüşümüyle dense global torsional K assembly
 - Düğümde yığılmış polar ataletlerden diagonal global M assembly
 - Homojen sıfır dönme kısıtı için indirgenmiş aktif M/K matrisleri
+- Tek eleman işareti, rijit-cisim modu, DOF mapping, üç düğümlü assembly,
+  K simetrisi/enerjisi ve iki ataletli analitik frekansı birlikte doğrulayan
+  V0.3.1 foundation regresyonu
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
@@ -155,7 +160,7 @@ request'lerde derleme ve test doğrulaması yapar.
 
 ## Dizin yapısı
 
-- `docs/`: mimari, matematik, fizik, geliştirme ve karar kayıtları
+- `docs/`: mimari, matematik, fizik, doğrulama, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
 - `engine/src/matrix/`: lokal/global matris, DOF haritası ve assembly katmanı
 - `engine/src/system/`: genel torsional node, element ve sistem topolojisi
@@ -211,7 +216,10 @@ altında bulunur. DOF eşlemesi ile global M/K assembly matematiği
 [`docs/mathematics/global_matrix_assembly.md`](docs/mathematics/global_matrix_assembly.md),
 kalıcı mimari karar ise
 [`docs/decisions/0008-global-matrix-assembly-design.md`](docs/decisions/0008-global-matrix-assembly-design.md)
-altında bulunur.
+altında bulunur. V0.3.1 analitik foundation doğrulama modeli, toleransları ve
+sonuç sözleşmesi
+[`docs/validation/torsional_validation.md`](docs/validation/torsional_validation.md)
+belgesinde açıklanır.
 
 ## Lisans
 
