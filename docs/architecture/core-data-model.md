@@ -2,7 +2,7 @@
 
 ## Amaç
 
-V0.2.3 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
+V0.2.4 çekirdek veri modeli, torsional vibration damper (TVD) bileşenlerinin
 geometrik ve malzeme özelliklerini fizik yordamlarına, genel düğüm-eleman
 topolojisini ise gelecekteki sistem analiz katmanlarına taşır. Geometri ve
 malzeme türleri yalnız veri taşır; genel sistem yönetim yordamları topolojik ve
@@ -28,10 +28,12 @@ temel fiziksel önkoşulları doğrular.
 - `tms_dynamic_torsional_stiffness`, aynı girdilerden K', K'', kayıp faktörü
   ve çalışma noktası üstverisini üretir.
 - `tms_frequency_solver`, hesaplanan rijitlik ve ataletten doğal frekansı bulur.
+- `tms_local_matrix`, iki uçlu bir elemanın 2x2 lokal matris katsayılarını
+  sistem katmanından bağımsız ve sabit boyutlu bir veri türünde taşır.
 - `tms_torsional_node`, yığılmış polar atalet, başlangıç açısı ve dönel sınır
   koşulu taşıyan genel düğüm türünü tanımlar.
 - `tms_torsional_element`, iki düğüm arasındaki lineer rijitlik ve eşdeğer
-  viskoz sönüm bağlantısını tanımlar.
+  viskoz sönüm bağlantısını tanımlar ve 2x2 lokal rijitlik katkısını üretir.
 - `tms_generalized_torsional_system`, private düğüm/eleman koleksiyonlarını,
   ekleme-okuma yordamlarını, aktif DOF sayımını ve sistem doğrulamasını sağlar.
 - `tms_torsional_system`, bileşen sonuçlarını iki ataletli sistem türünde
@@ -150,7 +152,9 @@ bir aktif torsional DOF oluşturur. Düğüm kimliği doğrudan DOF indeksi değ
 
 `torsional_element_t`, pozitif benzersiz kimlik, iki farklı uç düğüm kimliği,
 lineer rijitlik (`N·m/rad`) ve eşdeğer viskoz sönüm (`N·m·s/rad`) taşır.
-Paralel elemanlar farklı kimliklerle temsil edilebilir.
+Paralel elemanlar farklı kimliklerle temsil edilebilir. Elemanın saf
+`calculate_local_stiffness` yordamı, `[theta_i, theta_j]` yerel sırası için
+`Ke = k[[1,-1],[-1,1]]` matrisini `local_matrix_2x2` değeri olarak döndürür.
 
 `torsional_system_t` içindeki koleksiyonlar private'dır. Public saf yordamlar:
 
@@ -159,7 +163,10 @@ Paralel elemanlar farklı kimliklerle temsil edilebilir.
 - sabitlenmemiş düğümlerden aktif DOF sayısını belirler,
 - kimlik benzersizliğini ve bağlantı uçlarının varlığını doğrular.
 
-Genel sistem katmanı M, K veya C matrisi oluşturmaz ve modal çözüm yapmaz.
+Eleman katmanı yalnız lokal K katkısını üretir. Genel sistem katmanı bu katkıyı
+global K matrisine birleştirmez; M veya C matrisi oluşturmaz ve modal çözüm
+yapmaz. Bağımlılık yönü `tms_kinds -> tms_local_matrix ->
+tms_torsional_element -> tms_generalized_torsional_system` biçimindedir.
 Mevcut iki ataletli dönüşüm `J_h`, `J_r` ve K' değerlerini taşır. K''
 `N·m/rad`, viskoz `c` ise `N·m·s/rad` olduğundan damping alanına doğrudan
 aktarılmaz.

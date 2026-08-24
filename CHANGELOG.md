@@ -7,6 +7,24 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.2.4] - 2026-08-24
+
+### Eklendi
+
+- İki torsional uç için sabit boyutlu `local_matrix_2x2` veri taşıyıcısı.
+- Lineer elemandan `Ke = k[[1,-1],[-1,1]]` lokal rijitlik katkısını üreten
+  saf `calculate_local_stiffness` yordamı.
+- Bilinen matris katsayılarını, simetriyi, sıfır satır toplamını, pozitif
+  yarı-tanımlı enerjiyi, rijit-cisim null modunu ve negatif rijitlik reddini
+  doğrulayan CTest kapsamı.
+- Lokal torsional eleman matrisi türetimi ve Karar 0007 tasarım kaydı.
+
+### Değiştirildi
+
+- Proje sürümü `0.2.4` olarak güncellendi; CTest kapsamı 46 teste çıkarıldı.
+- Genel torsional sistem belgeleri, lokal eleman katkısı ile henüz uygulanmayan
+  global matrix assembly arasındaki sınırı açıklayacak şekilde genişletildi.
+
 ## [0.2.3] - 2026-08-24
 
 ### Eklendi

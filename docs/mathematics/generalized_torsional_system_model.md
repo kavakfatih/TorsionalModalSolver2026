@@ -26,7 +26,7 @@ Gelecekteki kütle matrisi assembly işleminde düğümün kavramsal katkısı:
 M_ii += J_i
 ```
 
-V0.2.3 bu matrisi oluşturmaz; yalnız gerekli `J_i` verisini ve topolojik
+V0.2.4 bu matrisi oluşturmaz; yalnız gerekli `J_i` verisini ve topolojik
 sözleşmeyi sağlar.
 
 ## Eleman rijitliği ve sönümü
@@ -36,15 +36,17 @@ potansiyel enerjisi:
 
 ```text
 delta_theta_e = theta_i - theta_j
-U_e = 1/2 K_e delta_theta_e^2
+U_e = 1/2 k_e delta_theta_e^2
 ```
 
 Elemanın iki ucundaki geri çağırıcı momentler eşit büyüklükte ve zıt işaretlidir.
-Gelecekteki global rijitlik assembly işlemi için kavramsal yerel katkı:
+V0.2.4'te elemanın ürettiği, gelecekteki global rijitlik assembly işlemine
+girdi olacak yerel katkı:
 
 ```text
-K_e [ 1  -1 ]
-    [-1   1 ]
+          [ 1  -1 ]
+K_e = k_e [       ]
+          [-1   1 ]
 ```
 
 Eşdeğer viskoz sönüm için bağıl hız ve kavramsal yerel katkı:
@@ -57,8 +59,8 @@ c_e [ 1  -1 ]
     [-1   1 ]
 ```
 
-Bu ifadeler gelecekteki assembly arayüzünü tanımlar; V0.2.3 kodu M, K veya C
-matrisi üretmez.
+Rijitlik için lokal K katkısı uygulanmıştır. Viskoz sönüm ifadesi gelecekteki
+assembly arayüzünü tanımlar; V0.2.4 lokal C, global M/K/C matrisi üretmez.
 
 ## Gelecekteki hareket denklemi
 
@@ -74,8 +76,11 @@ Sönümsüz, dış zorlamasız hedef formülasyon:
 [M] theta'' + [C] theta' + [K] theta = 0
 ```
 
-V0.2.3 yalnız bu formülasyonların ihtiyaç duyduğu veri topolojisini kurar.
-Matris assembly, sınır koşulu eliminasyonu ve özdeğer çözümü kapsam dışıdır.
+V0.2.4 veri topolojisini ve lokal eleman K katkısını kurar. Global matris
+assembly, sınır koşulu eliminasyonu ve özdeğer çözümü kapsam dışıdır. Lokal
+matrisin ayrıntılı türetimi
+[`local_torsional_element_matrix.md`](local_torsional_element_matrix.md)
+belgesindedir.
 
 ## Kompleks kayıp rijitliği ile viskoz sönüm ayrımı
 

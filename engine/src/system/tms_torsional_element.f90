@@ -1,6 +1,7 @@
 module tms_torsional_element
   use, intrinsic :: ieee_arithmetic, only : ieee_is_finite
   use tms_kinds, only : dp
+  use tms_local_matrix, only : local_matrix_2x2
   implicit none
   private
 
@@ -31,6 +32,7 @@ module tms_torsional_element
   end type torsional_element_t
 
   public :: validate_torsional_element
+  public :: calculate_local_stiffness
 
 contains
 
@@ -70,5 +72,33 @@ contains
       error stop "Torsional eleman viskoz sönümü sonlu olmalı ve negatif olmamalıdır."
     end if
   end subroutine validate_torsional_element
+
+  !> İki düğümlü torsional elemanın lokal rijitlik matrisini hesaplar.
+  !!
+  !! Fiziksel açıklama: Lineer ve kütlesiz bağlantı yalnız iki uç arasındaki
+  !! bağıl dönmeye karşı koyar. Ortak rijit-cisim dönmesi iç moment üretmez.
+  !! Matematiksel açıklama: Yerel koordinat sırası [theta_i, theta_j] için
+  !! K_e = k*[[1,-1],[-1,1]] kullanılır. Matris simetrik ve pozitif
+  !! yarı-tanımlıdır; her satırın toplamı sıfırdır.
+  !! Girdi: Pozitif ve sonlu k [N*m/rad] taşıyan geçerli
+  !! torsional_element_t değeridir.
+  !! Çıktı: Katsayıları [N*m/rad] olan local_matrix_2x2 rijitlik matrisidir.
+  !! Varsayımlar ve geçerlilik: Küçük dönme, lineer elastik bağlantı ve aynı
+  !! pozitif dönme yönü kabul edilir. Eleman doğrulaması başarısızsa error stop
+  !! üretilir. Global DOF eşlemesi, assembly ve sınır koşulu uygulanmaz.
+  pure function calculate_local_stiffness(element) result(local_stiffness)
+    type(torsional_element_t), intent(in) :: element
+    type(local_matrix_2x2) :: local_stiffness
+
+    real(dp) :: stiffness
+
+    call validate_torsional_element(element)
+    stiffness = element%stiffness_nm_per_rad
+
+    local_stiffness%value(1, 1) = stiffness
+    local_stiffness%value(1, 2) = -stiffness
+    local_stiffness%value(2, 1) = -stiffness
+    local_stiffness%value(2, 2) = stiffness
+  end function calculate_local_stiffness
 
 end module tms_torsional_element

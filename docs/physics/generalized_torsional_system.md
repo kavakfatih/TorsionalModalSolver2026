@@ -2,13 +2,13 @@
 
 ## Amaç ve kapsam
 
-V0.2.3, özel iki ataletli TVD modelini değiştirmeden gelecekteki çok düğümlü
+V0.2.4, özel iki ataletli TVD modelini değiştirmeden gelecekteki çok düğümlü
 torsional sistemler için genel bir topoloji veri modeli sağlar. Bu katman fiziksel
 düğümleri ve aralarındaki lineer bağlantıları saklar, aktif serbestlik derecesi
 sayısını belirler ve topolojik bütünlüğü doğrular.
 
-Bu sürüm matris assembly, özdeğer çözümü veya yeni bir modal fizik algoritması
-içermez.
+Her eleman 2x2 lokal rijitlik katkısını üretebilir. Bu sürüm global matris
+assembly, özdeğer çözümü veya yeni bir modal fizik algoritması içermez.
 
 ## Torsional düğüm
 
@@ -23,7 +23,7 @@ koordinat taşıyan yığılmış atalet noktasını temsil eder.
 | `constrained` | İdeal dönel kinematik sınır koşulu | boyutsuz |
 
 Düğüm kimliği bir dizi indeksi veya doğrudan DOF sıra numarası değildir.
-`initial_angle_rad` yalnız başlangıç koşulu üstverisidir; V0.2.3 bunu ön-gerilme,
+`initial_angle_rad` yalnız başlangıç koşulu üstverisidir; V0.2.4 bunu ön-gerilme,
 denge çözümü veya modal rijitlik değişimine dönüştürmez.
 
 ## Torsional eleman
@@ -46,6 +46,9 @@ T_c = c (theta_i' - theta_j')
 ```
 
 Farklı kimlikli paralel elemanlar fiziksel olarak geçerlidir ve yasaklanmaz.
+`calculate_local_stiffness`, `[theta_i, theta_j]` sırası için
+`Ke = K[[1,-1],[-1,1]]` lokal katkısını verir. Matris simetrik, pozitif
+yarı-tanımlı ve sıfır satır toplamlıdır; global DOF eşlemesi yapmaz.
 
 ## Sistem koleksiyonu ve DOF
 
@@ -81,7 +84,7 @@ yeniden uygulamaz.
 
 Kompleks modeldeki `K''` kayıp rijitliği `N·m/rad`, genel elemandaki `c` ise
 `N·m·s/rad` birimindedir. Bu iki büyüklük doğrudan eşdeğer değildir. Frekansa
-bağlı bir dönüşüm veya viskoz model tanımlanmadığı için V0.2.3 köprüsü K''yi
+bağlı bir dönüşüm veya viskoz model tanımlanmadığı için V0.2.4 köprüsü K''yi
 sönüm alanına aktarmaz; `c = 0` kullanır. K'', kayıp faktörü, referans frekansı
 ve sıcaklık mevcut iki ataletli veri türünde korunur.
 
@@ -97,6 +100,8 @@ ve sıcaklık mevcut iki ataletli veri türünde korunur.
 
 Gelecekteki M/K bağlantısının matematiksel çerçevesi
 [`../mathematics/generalized_torsional_system_model.md`](../mathematics/generalized_torsional_system_model.md),
+münferit eleman matrisinin türetimi
+[`../mathematics/local_torsional_element_matrix.md`](../mathematics/local_torsional_element_matrix.md),
 mimari karar ise
-[`../decisions/0006-generalized-torsional-topology.md`](../decisions/0006-generalized-torsional-topology.md)
-altında açıklanır.
+[`../decisions/0007-local-element-matrix-design.md`](../decisions/0007-local-element-matrix-design.md)
+altında açıklanır. Genel topoloji kararı Karar 0006'da korunur.

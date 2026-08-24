@@ -9,6 +9,7 @@ target_sources(
     src/core/tms_kinds.f90
     src/core/tms_constants.f90
     src/core/tms_units.f90
+    src/matrix/tms_local_matrix.f90
     src/geometry/tms_geometry.f90
     src/materials/tms_dynamic_modulus.f90
     src/materials/tms_material_frequency.f90
@@ -66,6 +67,20 @@ if(BUILD_TESTING)
   tms26_add_fortran_test(dynamic_modulus tests/test_dynamic_modulus.f90)
   tms26_add_fortran_test(torsional_node tests/test_torsional_node.f90)
   tms26_add_fortran_test(torsional_element tests/test_torsional_element.f90)
+  tms26_add_fortran_test(
+    local_stiffness_matrix
+    tests/test_local_stiffness_matrix.f90
+  )
+  add_test(
+    NAME "tms26.local_stiffness_matrix.rejects_negative_stiffness"
+    COMMAND
+      "$<TARGET_FILE:tms26_test_local_stiffness_matrix>"
+      "negative_stiffness"
+  )
+  set_tests_properties(
+    "tms26.local_stiffness_matrix.rejects_negative_stiffness"
+    PROPERTIES WILL_FAIL TRUE
+  )
   tms26_add_fortran_test(
     generalized_torsional_system
     tests/test_generalized_torsional_system.f90

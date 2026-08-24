@@ -4,13 +4,13 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.2.3`, mevcut fixed-hub ve serbest-serbest iki
-ataletli TVD fiziğini korurken genel torsional düğüm-eleman topolojisini ekler.
-Yığılmış polar atalet düğümleri, lineer rijitlik/viskoz sönüm elemanları, aktif
-DOF sayımı ve sistem doğrulaması gelecekteki M/K matrix assembly altyapısına
-hazırdır. Bu sürümde matris veya genel özdeğer çözümü uygulanmamıştır.
+Güncel geliştirme sürümü `0.2.4`, mevcut fixed-hub ve serbest-serbest iki
+ataletli TVD fiziğini korurken genel torsional elemanların 2x2 lokal rijitlik
+matrisi katkısını üretmesini sağlar. Yığılmış polar atalet düğümleri, lineer
+elemanlar ve lokal K katkısı gelecekteki global M/K assembly altyapısına
+hazırdır. Bu sürümde global assembly veya genel özdeğer çözümü uygulanmamıştır.
 
-## V0.2.3 çekirdek kapsamı
+## V0.2.4 çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -23,8 +23,9 @@ hazırdır. Bu sürümde matris veya genel özdeğer çözümü uygulanmamışt�
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
 - `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
+- `tms_local_matrix`: iki uçlu elemanlar için 2x2 lokal matris veri taşıyıcısı
 - `tms_torsional_node`: genel düğüm kimliği, polar atalet ve sınır koşulu
-- `tms_torsional_element`: iki düğümlü lineer torsional K/c bağlantısı
+- `tms_torsional_element`: lineer K/c bağlantısı ve 2x2 lokal rijitlik hesabı
 - `tms_generalized_torsional_system`: koleksiyon yönetimi, aktif DOF sayımı ve
   topoloji doğrulaması
 - `tms_torsional_system`: TVD builder'ı ile fixed-hub ve serbest-serbest
@@ -37,11 +38,12 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.2.3 aşamasındadır. Dinamik elastomer ve kompleks burulma
+TMS26 şu anda V0.2.4 aşamasındadır. Dinamik elastomer ve kompleks burulma
 rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
 TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
 eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
-boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez.
+boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez. Her
+lineer eleman, global sisteme henüz birleştirilmeyen lokal K matrisini üretir.
 
 ### Tamamlananlar
 
@@ -64,6 +66,8 @@ boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülme
 - Genel torsional node/element veri türleri ve private sistem koleksiyonları
 - Sabitlenmemiş düğümlerden aktif DOF sayımı ve topoloji doğrulaması
 - İki ataletli TVD için serbest-serbest ve fixed-hub genel topoloji köprüsü
+- `Ke = k[[1,-1],[-1,1]]` biçiminde 2x2 lokal eleman rijitlik katkısı
+- Lokal matris simetrisi, sıfır satır toplamı ve pozitif yarı-tanımlılık testleri
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS ve Windows için GitHub Actions derleme/test iş akışları
 - Mimari, matematik, fizik, geliştirme ve karar belgeleri için dizin indeksleri
@@ -72,7 +76,7 @@ boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülme
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
 - Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
-- M/K/C matrix assembly ve sınır koşulu eliminasyonu
+- Global M/K/C matrix assembly ve sınır koşulu eliminasyonu
 - Genel çok serbestlik dereceli modal/eigen çözümü
 - Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
@@ -142,6 +146,7 @@ request'lerde derleme ve test doğrulaması yapar.
 
 - `docs/`: mimari, matematik, fizik, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
+- `engine/src/matrix/`: küçük lokal matris veri türleri
 - `engine/src/system/`: genel torsional node, element ve sistem topolojisi
 - `engine/tests/`: hesap motoru testleri
 - `benchmarks/`: performans ölçümleri
@@ -187,6 +192,10 @@ gelecekteki M/K bağlantısı
 [`docs/mathematics/generalized_torsional_system_model.md`](docs/mathematics/generalized_torsional_system_model.md)
 ve kalıcı mimari karar
 [`docs/decisions/0006-generalized-torsional-topology.md`](docs/decisions/0006-generalized-torsional-topology.md)
+altında bulunur. Lokal eleman rijitlik türetimi
+[`docs/mathematics/local_torsional_element_matrix.md`](docs/mathematics/local_torsional_element_matrix.md),
+matris taşıyıcısı ve bağımlılık kararı ise
+[`docs/decisions/0007-local-element-matrix-design.md`](docs/decisions/0007-local-element-matrix-design.md)
 altında bulunur.
 
 ## Lisans

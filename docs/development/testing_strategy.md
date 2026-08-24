@@ -30,6 +30,17 @@ değişmezliği kontrolleri `1e-10` bağıl hata sınırıyla uygulanır:
 - Eksenel genişlik ölçekleme: Malzeme ve yarıçaplar sabitken
   `K'(2L) = 2K'(L)` ve `K''(2L) = 2K''(L)` olmalıdır.
 
+Lokal torsional eleman matrisi regresyonu, `k = 100 N·m/rad` için bilinen 2x2
+katsayıları doğrudan doğrular. Ek fizik invariantları şunlardır:
+
+- karşılıklı bağlantı için matris simetrisi,
+- ortak rijit-cisim dönmesi için sıfır satır toplamı ve sıfır enerji,
+- bağıl dönme için `theta^T Ke theta > 0`,
+- negatif rijitliğin üretim matris yordamı tarafından reddedilmesi.
+
+Bu test global assembly veya özdeğer çözümü yapmaz; yalnız elemanın lokal
+fiziksel katkısını sınar.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
@@ -40,8 +51,8 @@ olarak farklı K'' değerinin viskoz `c` alanına aktarılmadığı doğrulanır
 
 Genel sistem testleri ayrıca sabitlenmemiş düğümlerin aktif DOF sayısını,
 fixed-hub dönüşümünde göbek kısıtını, yinelenen kimlikleri ve tanımsız eleman
-uçlarını kapsar. Bu testler birim testlerinin yerini almaz ve matris assembly
-veya eigen çözümü uygulamaz.
+uçlarını kapsar. Bu testler birim testlerinin yerini almaz ve global matris
+assembly veya eigen çözümü uygulamaz.
 
 ## Benchmark test
 

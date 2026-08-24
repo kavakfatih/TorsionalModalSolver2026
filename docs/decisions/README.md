@@ -18,6 +18,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0006-generalized-torsional-topology.md`](0006-generalized-torsional-topology.md):
   genel düğüm-eleman topolojisi, mevcut iki-atalet API uyumluluğu ve K''/viskoz
   sönüm ayrımı
+- [`0007-local-element-matrix-design.md`](0007-local-element-matrix-design.md):
+  sabit boyutlu lokal matris taşıyıcısı, eleman bağımlılığı ve global assembly
+  sınırı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

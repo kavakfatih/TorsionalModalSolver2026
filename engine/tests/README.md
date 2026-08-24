@@ -53,6 +53,12 @@ alanlarını; `test_torsional_element`, uç düğüm kimlikleri, K rijitliği ve
 eşdeğer viskoz c alanını doğrular. Pozitif olmayan veya sonlu olmayan
 büyüklükler, self-connection ve negatif sönüm ayrı `WILL_FAIL` vakalarıdır.
 
+`test_local_stiffness_matrix`, `k = 100 N·m/rad` için üretim yordamının
+`[[100,-100],[-100,100]]` lokal katkısını verdiğini doğrular. Simetri, sıfır
+satır toplamı, bağıl dönmede pozitif enerji ve ortak dönmede sıfır enerji ayrı
+assertion'larla korunur. Negatif rijitlik aynı üretim yordamını çağıran ayrı bir
+`WILL_FAIL` regresyonudur.
+
 `test_generalized_torsional_system`, private koleksiyonların public yönetim
 yordamlarını, aktif DOF sayımını ve Benchmark 004 iki-ataletli sisteminin genel
 iki-düğüm/bir-eleman gösterimini doğrular. K'' kayıp rijitliğinin viskoz sönüm
