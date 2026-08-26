@@ -7,6 +7,53 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.5.0] - 2026-08-26
+
+### Eklendi
+
+- Constraint-aware `K_r/M_r` matrislerini gerçek simetrik genelleştirilmiş
+  özdeğer problemi olarak taşıyan backend-neutral problem ve solution türleri.
+- `ITYPE=1`, `JOBZ='V'` ve `UPLO='U'` sözleşmeli, LP64 Fortran ABI kullanan
+  LAPACK `DSYGV` dense reference backend'i ile generalized solver facade'ı.
+- Original K/M matrislerini koruyan workspace-query ve working-copy çözüm
+  akışı; raw LAPACK `INFO` değerleri için anlamlı TMS26 tanıları.
+- Rijit ve elastik mod sınıflandırması, mass normalization, boyutsuz eigenpair
+  residual, kütle ortogonalliği ve fiziksel mode recovery katmanları.
+- Eigenvalue, açısal frekans, Hz frekansı, mode classification, residual,
+  reduced/physical mode shape ve solver metadata taşıyan private modal sonuç
+  sözleşmesi.
+- Fixed 1-DOF, free-free iki atalet, üç düğümlü zincir, constrained recovery,
+  repeated eigenvalue, birden çok rigid mode, tamamen constrained sistem,
+  geçersiz K/M, input immutability ve LAPACK tanı regresyonları.
+- `Phi^T K Phi=diag(lambda)` projection, partial-spectrum sonuç sözleşmesi ve
+  kritik expected-failure tanı metinlerini kilitleyen ek doğrulamalar.
+- Modal mimari, generalized eigenproblem matematiği, analytical validation ve
+  dense reference/future sparse backend kararı için V0.5 belgeleri.
+- macOS için keg-only Homebrew LAPACK ve Windows MSYS2 için LP64 OpenBLAS
+  sağlayıcılarını doğrulayan CMake/GitHub Actions bağımlılıkları.
+
+### Değiştirildi
+
+- Proje sürümü `0.5.0` olarak güncellendi.
+- V0.4 reduced-system çıktısı doğrudan modal analysis yoluna bağlandı;
+  constrained mode bileşenleri `phi=Pphi_r` ile sıfır olarak geri açılır ve
+  prescribed statik offset mode shape'e eklenmez.
+- Backend-neutral modal post-processing `1<=m<=n` özçift kabul edecek biçimde
+  future selected-spectrum/Lanczos backend'lerine açık tutuldu.
+- İki ataletli analitik solver korunarak generalized DSYGV çözümünün bağımsız
+  regression oracle'ı ve Benchmark 004 çapraz doğrulaması haline getirildi.
+- Harici sayısal bağımlılık discovery'si LP64 için
+  `find_package(LAPACK REQUIRED)` ve `LAPACK::LAPACK` imported target üzerinden
+  platformdan bağımsız hale getirildi.
+
+### Sınırlamalar
+
+- Modal sonuç lineer, sönümsüz ve frozen-property çözümüdür; damping matrisi,
+  kompleks özdeğerler ve harmonik/frekans cevabı çözülmez.
+- `G'(f) -> K(f) -> eigenfrequency` öz-tutarlı viskoelastik iterasyonu yoktur.
+- DSYGV dense reference backend'dir; sparse/CSR storage, Lanczos-family
+  production backend ve selected-spectrum extraction bu sürümde yoktur.
+
 ## [0.4.0] - 2026-08-25
 
 ### Eklendi

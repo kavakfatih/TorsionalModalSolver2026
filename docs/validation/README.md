@@ -9,6 +9,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`numerical_robustness_validation.md`](numerical_robustness_validation.md):
   V0.3.2 için sonlu girdi sözleşmesi, toleranslı geometri ara yüzleri, uç ölçek
   numerik kararlılığı ve fixed-DOF indirgenmiş matris regresyonları
+- [`modal_eigen_validation.md`](modal_eigen_validation.md): V0.5.0 generalized
+  modal solver için analitik eigenvalue/frekans, mass normalization, residual,
+  orthogonality, sign/repeated eigenspace ve physical recovery doğrulaması
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

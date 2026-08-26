@@ -26,6 +26,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0009-constraint-reduction-architecture.md`](0009-constraint-reduction-architecture.md):
   Physical DOF, constraint'ten bağımsız tam denklem numaralandırması, ayrı aktif
   harita, direct elimination ve result recovery mimarisi
+- [`0010-generalized-eigen-solver-backend.md`](0010-generalized-eigen-solver-backend.md):
+  LP64 LAPACK DSYGV dense reference backend'i, backend-neutral modal facade ve
+  gelecekteki sparse/Lanczos-family backend genişleme sınırı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

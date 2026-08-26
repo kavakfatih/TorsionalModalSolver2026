@@ -19,10 +19,10 @@ jobs:
       - name: Kaynak kodu al
         uses: actions/checkout@v4
 
-      - name: CMake, Ninja ve GNU Fortran kur
+      - name: CMake, Ninja, GNU Fortran ve LAPACK kur
         run: |
           brew update
-          brew install cmake ninja gcc
+          brew install cmake ninja gcc lapack
 
       - name: GNU Fortran derleyicisini belirle
         id: fortran
@@ -38,10 +38,21 @@ jobs:
           "$compiler_path" --version
           echo "path=$compiler_path" >> "$GITHUB_OUTPUT"
 
+      - name: LP64 LAPACK yolunu belirle
+        id: lapack
+        shell: bash
+        run: |
+          lapack_prefix="$(brew --prefix lapack)"
+          test -d "$lapack_prefix"
+          echo "prefix=$lapack_prefix" >> "$GITHUB_OUTPUT"
+
       - name: CMake yapılandırması
         run: >-
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_Fortran_COMPILER=${{ steps.fortran.outputs.path }}
+          -DBLA_SIZEOF_INTEGER=4
+          -DBLA_VENDOR=Generic
+          -DCMAKE_PREFIX_PATH=${{ steps.lapack.outputs.prefix }}
 
       - name: Derle
         run: cmake --build build --parallel

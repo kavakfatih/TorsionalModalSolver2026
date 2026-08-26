@@ -27,6 +27,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`constraint_reduction.md`](constraint_reduction.md): tam M/K sisteminden
   aktif Kr/Mr sistemine direct elimination, seçim matrisi, prescribed değer ve
   result recovery bağıntıları
+- [`generalized_modal_eigenproblem.md`](generalized_modal_eigenproblem.md):
+  `K_r phi=lambda M_r phi` problemi, rigid-mode toleransı, mass normalization,
+  relative residual, ortogonallik ve repeated eigenspace sözleşmesi
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

@@ -11,6 +11,9 @@ katman sınırlarını açıklar.
 - [`V0.4_constraint_foundation.md`](V0.4_constraint_foundation.md): Physical
   DOF, tam ve aktif denklem kimlikleri, constraint yönetimi, direct elimination,
   indirgenmiş M/K sistemi ve result recovery mimarisi
+- [`V0.5_modal_eigen_solver.md`](V0.5_modal_eigen_solver.md): reduced Kr/Mr,
+  backend-neutral generalized solver facade, dense DSYGV reference backend,
+  modal doğrulama/sonuç katmanı ve fiziksel mode recovery akışı
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

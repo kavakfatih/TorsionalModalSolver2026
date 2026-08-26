@@ -132,6 +132,41 @@ modül sorumlulukları ise
 [`../architecture/V0.4_constraint_foundation.md`](../architecture/V0.4_constraint_foundation.md)
 belgelerindedir.
 
+V0.5.0 modal doğrulaması, V0.4 `K_r/M_r` çıktısını production generalized
+eigen ve modal-analysis yordamları üzerinden çözer. Ana CTest programları
+`test_generalized_eigen_solver` ve `test_modal_analysis` olup aşağıdaki
+birbirini tamamlayan kanıtları sağlar:
+
+- fixed 1-DOF sistemde `lambda=k/J`, frekans, mass normalization ve residual,
+- free-free iki atalette bir rigid ile bir elastic mode ve mevcut analitik
+  solver ile sign-invariant çapraz doğrulama,
+- eş üç düğümlü zincirde `[0,k/J,3k/J]` eigenvalue sırası,
+- constrained zincirde reduced çözüm ve `phi=Pphi_r` physical recovery,
+- repeated eigenvalue için tekil eigenvector yerine multiplicity ve eigenspace
+  eşdeğerliği,
+- ayrık serbest alt sistemlerde birden çok rigid-body mode,
+- `Phi^T M Phi~=I` mass orthogonality ve her eigenpair için boyutsuz relative
+  residual,
+- original K/M matrislerinin DSYGV çağrısından sonra değişmemesi,
+- tamamen constrained `0x0` sistemde LAPACK çağrılmadan temiz tanı.
+
+Mode shape işareti fiziksel olarak arbitrary olduğundan `phi` ile `-phi`
+eşdeğer kabul edilir. Repeated eigenspace içinde seçilen baz da unique değildir;
+test exact sütun karşılaştırması yapmaz. Nonsymmetric/non-finite K/M, boyut
+uyuşmazlığı, non-SPD M ve anlamlı negatif eigenvalue durumları ayrı beklenen-hata
+CTest süreçleridir. Non-SPD, fully constrained ve significant-negative yolları
+yalnız exit code ile değil, beklenen TMS26 tanı metniyle de doğrulanır. Singular
+symmetric positive-semidefinite K ise free-free rigid mode taşıyabildiği için
+geçerlidir. Modal baz için residual ve `Phi^T M Phi~=I` yanında
+`Phi^T K Phi~=diag(lambda)` bağıntısı da bağımsız test hesabıyla sınanır.
+
+Bu kapsam lineer, sönümsüz ve frozen-property çözümü doğrular. Toleranslar ve
+analitik model tablosu
+[`../validation/modal_eigen_validation.md`](../validation/modal_eigen_validation.md),
+matematiksel tanımlar ise
+[`../mathematics/generalized_modal_eigenproblem.md`](../mathematics/generalized_modal_eigenproblem.md)
+belgelerindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
@@ -150,6 +185,13 @@ aktif Equation ID haritası, storage-bağımsız reduction ve result recovery
 katmanlarını birlikte doğrulayan entegrasyon testidir. Önceki V0.3 assembly ve
 validation testleri tarihsel regresyon koruması olarak çalışmayı sürdürür.
 
+V0.5.0 için `test_modal_analysis`, reduced-system builder, generalized solver
+facade, DSYGV reference backend, modal validation/result ve mevcut
+`recover_mode_shape` katmanlarını uçtan uca birleştirir. LAPACK backend yalnız
+sayısal K/M problemine bağımlıdır; test Geometry, Material, Physical DOF ve
+constraint sorumluluklarının backend'e sızmadığını da katman kullanımıyla
+korur.
+
 ## Benchmark test
 
 Benchmark testleri, temsilî TVD modellerinde yürütme süresi ve bellek kullanım
@@ -159,14 +201,19 @@ sonuçlar olarak tutulur. Donanım farklılıklarına bağlı performans değerl
 henüz ana CI geçiş koşulu değildir; analitik referanslar ilgili CTest fizik
 doğrulamalarında sınanır.
 
+Benchmark 004, hub-normalized analitik iki-atalet modlarını DSYGV'nin
+mass-normalized ve sign-arbitrary modlarıyla eigenvalue, residual, mass inner
+product ve physical recovery üzerinden eşleştirir. Böylece normalize bileşen
+değerlerinin farklı olması fizik hatası olarak değerlendirilmez.
+
 ## CI validation
 
 GitHub Actions, `main` ve `develop` dallarına yapılan push işlemlerinde ve tüm
 pull request'lerde aşağıdaki işlemleri yapar:
 
 1. Kaynak kodunu alır.
-2. macOS üzerinde Homebrew GNU Fortran; Windows üzerinde MinGW64 GNU Fortran
-   araç zincirini kurar.
+2. macOS üzerinde Homebrew GNU Fortran ile keg-only LP64 LAPACK; Windows
+   üzerinde MinGW64 GNU Fortran ile LP64 OpenBLAS/LAPACK araç zincirini kurar.
 3. CMake ve Ninja ile ayrı `build/` dizininde yapılandırır ve derler.
 4. CTest test takımını `--output-on-failure` seçeneğiyle çalıştırır.
 

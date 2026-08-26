@@ -29,6 +29,7 @@ jobs:
             mingw-w64-x86_64-gcc-fortran
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-openblas
 
       - name: Araç zincirini doğrula
         shell: "msys2 {0}"
@@ -47,6 +48,9 @@ jobs:
         run: >-
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
           -DCMAKE_Fortran_COMPILER=gfortran
+          -DBLA_SIZEOF_INTEGER=4
+          -DBLA_VENDOR=OpenBLAS
+          -DCMAKE_PREFIX_PATH=/mingw64
 
       - name: Derle
         shell: "msys2 {0}"

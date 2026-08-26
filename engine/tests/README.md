@@ -124,6 +124,43 @@ ve
 [`../../docs/mathematics/constraint_reduction.md`](../../docs/mathematics/constraint_reduction.md)
 belgelerindedir.
 
+`test_generalized_eigen_solver`, backend-neutral problem ve solution
+sözleşmeleriyle LP64 LAPACK DSYGV reference backend'ini doğrudan doğrular.
+K/M karelik, ortak boyut, sonluluk ve simetri önkoşulları; M positive definite
+zorunluluğu; singular positive-semidefinite K kabulü; input immutability;
+ascending eigenpair eşleşmesi ve anlamlı LAPACK diagnostic'leri bu test
+grubundadır. Invalid selector vakaları ayrı
+`tms26.generalized_eigen_solver.rejects_*` CTest süreçleri olarak çalışır.
+Non-SPD M vakalarında CMake sarmalayıcısı hem nonzero çıkışı hem de beklenen
+`M positive definite` TMS26 tanısını doğrular. Backend-neutral solution
+sözleşmesi `1<=mode_count<=DOF_count` partial-spectrum aralığını korur;
+DSYGV V0.5'te yine bütün spectrum'u çözer.
+
+`test_modal_analysis`, V0.4 reduced system ile V0.5 modal katmanı arasındaki
+uçtan uca bağlantıyı sınar. Fixed 1-DOF, free-free iki atalet, üç düğümlü
+zincir, ilk düğümü constrained zincir, repeated eigenvalue, birden çok rigid
+mode ve tamamen constrained sistem senaryolarını kapsar. Kontroller şunlardır:
+
+- eigenvalue ve Hz frekansının analitik referansla uyuşması,
+- `phi^T M phi=1` mass normalization,
+- boyutsuz relative eigenpair residual,
+- `Phi^T M Phi~=I` mass orthogonality,
+- `Phi^T K Phi~=diag(lambda)` modal stiffness diagonalization,
+- mode shape işaretinden bağımsız correlation,
+- repeated eigenvalue için basis-independent eigenspace eşdeğerliği,
+- `phi=Pphi_r` physical recovery ve constrained bileşenlerin sıfır kalması.
+
+Anlamlı negatif eigenvalue ve aktif DOF bulunmaması temiz modal tanılarla
+reddedilir; bu iki yolun tanı metni CMake expected-failure sarmalayıcısıyla
+kilitlenir. Küçük roundoff kaynaklı negatif değerler ölçeğe duyarlı rigid-mode
+toleransı içinde ele alınır. Requested mode count seçimi ve gelecekteki
+partial-spectrum backend'lere açık `1<=m<=n` ortak tolerans sözleşmesi de
+regresyon kapsamındadır. Bu testler lineer, sönümsüz ve frozen-property
+çözümü doğrular; frequency-dependent elastomer iterasyonu veya damping çözümü
+yapmaz. Ayrıntılar
+[`../../docs/validation/modal_eigen_validation.md`](../../docs/validation/modal_eigen_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman
@@ -136,8 +173,9 @@ ilgili testler aynı commit içinde güncellenir.
 `benchmarks/003_dynamic_torsional_stiffness/` ise bu noktanın annüler geometri
 üzerindeki kompleks rijitlik sonucunu tanımlar.
 `benchmarks/004_two_inertia_tvd/`, fixed-hub ve serbest-serbest iki ataletli
-sistemin analitik frekansları ile mod şekillerini ve V0.2.3 genel topoloji
-eşlemesini tanımlar.
+sistemin analitik frekansları ile hub-normalized mod şekillerini, V0.2.3 genel
+topoloji eşlemesini ve V0.5 DSYGV mass-normalized/sign-arbitrary modal sonucunun
+aynı fiziksel eigenspace'i verdiğini tanımlar.
 
 ## Test ekleme
 

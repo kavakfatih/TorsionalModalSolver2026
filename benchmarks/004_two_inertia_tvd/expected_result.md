@@ -40,6 +40,39 @@ phi_e = [1, -J_h/J_r]
       = [1, -0.5]
 ```
 
+## V0.5 generalized eigenproblem referansı
+
+DSYGV backend'i serbest-serbest sistem için artan sırada şu özdeğerleri
+üretmelidir:
+
+```text
+lambda = [0, 15000] 1/s^2
+```
+
+`phi_i^T M phi_i = 1` mass normalization uygulandığında beklenen mode
+shape'ler, global `+/-` işaret belirsizliği dışında, şöyledir:
+
+```text
+phi_rigid   = [1/sqrt(0.30), 1/sqrt(0.30)]
+            = [1.825741858350554, 1.825741858350554]
+
+phi_elastic = [1/sqrt(0.15), -0.5/sqrt(0.15)]
+            = [2.581988897471611, -1.290994448735806]
+```
+
+Fixed-hub reduction sonrasında tek aktif atalet `J_r` olduğundan:
+
+```text
+lambda_fixed = 5000 1/s^2
+phi_reduced  = [1/sqrt(0.20)]
+             = [2.236067977499790]
+phi_physical = [0, 2.236067977499790]
+```
+
+Eigenvector işareti keyfidir; yukarıdaki her vektörün negatifi aynı fiziksel
+mode'u temsil eder. Karşılaştırmalar bu nedenle sign-invariant modal
+correlation ve mass normalization invariantlarıyla yapılır.
+
 ## Ölçekleme ve limit regresyonları
 
 - `K' -> 4K'` olduğunda `f_e -> 2f_e`.

@@ -32,6 +32,13 @@ target_sources(
     src/matrix/tms_matrix_assembly.f90
     src/constraints/tms_reduced_system.f90
     src/solver/tms_torsional_system.f90
+    src/eigen/tms_generalized_eigen_problem.f90
+    src/eigen/tms_eigen_solution.f90
+    src/eigen/tms_lapack_dsygv_backend.f90
+    src/eigen/tms_generalized_eigen_solver.f90
+    src/modal/tms_modal_validation.f90
+    src/modal/tms_modal_result.f90
+    src/modal/tms_modal_analysis.f90
 )
 
 set_target_properties(
@@ -49,6 +56,9 @@ target_include_directories(
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/modules>"
 )
+
+# DSYGV backend'inin platform bağımsız LAPACK bağlantısını sağlar.
+target_link_libraries(tms26_engine PRIVATE LAPACK::LAPACK)
 
 if(BUILD_TESTING)
   # Tüm Fortran test hedeflerine aynı standart ve bağlantı kurallarını uygular.
@@ -342,6 +352,107 @@ if(BUILD_TESTING)
 
   tms26_add_fortran_test(frequency_solver tests/test_frequency_solver.f90)
   tms26_add_fortran_test(torsional_system tests/test_torsional_system.f90)
+
+  tms26_add_fortran_test(
+    generalized_eigen_solver
+    tests/test_generalized_eigen_solver.f90
+  )
+
+  # Generalized eigenproblem structural contract'ı ile DSYGV M-SPD tanısını
+  # ayrı süreçlerde sınar. Üretim API'sinin error stop vermesi başarıdır.
+  foreach(
+    validation_case
+    IN ITEMS
+      nonsquare_stiffness
+      nonsquare_mass
+      dimension_mismatch
+      nonsymmetric_stiffness
+      nonsymmetric_mass
+      nan_stiffness
+      positive_infinity_stiffness
+      negative_infinity_stiffness
+      nan_mass
+      positive_infinity_mass
+      negative_infinity_mass
+      zero_order
+      excessive_mode_count
+  )
+    set(
+      validation_test
+      "tms26.generalized_eigen_solver.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_generalized_eigen_solver>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  # DSYGV INFO>N yolunun yalnız başarısız çıkmasını değil, raw INFO yerine
+  # anlamlı TMS26 M-SPD tanısını üretmesini de platform bağımsız doğrular.
+  foreach(
+    validation_case
+    IN ITEMS
+      zero_mass
+      negative_mass
+      indefinite_mass
+  )
+    set(
+      validation_test
+      "tms26.generalized_eigen_solver.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "${CMAKE_COMMAND}"
+        "-DTEST_EXECUTABLE=$<TARGET_FILE:tms26_test_generalized_eigen_solver>"
+        "-DTEST_SELECTOR=${validation_case}"
+        "-DEXPECTED_REGEX=M positive definite"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/assert_expected_failure.cmake"
+    )
+  endforeach()
+
+  tms26_add_fortran_test(modal_analysis tests/test_modal_analysis.f90)
+
+  # Seçenek hata yollarını ayrı CTest süreçlerinde doğrular.
+  foreach(
+    validation_case
+    IN ITEMS
+      negative_requested_mode_count
+      excessive_requested_mode_count
+      nonfinite_rigid_multiplier
+  )
+    set(validation_test "tms26.modal_analysis.rejects_${validation_case}")
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_modal_analysis>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  # Fully constrained ve significant negative eigenvalue vakalarının doğru
+  # pre/post-processing tanı yolunda, LAPACK misuse olmadan reddini kilitler.
+  foreach(validation_case IN ITEMS fully_constrained significant_negative_eigenvalue)
+    if(validation_case STREQUAL "fully_constrained")
+      set(expected_regex "aktif DOF yoktur")
+    else()
+      set(expected_regex "negatif")
+    endif()
+    set(validation_test "tms26.modal_analysis.rejects_${validation_case}")
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "${CMAKE_COMMAND}"
+        "-DTEST_EXECUTABLE=$<TARGET_FILE:tms26_test_modal_analysis>"
+        "-DTEST_SELECTOR=${validation_case}"
+        "-DEXPECTED_REGEX=${expected_regex}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/assert_expected_failure.cmake"
+    )
+  endforeach()
 
   # Sistem katmanının doğrudan modal girdileri ile builder yoğunluk ve
   # geometri önkoşullarını error stop üzerinden reddettiğini doğrular.
