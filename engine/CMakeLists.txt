@@ -27,10 +27,13 @@ target_sources(
     src/constraints/tms_constraint_types.f90
     src/constraints/tms_constraint_manager.f90
     src/matrix/tms_stiffness_matrix.f90
+    src/matrix/tms_loss_stiffness_matrix.f90
+    src/matrix/tms_damping_matrix.f90
     src/matrix/tms_mass_matrix.f90
     src/matrix/tms_matrix_reduction.f90
     src/matrix/tms_matrix_assembly.f90
     src/constraints/tms_reduced_system.f90
+    src/harmonic/tms_reduced_dynamic_system.f90
     src/solver/tms_torsional_system.f90
     src/eigen/tms_generalized_eigen_problem.f90
     src/eigen/tms_eigen_solution.f90
@@ -39,6 +42,15 @@ target_sources(
     src/modal/tms_modal_validation.f90
     src/modal/tms_modal_result.f90
     src/modal/tms_modal_analysis.f90
+    src/harmonic/tms_complex_linear_problem.f90
+    src/harmonic/tms_complex_linear_solution.f90
+    src/harmonic/tms_lapack_zsysvx_backend.f90
+    src/harmonic/tms_complex_linear_solver.f90
+    src/harmonic/tms_dynamic_stiffness.f90
+    src/harmonic/tms_harmonic_excitation.f90
+    src/harmonic/tms_harmonic_response.f90
+    src/harmonic/tms_frf.f90
+    src/harmonic/tms_harmonic_analysis.f90
 )
 
 set_target_properties(
@@ -472,6 +484,109 @@ if(BUILD_TESTING)
       NAME "${validation_test}"
       COMMAND
         "$<TARGET_FILE:tms26_test_torsional_system>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    dynamic_matrix_assembly
+    tests/test_dynamic_matrix_assembly.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      negative_loss_stiffness
+      nan_loss_stiffness
+      positive_infinity_loss_stiffness
+      negative_infinity_loss_stiffness
+      negative_damping
+      nan_damping
+      positive_infinity_damping
+      negative_infinity_damping
+  )
+    set(
+      validation_test
+      "tms26.dynamic_matrix_assembly.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_dynamic_matrix_assembly>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    complex_linear_solver
+    tests/test_complex_linear_solver.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      zero_order
+      zero_rhs
+      nonsquare_coefficient
+      rhs_dimension_mismatch
+      nonsymmetric_coefficient
+      nan_coefficient_real
+      infinite_coefficient_imaginary
+      nan_rhs_imaginary
+      infinite_rhs_real
+      singular_response_access
+  )
+    set(
+      validation_test
+      "tms26.complex_linear_solver.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_complex_linear_solver>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    harmonic_analysis
+    tests/test_harmonic_analysis.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      empty_frequency
+      zero_frequency
+      negative_frequency
+      nan_frequency
+      positive_infinity_frequency
+      negative_infinity_frequency
+      unordered_frequency
+      duplicate_frequency
+      empty_excitation
+      unknown_node
+      unsupported_dof
+      constrained_target
+      nan_torque_real
+      nan_torque_imaginary
+      infinite_torque_real
+      infinite_torque_imaginary
+      overflow_torque_sum
+      fully_constrained
+      zero_frf_torque
+  )
+    set(
+      validation_test
+      "tms26.harmonic_analysis.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_harmonic_analysis>"
         "${validation_case}"
     )
     set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)

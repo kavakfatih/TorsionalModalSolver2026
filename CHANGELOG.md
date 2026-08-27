@@ -7,6 +7,54 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.6.0] - 2026-08-27
+
+### Eklendi
+
+- Eleman düzeyinde birbirinden ayrı `K'`, `K''` ve viskoz `c` kanalları ile
+  `K''_e` ve `C_e` lokal katkı API'leri.
+- Private storage kullanan semantik global loss-stiffness ve damping matrisleri;
+  full K'/K''/C/M assembly ve aynı retained denklem indeksleriyle reduction.
+- K'/K''/C/M, active mapping ve `theta_hat=P theta_hat_r` complex recovery
+  bilgisini taşıyan ayrı reduced dynamic torsional system.
+- `Z=K'-omega^2 M+i(K''+omega C)` complex-symmetric dynamic stiffness katmanı,
+  Physical DOF tabanlı complex peak torque excitation ve explicit frequency
+  sweep sözleşmesi.
+- Backend-neutral çoklu-RHS complex linear problem/solution/facade katmanları
+  ile LP64 LAPACK `ZSYSVX` dense reference backend'i.
+- `SOLVED`, `SOLVED_ILL_CONDITIONED` ve `SINGULAR` frequency-point durumları;
+  RCOND, RHS başına FERR/BERR ve backend-independent relative residual.
+- Singular noktayı uydurma cevap üretmeden koruyan, reduced/physical complex
+  response, magnitude, phase, velocity, acceleration ve backend metadata
+  taşıyan harmonic result sözleşmesi.
+- TVD relative angle, complex dynamic element torque, transmitted magnitude,
+  average dissipated power ve energy-per-cycle sonuç yardımcıları.
+- Tek tanımlı torque input channel için rotational receptance, mobility ve
+  accelerance yardımcıları; genel harmonic response ile FRF ayrımı.
+- Exact K''/C assembly, fixed/free iki-atalet, viscous/loss/combined 1-DOF,
+  passivity, phase, low-frequency limit, exact singular, ill-conditioned,
+  non-Hermitian, multiple-RHS ve V0.5 modal cross-validation testleri.
+- V0.6 mimari, matematik, fizik, validation ve ZSYSVX karar belgeleri.
+
+### Değiştirildi
+
+- Proje sürümü `0.6.0` olarak güncellendi.
+- İki-atalet TVD köprüsü source K'' değerini generalized elementin ayrı
+  loss-stiffness alanına aktaracak biçimde genişletildi; viskoz `c=0` korunur.
+- Mevcut matrix assembly/reduction generikleri, V0.5 K/M ve DSYGV davranışını
+  değiştirmeden K'' ve C semantik türlerini destekleyecek biçimde genişletildi.
+- README ve test stratejisi direct, full-order, linear, frequency-domain ve
+  frozen-property harmonic response kapsamını açıklayacak biçimde güncellendi.
+
+### Sınırlamalar
+
+- Sweep boyunca K', K'', C ve M frozen kabul edilir; material interpolation,
+  WLF/Arrhenius, nonlinear amplitude dependence ve self-consistent güncelleme
+  yoktur.
+- Mode-superposition harmonic, complex eigen solver, transient response,
+  sparse/iterative backend ve dynamic prescribed-angle RHS correction yoktur.
+- Reaction torque recovery ve phase unwrapping bu sürümün kapsamında değildir.
+
 ## [0.5.0] - 2026-08-26
 
 ### Eklendi

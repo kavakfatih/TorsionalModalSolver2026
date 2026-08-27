@@ -78,16 +78,19 @@ contains
   !> Özel iki ataletli TVD verisini genel düğüm-eleman topolojisine dönüştürür.
   !!
   !! Fiziksel açıklama: Göbek ve atalet halkası iki yığılmış atalet düğümü,
-  !! elastomer ise aralarındaki konservatif torsional bağlantı olarak temsil
-  !! edilir. Opsiyonel sınır koşulu göbek düğümünü sabitleyebilir.
+  !! elastomer ise aralarındaki depolama ve kayıp rijitliği taşıyan lineer
+  !! torsional bağlantı olarak temsil edilir. Opsiyonel sınır koşulu göbek
+  !! düğümünü sabitleyebilir.
   !! Matematiksel açıklama: Düğüm 1 için J = J_h, düğüm 2 için J = J_r ve
-  !! eleman 1 için K = K' atanır. Başlangıç açıları sıfırdır.
+  !! eleman 1 için K=K', K_loss=K'' ve c=0 atanır. Başlangıç açıları
+  !! sıfırdır.
   !! Girdiler: Ataletleri [kg*m^2], K' ve K'' değerlerini [N*m/rad] taşıyan
   !! two_inertia_tvd_system_t ile boyutsuz opsiyonel hub_constrained bilgisidir.
   !! Çıktı: İki düğüm ve bir eleman taşıyan torsional_system_t topolojisidir.
   !! Varsayımlar ve geçerlilik: J_h > 0, J_r > 0 ve K' > 0 olmalıdır. K''
   !! kayıp rijitliği [N*m/rad], viskoz c [N*m*s/rad] ile boyutsal olarak aynı
-  !! değildir; bu nedenle damping alanına aktarılmaz ve c = 0 kullanılır.
+  !! değildir; bu nedenle ayrı loss_stiffness alanına aktarılır ve c=0
+  !! kullanılır. Bu köprü K''/omega gibi bir dönüşüm uygulamaz.
   !! Matris assembly veya modal çözüm yapılmaz. Ayrıntılar:
   !! docs/physics/generalized_torsional_system.md.
   pure function build_generalized_two_inertia_system( &
@@ -118,7 +121,9 @@ contains
       node_i_id=1, &
       node_j_id=2, &
       stiffness_nm_per_rad=source_system%storage_stiffness_nm_per_rad, &
-      damping_nms_per_rad=0.0_dp))
+      damping_nms_per_rad=0.0_dp, &
+      loss_stiffness_nm_per_rad= &
+        source_system%loss_stiffness_nm_per_rad))
 
     call validate_torsional_system(generalized_system)
   end function build_generalized_two_inertia_system

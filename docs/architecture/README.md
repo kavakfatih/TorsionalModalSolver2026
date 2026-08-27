@@ -14,6 +14,9 @@ katman sınırlarını açıklar.
 - [`V0.5_modal_eigen_solver.md`](V0.5_modal_eigen_solver.md): reduced Kr/Mr,
   backend-neutral generalized solver facade, dense DSYGV reference backend,
   modal doğrulama/sonuç katmanı ve fiziksel mode recovery akışı
+- [`V0.6_frequency_domain_response.md`](V0.6_frequency_domain_response.md):
+  ayrı K'/K''/C/M assembly ve reduction, complex dynamic stiffness, ZSYSVX
+  facade, status-aware sweep, physical response recovery ve derived TVD sonuçları
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

@@ -30,6 +30,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`generalized_modal_eigenproblem.md`](generalized_modal_eigenproblem.md):
   `K_r phi=lambda M_r phi` problemi, rigid-mode toleransı, mass normalization,
   relative residual, ortogonallik ve repeated eigenspace sözleşmesi
+- [`harmonic_torsional_response.md`](harmonic_torsional_response.md):
+  `exp(+i*omega*t)` peak-amplitude konvansiyonu, dynamic stiffness,
+  complex-symmetric çözüm, residual, FRF ve dissipated energy bağıntıları
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

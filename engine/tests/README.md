@@ -49,9 +49,9 @@ K' ve yoğunluklar ile geçersiz göbek/halka geometrileri ayrı `WILL_FAIL`
 regresyonlarıdır.
 
 `test_torsional_node`, kimlik, polar atalet, başlangıç açısı ve sınır koşulu
-alanlarını; `test_torsional_element`, uç düğüm kimlikleri, K rijitliği ve
-eşdeğer viskoz c alanını doğrular. Pozitif olmayan veya sonlu olmayan
-büyüklükler, self-connection ve negatif sönüm ayrı `WILL_FAIL` vakalarıdır.
+alanlarını; `test_torsional_element`, uç düğüm kimlikleri ile ayrı K', K'' ve
+viskoz c alanlarını doğrular. Pozitif olmayan K', negatif K''/c veya sonlu
+olmayan büyüklükler ve self-connection ayrı `WILL_FAIL` vakalarıdır.
 
 `test_local_stiffness_matrix`, `k = 100 N·m/rad` için üretim yordamının
 `[[100,-100],[-100,100]]` lokal katkısını verdiğini doğrular. Simetri, sıfır
@@ -61,10 +61,10 @@ assertion'larla korunur. Negatif rijitlik aynı üretim yordamını çağıran a
 
 `test_generalized_torsional_system`, private koleksiyonların public yönetim
 yordamlarını, aktif DOF sayımını ve Benchmark 004 iki-ataletli sisteminin genel
-iki-düğüm/bir-eleman gösterimini doğrular. K'' kayıp rijitliğinin viskoz sönüm
-alanına aktarılmadığı, serbest-serbest gösterimin iki ve fixed-hub gösteriminin
-bir aktif DOF taşıdığı sınanır. Boş sistem, yinelenen kimlik ve tanımsız eleman
-ucu hata regresyonlarıdır.
+iki-düğüm/bir-eleman gösterimini doğrular. K'' kayıp rijitliğinin ayrı element
+alanına aktarıldığı, viskoz c'nin sıfır kaldığı, serbest-serbest gösterimin iki
+ve fixed-hub gösteriminin bir aktif DOF taşıdığı sınanır. Boş sistem, yinelenen
+kimlik ve tanımsız eleman ucu hata regresyonlarıdır.
 
 `test_matrix_assembly`, fiziksel node ID ile equation ID ayrımını, tek eleman
 ve üç düğümlü zincir için global torsional K matrisini, K simetrisini, serbest
@@ -159,6 +159,43 @@ regresyon kapsamındadır. Bu testler lineer, sönümsüz ve frozen-property
 çözümü doğrular; frequency-dependent elastomer iterasyonu veya damping çözümü
 yapmaz. Ayrıntılar
 [`../../docs/validation/modal_eigen_validation.md`](../../docs/validation/modal_eigen_validation.md)
+belgesindedir.
+
+V0.6 harmonic test grubu, modal testlerden ayrı direct/full-order complex
+response yolunu doğrular. `test_complex_linear_solver`, backend-neutral
+problem/solution contract'ı ile LP64 LAPACK ZSYSVX reference backend'ini
+gerçekten çağırır. Kapsamı:
+
+- complex symmetric fakat Hermitian olmayan bilinen çözüm,
+- multiple RHS ve per-RHS `FERR/BERR/residual`,
+- original A/B input immutability,
+- exact singular `SINGULAR` status ve fabricated response bulunmaması,
+- working-precision `SOLVED_ILL_CONDITIONED` status ile çözüm ve diagnostics'in
+  korunması,
+- karelik, boyut, transpose-symmetry ve kompleks IEEE finite önkoşullarıdır.
+
+Harmonic physics/integration testleri ayrıca şu zinciri üretim API'leri
+üzerinden sınar:
+
+- lokal ve global `K''/C` assembly ile aynı-index constraint reduction,
+- `Z=K'-omega^2 M+i(K''+omega C)` ve `Z^T=Z`, `Z^H/=Z` ayrımı,
+- fixed 1-DOF viscous/loss/combined analitik cevapları,
+- fixed-hub ve free-free iki ataletli TVD referansları,
+- finite, pozitif ve strictly increasing explicit frequency array,
+- complex nodal torque scatter-add ile unknown/unsupported/constrained target
+  tanıları,
+- status-aware sweep, reduced/physical response recovery ve input
+  immutability,
+- magnitude, phase, velocity, acceleration, rotational FRF, relative angle,
+  dynamic element torque, transmitted-torque magnitude ve passive dissipated
+  power/energy.
+
+Singular bir frequency point normal analysis-state sonucudur ve CTest
+expected-failure vakası değildir. Geçersiz frequency, excitation, negatif veya
+nonfinite `K''/c` ise ayrı selector süreçlerinde reddedilir. Platformlar arası
+testler exact `RCOND/FERR/BERR` değerini değil, status, sonluluk, işaret ve
+backend-independent relative residual sözleşmesini kullanır. Ayrıntılar
+[`../../docs/validation/harmonic_response_validation.md`](../../docs/validation/harmonic_response_validation.md)
 belgesindedir.
 
 ## Benchmark regression

@@ -167,13 +167,44 @@ matematiksel tanımlar ise
 [`../mathematics/generalized_modal_eigenproblem.md`](../mathematics/generalized_modal_eigenproblem.md)
 belgelerindedir.
 
+V0.6.0 harmonic doğrulaması, mevcut modal regresyonları değiştirmeden ayrı bir
+direct/full-order complex response kanıt zinciri ekler. Test katmanları:
+
+- element `K''` ve `C` lokal katkıları ile passive-property doğrulaması,
+- üç düğümlü full/reduced `K'`, `K''`, `C`, `M` exact assembly regresyonu,
+- dynamic stiffness için reel/sanal bileşenler ve complex-symmetry invariantı,
+- LP64 LAPACK ZSYSVX facade için bilinen çözüm, multiple RHS, input
+  immutability, exact singular ve working-precision ill-conditioned status,
+- fixed 1-DOF viscous-only, loss-only ve combined damping analitik cevapları,
+- fixed-hub ve free-free iki ataletli TVD harmonic referansları,
+- excitation scatter-add, constraint tanıları ve explicit frequency-array
+  sözleşmesi,
+- physical complex recovery, magnitude/phase, velocity/acceleration, FRF,
+  relative angle, element torque ve dissipated power/energy.
+
+Exact singular nokta beklenen program hatası değildir; `SINGULAR` analysis
+status ile normal test akışında doğrulanır. `SOLVED_ILL_CONDITIONED` durumda
+hesaplanan cevap ile RCOND/FERR/BERR ve backend-independent residual korunur.
+Exact `RCOND`, `FERR` veya `BERR` değerleri platformlar arasında zorlanmaz.
+Invalid input vakaları ise ayrı CTest selector süreçlerinde ve gerektiğinde
+beklenen diagnostic regex'iyle sınanır.
+
+Harmonic test yardımcıları kompleks değerlerin reel ve sanal bileşenlerini
+IEEE finite kontrolünden geçirir. Relative residual, matris/vector normları ve
+passivity toleransları problem ölçeğine duyarlı olmalıdır. Ayrıntılı vaka
+listesi ve tolerans ilkeleri
+[`../validation/harmonic_response_validation.md`](../validation/harmonic_response_validation.md),
+denklem sözleşmesi
+[`../mathematics/harmonic_torsional_response.md`](../mathematics/harmonic_torsional_response.md)
+belgelerindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
 `test_generalized_torsional_system`, node/element koleksiyon yönetimini ve
-mevcut iki ataletli TVD'nin konservatif alt modelinin genel topolojiye kayıpsız
-dönüşümünü sınar. Benchmark 004 için `J_h`, `J_r` ve K' aktarılır; boyutsal
-olarak farklı K'' değerinin viskoz `c` alanına aktarılmadığı doğrulanır.
+mevcut iki ataletli TVD'nin genel topolojiye kayıpsız dönüşümünü sınar.
+Benchmark 004 için `J_h`, `J_r`, K' ve K'' aktarılır; K'' ayrı kayıp rijitliği
+alanında korunurken boyutsal olarak farklı viskoz `c` değeri sıfır kalır.
 
 Genel sistem testleri ayrıca sabitlenmemiş düğümlerin aktif DOF sayısını,
 fixed-hub dönüşümünde göbek kısıtını, yinelenen kimlikleri ve tanımsız eleman
@@ -192,6 +223,13 @@ sayısal K/M problemine bağımlıdır; test Geometry, Material, Physical DOF ve
 constraint sorumluluklarının backend'e sızmadığını da katman kullanımıyla
 korur.
 
+V0.6.0 için complex linear solver testleri facade ile ZSYSVX reference
+backend'ini, harmonic integration testleri ise full dynamic assembly'den
+status-aware frequency sweep ve physical response recovery'ye kadar olan yolu
+birleştirir. Low-level solver birden çok RHS'yi sınarken public harmonic analiz
+tek load case'i koruyabilir. Singular bir frekans noktası bütün sweep'i
+sonlandırmamalıdır.
+
 ## Benchmark test
 
 Benchmark testleri, temsilî TVD modellerinde yürütme süresi ve bellek kullanım
@@ -205,6 +243,12 @@ Benchmark 004, hub-normalized analitik iki-atalet modlarını DSYGV'nin
 mass-normalized ve sign-arbitrary modlarıyla eigenvalue, residual, mass inner
 product ve physical recovery üzerinden eşleştirir. Böylece normalize bileşen
 değerlerinin farklı olması fizik hatası olarak değerlendirilmez.
+
+V0.6 harmonic regression referansları aynı iki-atalet fiziğinin fixed-hub ve
+free-free finite-frequency cevaplarını kullanır. Harmonic benchmark verisi;
+peak complex torque, açık frequency array, frozen K'/K''/c/M ve response/phase/
+relative-angle/energy sonuçlarını modal oracle'dan kavramsal olarak ayrı
+tutmalıdır.
 
 ## CI validation
 

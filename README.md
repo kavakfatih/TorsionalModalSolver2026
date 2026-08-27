@@ -4,13 +4,14 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.5.0`, V0.4 constraint foundation tarafından
-üretilen indirgenmiş `K_r/M_r` sistemini gerçek simetrik genelleştirilmiş
-özdeğer problemi olarak çözer. Dense LAPACK `DSYGV`, küçük modeller için
-doğrulanabilir reference backend olarak kullanılır; modal API backend
-ayrıntılarını açmaz ve gelecekteki sparse/Lanczos-family çözücülere hazırlanır.
+Güncel geliştirme sürümü `0.6.0`, complex peak nodal torque altında
+**direct**, **full-order**, **linear**, **frequency-domain** ve
+**frozen-property** torsional harmonic response hesaplar. Reduced dynamic
+stiffness `Z_r=K'_r-omega^2 M_r+i(K''_r+omega C_r)` biçimindedir. Dense LAPACK
+`ZSYSVX`, complex-symmetric reference backend olarak solver facade arkasında
+kullanılır; V0.5 `DSYGV` modal çözüm yolu değişmeden korunur.
 
-## V0.5.0 generalized modal eigen solver kapsamı
+## V0.6.0 frequency-domain dynamic response kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -27,9 +28,11 @@ ayrıntılarını açmaz ve gelecekteki sparse/Lanczos-family çözücülere haz
 - `tms_matrix_types`: private allocatable depolamalı genel dense matris türü
 - `tms_dof_types`: anlamlı DOF türü ve `(node_id,dof_type)` Physical DOF kimliği
 - `tms_dof_map`: Physical DOF ile constraint'ten bağımsız tam Equation ID
-- `tms_stiffness_matrix`: global torsional K matrisi ve lokal katkı toplama
+- `tms_stiffness_matrix`: global torsional storage K' matrisi
+- `tms_loss_stiffness_matrix`: ayrı global torsional loss K'' matrisi
+- `tms_damping_matrix`: ayrı global viskoz torsional C matrisi
 - `tms_mass_matrix`: düğüm polar ataletlerinden global diagonal M matrisi
-- `tms_matrix_assembly`: topoloji, tam DOF haritası ve full M/K assembly
+- `tms_matrix_assembly`: topoloji ve full K'/K''/C/M assembly
 - `tms_matrix_reduction`: aktif denklem haritasıyla storage-bağımsız indirgeme
 - `tms_constraint_types`: fixed ve prescribed value constraint veri modeli
 - `tms_constraint_manager`: constraint doğrulaması ve Active Equation ID haritası
@@ -42,8 +45,18 @@ ayrıntılarını açmaz ve gelecekteki sparse/Lanczos-family çözücülere haz
 - `tms_modal_result`: frekans, sınıflandırma, tanı ve mod şekli sonuçları
 - `tms_modal_analysis`: reduced sistemden çözüme ve fiziksel mode recovery'ye
   uzanan modal analiz orkestrasyonu
+- `tms_reduced_dynamic_system`: reduced K'/K''/C/M ve complex recovery bağlamı
+- `tms_dynamic_stiffness`: `Z=K'-omega^2M+i(K''+omega C)` oluşturucusu
+- `tms_harmonic_excitation`: Physical DOF tabanlı complex peak torque assembly
+- `tms_complex_linear_problem` / `tms_complex_linear_solution`: backend-neutral
+  çoklu-RHS doğrusal problem, status ve diagnostics sözleşmesi
+- `tms_lapack_zsysvx_backend`: LP64 complex-symmetric dense reference backend
+- `tms_complex_linear_solver`: ZSYSVX ayrıntısını gizleyen solver facade'ı
+- `tms_harmonic_response`: sweep status, response, diagnostics ve TVD çıktıları
+- `tms_harmonic_analysis`: direct frequency sweep çözüm orkestrasyonu
+- `tms_frf`: tek tanımlı torque input channel için rotational FRF yardımcıları
 - `tms_torsional_node`: genel düğüm kimliği, polar atalet ve sınır koşulu
-- `tms_torsional_element`: lineer K/c bağlantısı ve 2x2 lokal rijitlik hesabı
+- `tms_torsional_element`: ayrı K', K'' ve c bağlantı kanalları
 - `tms_generalized_torsional_system`: koleksiyon yönetimi, aktif DOF sayımı ve
   topoloji doğrulaması
 - `tms_torsional_system`: TVD builder'ı ile fixed-hub ve serbest-serbest
@@ -56,24 +69,25 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.5.0 aşamasındadır. Dinamik elastomer ve kompleks burulma
-rijitliği hesabı, annüler rijit gövde ataletleri ve iki sınır koşullu analitik
-TVD modeli kullanılabilir. Aynı iki ataletli sistem artık iki düğüm ve bir
-eleman olarak genel topolojide temsil edilebilir. K'' sistem verisinde korunur;
-boyutsal olarak farklı viskoz sönüm katsayısına doğrudan dönüştürülmez.
+TMS26 şu anda V0.6.0 aşamasındadır. Dinamik elastomer ve kompleks burulma
+rijitliği, annüler rijit gövde ataletleri, generalized node-element topolojisi,
+constraint reduction, sönümsüz modal analiz ve complex harmonic response aynı
+çekirdekte kullanılabilir. K'' ile boyutsal olarak farklı viskoz `c` ayrı
+eleman alanları, global matrisler ve doğrulama kanalları olarak korunur.
 
-Lineer elemanların lokal K katkıları ve düğüm polar ataletleri önce
-constraint'ten bağımsız tam Equation ID uzayında full K/M matrislerine
-birleştirilir. Constraint manager bundan sonra ayrı Active Equation ID
-haritasını kurar; direct elimination Kr/Mr matrislerini üretir. V0.5.0 modal
-analiz yolu bu matrisleri `K_r phi = lambda M_r phi` biçiminde çözer, modları
-ölçeğe duyarlı biçimde sınıflandırır ve `phi=P phi_r` ile Physical DOF uzayına
-geri açar. Prescribed statik offset mode shape'e eklenmez.
+Lineer elemanların lokal K', K'' ve C katkıları ile düğüm polar ataletleri önce
+constraint'ten bağımsız Full Equation ID uzayında birleştirilir. Constraint
+manager aynı retained indekslerle `K'_r/K''_r/C_r/M_r` matrislerini üretir.
+V0.5 modal yolu `K_r phi=lambda M_r phi` denklemini çözmeye devam eder. V0.6
+harmonic yolu ise her explicit pozitif frekansta `Z_r theta_hat=T_hat`
+denklemini doğrudan çözer ve `theta_hat=P theta_hat_r` ile Physical DOF uzayına
+geri açar. Prescribed statik offset harmonic phasor'a eklenmez.
 
-Modal sonuç **linear**, **undamped** ve **frozen-property** kapsamındadır.
-Elastomer rijitliği hangi frekans-sıcaklık çalışma noktasından üretildiyse o
-değer çözüm boyunca sabit kabul edilir; `G'(f) -> K(f) -> eigenfrequency`
-öz-tutarlı iterasyonu yapılmaz.
+Harmonic sonuç **direct**, **full-order**, **linear**, **small-amplitude**,
+**frequency-domain** ve **frozen-property** kapsamındadır. Complex genlikler
+`exp(+i*omega*t)` konvansiyonunda peak amplitude değerleridir; RMS değildir.
+Elastomer özellikleri sweep boyunca sabit kabul edilir; frekans-sıcaklık
+interpolasyonu yapılmaz.
 
 ### Tamamlananlar
 
@@ -136,6 +150,23 @@ değer çözüm boyunca sabit kabul edilir; `G'(f) -> K(f) -> eigenfrequency`
 - Fixed 1-DOF, free-free iki atalet, üç düğümlü zincir, constrained recovery,
   repeated mode, invalid K/M ve tamamen constrained sistem testleri
 - `phi=Pphi_r` ile constrained bileşenleri sıfır bırakan fiziksel mode recovery
+- K', K'' ve viskoz C için ayrı lokal/global matris türleri, full assembly ve
+  aynı retained indekslerle direct reduction
+- Explicit, sonlu, pozitif ve kesin artan frequency grid ile complex peak
+  nodal torque excitation assembly
+- `Z_r=K'_r-omega^2M_r+i(K''_r+omega C_r)` complex-symmetric dynamic stiffness
+- `FACT='N'`, `UPLO='U'` ve workspace query kullanan LP64 LAPACK `ZSYSVX`
+  backend'i; çoklu RHS'ye açık backend-neutral complex solver facade'ı
+- `SOLVED`, `SOLVED_ILL_CONDITIONED` ve `SINGULAR` frequency-point durumları;
+  singular noktada uydurma response olmadan sweep'e devam etme
+- RCOND, RHS başına FERR/BERR ve backend-independent scaled relative residual
+- Reduced/physical complex response, magnitude, phase, velocity ve acceleration
+- Oriented TVD relative angle, complex element torque, transmitted magnitude,
+  average dissipated power ve dissipated energy-per-cycle yardımcıları
+- Tek tanımlı torque input channel için rotational receptance, mobility ve
+  accelerance; genel forced response ile FRF'nin açık ayrımı
+- Viscous-only, K''-only, combined damping, fixed/free two-inertia, passivity,
+  exact singular, ill-conditioned ve V0.5 modal cross-validation regresyonları
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS LP64 LAPACK ve Windows LP64 OpenBLAS sağlayıcılarıyla GitHub Actions
   derleme/test iş akışları
@@ -144,10 +175,13 @@ değer çözüm boyunca sabit kabul edilir; `G'(f) -> K(f) -> eigenfrequency`
 ### Henüz kapsam dışında
 
 - İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
-- Kompleks rijitlik kullanan sönümlü doğal frekans veya frekans cevabı çözümü
-- Global C/damping assembly ve sıfırdan farklı prescribed dönme için RHS
-  düzeltmesi veya yük çözümü
+- Sönümlü kompleks özdeğer problemi ve mode-superposition harmonic çözüm
+- Frekansa/sıcaklığa bağlı malzeme interpolasyonu veya sweep sırasında K'/K''
+  güncellemesi
+- Sıfırdan farklı dynamic prescribed dönme için RHS correction ve reaction
+  torque recovery
 - Sparse matris depolaması, CSR ve production iterative eigen solver
+- Sparse complex direct solver, GMRES/BiCGSTAB ve complex Krylov yöntemleri
 - Lanczos, Block Lanczos, Krylov–Schur, LOBPCG, ARPACK ve SLEPc backend'leri
 - MPC, constraint equation, Lagrange multiplier, penalty ve contact
 - Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
@@ -166,11 +200,13 @@ benchmark güncellemesiyle birlikte eklenir.
 - LP64 (32-bit Fortran `INTEGER`) arayüzlü LAPACK ve BLAS
 - VS Code (önerilen geliştirme ortamı)
 
-LAPACK, `K_r phi = lambda M_r phi` gerçek simetrik genelleştirilmiş özdeğer
-problemini `DSYGV` ile çözmek için kullanılır. Kaynak kod veya platforma özgü
+LAPACK, `K_r phi=lambda M_r phi` gerçek simetrik genelleştirilmiş özdeğer
+problemini `DSYGV`, complex-symmetric `Z_r theta_hat=T_hat` problemini ise
+`ZSYSVX` ile çözmek için kullanılır. Kaynak kod veya platforma özgü
 `-llapack/-lblas` yolları repoya gömülmez; CMake sağlayıcıyı
 `find_package(LAPACK REQUIRED)` ile bulur ve `LAPACK::LAPACK` hedefini bağlar.
-ILP64/OpenBLAS64 bu sürümün ABI sözleşmesiyle uyumlu değildir.
+Her iki backend default 32-bit Fortran `INTEGER` kullanan LP64 ABI gerektirir;
+ILP64/OpenBLAS64 bu sürümün sözleşmesiyle uyumlu değildir.
 
 ## Derleme ve test
 
@@ -259,7 +295,7 @@ request'lerde derleme ve test doğrulaması yapar.
 - Windows iş akışı MSYS2 MinGW64 ortamında GNU Fortran, CMake, Ninja ve LP64
   OpenBLAS/LAPACK kurar.
 - İki iş akışı da LAPACK provider'ını configure sırasında CMake ile doğrular,
-  projeyi derler ve DSYGV kullanan otomatik testleri çalıştırır.
+  projeyi derler ve DSYGV ile ZSYSVX kullanan otomatik testleri çalıştırır.
 - Otomatik testler, iki platformda da `ctest --output-on-failure` ile raporlanır.
 
 İş akışı tanımları [macOS CI](.github/workflows/macos-build.yml) ve
@@ -271,6 +307,8 @@ request'lerde derleme ve test doğrulaması yapar.
 - `engine/src/`: Fortran hesap motoru kaynakları
 - `engine/src/constraints/`: constraint veri modeli, yönetimi ve reduced system
 - `engine/src/eigen/`: backend-neutral eigenproblem/solution ve DSYGV backend
+- `engine/src/harmonic/`: dynamic stiffness, complex solver ve harmonic sonuç
+  katmanları
 - `engine/src/modal/`: modal analiz, doğrulama, sonuç ve fiziksel recovery
 - `engine/src/matrix/`: lokal/global matris, DOF haritası, assembly ve reduction
 - `engine/src/system/`: genel torsional node, element ve sistem topolojisi
@@ -349,6 +387,18 @@ analitik ve sayısal doğrulama kapsamı
 DSYGV reference backend ile gelecek sparse/Lanczos-family facade kararı ise
 [`docs/decisions/0010-generalized-eigen-solver-backend.md`](docs/decisions/0010-generalized-eigen-solver-backend.md)
 belgesinde açıklanır.
+
+V0.6.0 direct harmonic katman akışı
+[`docs/architecture/V0.6_frequency_domain_response.md`](docs/architecture/V0.6_frequency_domain_response.md),
+phasor denklemleri ve enerji/FRF bağıntıları
+[`docs/mathematics/harmonic_torsional_response.md`](docs/mathematics/harmonic_torsional_response.md),
+K'/K''/C fiziksel ayrımı
+[`docs/physics/torsional_damping_models.md`](docs/physics/torsional_damping_models.md),
+analitik ve solver-status doğrulamaları
+[`docs/validation/harmonic_response_validation.md`](docs/validation/harmonic_response_validation.md),
+complex-symmetric ZSYSVX backend kararı ise
+[`docs/decisions/0011-frequency-domain-complex-solver.md`](docs/decisions/0011-frequency-domain-complex-solver.md)
+belgelerinde açıklanır.
 
 ## Lisans
 

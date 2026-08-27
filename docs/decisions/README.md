@@ -29,6 +29,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0010-generalized-eigen-solver-backend.md`](0010-generalized-eigen-solver-backend.md):
   LP64 LAPACK DSYGV dense reference backend'i, backend-neutral modal facade ve
   gelecekteki sparse/Lanczos-family backend genişleme sınırı
+- [`0011-frequency-domain-complex-solver.md`](0011-frequency-domain-complex-solver.md):
+  `exp(+i*omega*t)` harmonic convention, K'/K''/C ayrımı, complex-symmetric
+  ZSYSVX reference backend'i ve status-aware frequency-sweep sözleşmesi
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

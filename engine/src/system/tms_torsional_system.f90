@@ -60,10 +60,11 @@ contains
   !> Genel torsional sisteme doğrulanmış bir bağlantı elemanı ekler.
   !!
   !! Fiziksel açıklama: Eleman, mevcut iki dönel düğüm arasındaki lineer
-  !! torsional rijitlik ve eşdeğer viskoz sönüm bağlantısını temsil eder.
+  !! depolama rijitliği, kayıp rijitliği ve viskoz sönüm bağlantısını temsil
+  !! eder.
   !! Matematiksel açıklama: Eleman kimliği benzersiz, uç kimlikleri farklı ve
-  !! sistemde mevcut, K > 0 ve c >= 0 olmalıdır.
-  !! Girdiler: Değiştirilecek torsional_system_t ile K [N*m/rad] ve
+  !! sistemde mevcut, K' > 0, K'' >= 0 ve c >= 0 olmalıdır.
+  !! Girdiler: Değiştirilecek torsional_system_t ile K' ve K'' [N*m/rad],
   !! c [N*m*s/rad] alanlarını taşıyan torsional_element_t değeridir. Çıktı,
   !! güncellenmiş sistem koleksiyonudur.
   !! Varsayımlar ve geçerlilik: Aynı düğüm çifti arasında farklı kimlikli

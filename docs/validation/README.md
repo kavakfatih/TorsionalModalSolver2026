@@ -12,6 +12,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`modal_eigen_validation.md`](modal_eigen_validation.md): V0.5.0 generalized
   modal solver için analitik eigenvalue/frekans, mass normalization, residual,
   orthogonality, sign/repeated eigenspace ve physical recovery doğrulaması
+- [`harmonic_response_validation.md`](harmonic_response_validation.md): V0.6.0
+  K'/K''/C/M assembly, complex-symmetric ZSYSVX, status/diagnostics, 1-DOF ve
+  iki-atalet analitik cevapları, excitation, FRF ve passivity doğrulaması
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.
