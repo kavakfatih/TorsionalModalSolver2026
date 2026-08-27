@@ -15,11 +15,15 @@ target_sources(
     src/geometry/tms_geometry.f90
     src/materials/tms_dynamic_modulus.f90
     src/materials/tms_material_frequency.f90
+    src/materials/tms_dynamic_material_metadata.f90
+    src/materials/tms_dynamic_modulus_provider.f90
+    src/materials/tms_tabulated_dynamic_modulus_provider.f90
     src/materials/tms_material.f90
     src/solver/tms_inertia.f90
     src/solver/tms_torsional_stiffness.f90
     src/solver/tms_dynamic_torsional_stiffness.f90
     src/solver/tms_frequency_solver.f90
+    src/system/tms_dynamic_torsional_property_binding.f90
     src/system/tms_torsional_node.f90
     src/system/tms_torsional_element.f90
     src/system/tms_torsional_system.f90
@@ -50,7 +54,10 @@ target_sources(
     src/harmonic/tms_harmonic_excitation.f90
     src/harmonic/tms_harmonic_response.f90
     src/harmonic/tms_frf.f90
+    src/harmonic/tms_material_state_trace.f90
+    src/harmonic/tms_material_aware_harmonic_response.f90
     src/harmonic/tms_harmonic_analysis.f90
+    src/harmonic/tms_material_aware_harmonic_analysis.f90
 )
 
 set_target_properties(
@@ -587,6 +594,113 @@ if(BUILD_TESTING)
       NAME "${validation_test}"
       COMMAND
         "$<TARGET_FILE:tms26_test_harmonic_analysis>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    tabulated_dynamic_modulus_provider
+    tests/test_tabulated_dynamic_modulus_provider.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      less_than_two_points
+      zero_frequency
+      negative_frequency
+      nan_frequency
+      infinite_frequency
+      duplicate_frequency
+      numerical_duplicate_frequency
+      unordered_frequency
+      zero_storage_modulus
+      negative_storage_modulus
+      nan_storage_modulus
+      infinite_storage_modulus
+      negative_loss_modulus
+      nan_loss_modulus
+      infinite_loss_modulus
+      invalid_dataset_temperature
+      nan_dataset_temperature
+      infinite_dataset_temperature
+      mixed_point_temperature
+      invalid_policy
+      below_linear_domain
+      above_linear_domain
+      below_log_domain
+      above_log_domain
+      temperature_mismatch
+      invalid_strain_amplitude
+      invalid_prestrain
+      magic_unavailable_strain
+      magic_unavailable_prestrain
+      invalid_mode
+  )
+    set(
+      validation_test
+      "tms26.tabulated_dynamic_modulus_provider.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_tabulated_dynamic_modulus_provider>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    dynamic_torsional_property_binding
+    tests/test_dynamic_torsional_property_binding.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      nonpositive_element_id
+      negative_radius
+      unordered_radii
+      zero_length
+      uninitialized_provider
+      tensile_mode
+  )
+    set(
+      validation_test
+      "tms26.dynamic_torsional_property_binding.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_dynamic_torsional_property_binding>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    material_aware_harmonic_analysis
+    tests/test_material_aware_harmonic_analysis.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      duplicate_binding
+      unknown_element
+      uncovered_sweep
+      temperature_mismatch
+      empty_bindings
+  )
+    set(
+      validation_test
+      "tms26.material_aware_harmonic_analysis.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_material_aware_harmonic_analysis>"
         "${validation_case}"
     )
     set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)

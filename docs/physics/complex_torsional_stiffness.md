@@ -66,8 +66,9 @@ fazı ve sönümlü rezonans konumu değerlendirilirken dikkate alınır. V0.2.2
 `tms_torsional_system`, fixed-hub ve serbest-serbest analitik modal tahminlerde
 kompleks sonuçtan yalnız K' bileşenini mevcut `tms_frequency_solver` yordamına
 aktarır. K'' sistem verisinde korunur ancak sönümsüz özdeğer denklemine dahil
-edilmez. Kompleks özdeğer veya frekans cevabı çözümü bu sürümün kapsamı
-dışındadır; frozen-property sınırı
+edilmez. V0.6 frozen ve V0.7 material-aware harmonic yollar K'' değerini
+complex dynamic stiffness'in sanal kanalında kullanır; modal yol yine
+frozen-property kalır. Modal sınır
 [`two_inertia_torsional_system.md`](two_inertia_torsional_system.md) belgesinde
 açıklanır.
 
@@ -100,6 +101,8 @@ malzeme çalışma noktasından sonuca aynen aktarılır.
 - Malzeme homojen ve lineer viskoelastik kabul edilir.
 - Geometri eş merkezli rijit silindirler, tam bağlı annüler elastomer,
   küçük deformasyon ve ihmal edilen uç etkileri kabulüne dayanır.
-- Solver, `dynamic_rubber_material_t` içindeki tek çalışma noktası alanlarını
-  kullanır; `frequency_points` dizisinde seçim veya interpolasyon yapmaz.
+- Legacy `calculate_dynamic_torsional_stiffness`, `dynamic_rubber_material_t`
+  içindeki tek çalışma noktası alanlarını kullanır ve `frequency_points`
+  dizisinde seçim yapmaz. V0.7 ayrı provider/binding API'si G'(f),G''(f)
+  durumunu sorgular; legacy alanlarla otomatik synchronization yapmaz.
 - FEM, nonlinear hiperelastisite ve Prony serisi uygulanmaz.

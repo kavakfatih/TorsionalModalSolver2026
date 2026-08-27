@@ -33,6 +33,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`harmonic_torsional_response.md`](harmonic_torsional_response.md):
   `exp(+i*omega*t)` peak-amplitude konvansiyonu, dynamic stiffness,
   complex-symmetric çözüm, residual, FRF ve dissipated energy bağıntıları
+- [`dynamic_modulus_interpolation.md`](dynamic_modulus_interpolation.md):
+  linear ve log-frequency axis interpolation, exact-point machine tolerance,
+  measured-isotherm/no-extrapolation kuralları, passivity ve causality sınırı
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

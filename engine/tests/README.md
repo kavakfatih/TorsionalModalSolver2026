@@ -198,6 +198,26 @@ backend-independent relative residual sözleşmesini kullanır. Ayrıntılar
 [`../../docs/validation/harmonic_response_validation.md`](../../docs/validation/harmonic_response_validation.md)
 belgesindedir.
 
+V0.7 test grubu `test_tabulated_dynamic_modulus_provider`,
+`test_dynamic_torsional_property_binding` ve
+`test_material_aware_harmonic_analysis` programlarından oluşur. Exact ve
+machine-equivalent frequency noktaları, iki interpolation policy, strict
+no-extrapolation, measured-isotherm temperature, passive data validation,
+private-copy immutability ve SHEAR-only binding ayrı doğrulanır.
+
+Uçtan uca test; interpolate edilen G'/G'' değerlerini bonded-annular K'/K''
+ile 1-DOF dynamic stiffness'e bağlar ve ZSYSVX cevabını bağımsız analitik
+formülle karşılaştırır. Deliberately farklı nominal element K'/K'' değerleri
+no-double-counting'i, aynı modelin V0.6 frozen analizi geriye uyumluluğu
+kanıtlar. Mixed constant/dynamic ve iki-provider seri sistemleri bağımsız 2x2
+complex inverse ile sınanır. Exact singular dynamic stiffness noktasında
+harmonic response unavailable iken material trace'in korunduğu doğrulanır.
+Duplicate/unknown binding, full-sweep domain eksikliği ve temperature mismatch
+solver çağrısından önce ayrı expected-failure CTest süreçlerinde reddedilir.
+Ayrıntılar
+[`../../docs/validation/dynamic_material_provider_validation.md`](../../docs/validation/dynamic_material_provider_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

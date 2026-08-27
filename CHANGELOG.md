@@ -7,6 +7,62 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.7.0] - 2026-08-28
+
+### Eklendi
+
+- Dataset/material/specimen kimlikleri, measured-isotherm sıcaklığı, seçimlik
+  strain/prestrain, deformation mode, conditioning, source, standard ve notes
+  için explicit availability semantics taşıyan dinamik malzeme metadata modeli.
+- Solver'dan interpolation ayrıntısını ayıran `dynamic_modulus_provider_t`
+  sınırı ile private bağımsız tablo kopyası kullanan concrete tabulated provider.
+- Default `LINEAR_FREQUENCY` ve seçimlik `LINEAR_LOG_FREQUENCY` policy'leri;
+  exact-point machine tolerance, strict no-extrapolation ve isotherm eşlemesi.
+- Eleman ID, provider ve bir kez hesaplanan bonded-annular `C_theta` değerini
+  ayrı tutan SHEAR-only dynamic torsional property binding.
+- Mixed constant/dynamic ve multiple-provider sistemlerde bound nominal K'/K''
+  katkısını double-count etmeden frequency-dependent K'/K'' ile override eden
+  ayrı material-aware harmonic orchestration.
+- Provider domain'ini bütün sweep için ZSYSVX öncesinde doğrulayan preparation;
+  frequency-independent topology, DOF/constraint, M, C ve base matrix reuse.
+- Mevcut `harmonic_response_t` nesnesini dataset/binding ve her requested
+  frequency için G'/G'', tan(delta), K'/K'', policy ve interpolation bracket
+  izleriyle birleştiren material-aware result wrapper.
+- Exact/interpolated provider, invalid/passivity verisi, no-extrapolation,
+  temperature/mode, annular mapping, override, frozen V0.6, c, mixed/multiple
+  binding, 1-DOF/2-DOF analitik response ve singular trace regresyonları.
+- V0.7 mimari, malzeme, interpolation matematiği, validation ve Karar 0012
+  belgeleri.
+
+### Değiştirildi
+
+- Proje sürümü `0.7.0` olarak güncellendi.
+- Legacy `calculate_dynamic_torsional_stiffness()` sonucu korunarak provider
+  çıktısının aynı G*→K* fiziğini kullanabilmesi için reusable modulus ve
+  precomputed-geometry-factor yardımcıları eklendi.
+- README ve test stratejisi tabulated frequency-dependent dynamic shear
+  provider ile material-aware harmonic response kapsamını açıklayacak biçimde
+  güncellendi.
+
+### Korundu
+
+- V0.5 `DSYGV` modal analiz frozen-property olarak kalır; frequency-dependent
+  material eigenproblem'e bağlanmaz.
+- V0.6 `analyze_harmonic_response()` nominal/frozen K'/K''/C/M davranışı ve
+  `exp(+i*omega*t)` harmonic convention değişmez.
+- `dynamic_rubber_material_t` legacy alanları ve `frequency_points(:)` arasında
+  ADR 0003 uyarınca otomatik synchronization yapılmaz.
+
+### Sınırlamalar
+
+- Model linear, small-amplitude, lumped, frequency-domain ve measured-isotherm
+  kapsamındadır. Amplitude/prestrain/temperature interpolation, WLF, Arrhenius,
+  TTS, Prony, nonlinear viscoelasticity ve self-heating yoktur.
+- `K*=C_theta G*` mapping distributed rubber inertia, internal waves, local
+  rubber resonance, bond compliance ve frequency-dependent geometry içermez.
+- Tabulated interpolation causal time-domain constitutive law veya
+  Kramers–Kronig consistency garanti etmez; file/vendor importer yoktur.
+
 ## [0.6.0] - 2026-08-27
 
 ### Eklendi

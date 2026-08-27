@@ -53,5 +53,6 @@ rijitlik biriminde gösterilir.
 - `ri = 0`, bağlı iç silindirik yüzey bulunmadığı için kapsam dışıdır.
 - Annüler milin eksen boyunca burulmasına ait `GJp/ℓ` modeli ayrıdır ve
   TVD solver'larında kullanılmaz.
-- Geometrik nonlinearite, hiperelastisite ve frekanslar arası interpolasyon
-  bu modelin kapsamı dışındadır.
+- Geometrik nonlinearite ve hiperelastisite bu modelin kapsamı dışındadır.
+  Legacy single-point yordam interpolation yapmaz; V0.7 tabulated provider
+  aynı mapping'i explicit policy ile harmonic path'te kullanır.

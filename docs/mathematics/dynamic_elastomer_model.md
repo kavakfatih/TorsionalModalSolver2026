@@ -5,7 +5,11 @@
 Elastomerin harmonik uyarım altındaki kayma davranışı, frekans ve sıcaklığa
 bağlı kompleks dinamik kayma modülüyle temsil edilir. V0.2.0 bu büyüklükleri
 saklayan veri yapısını ve kayıp faktörü hesabını tanımlar; interpolasyon, eğri
-uydurma, Prony serisi ve çözüm algoritması içermez.
+uydurma, Prony serisi ve çözüm algoritması içermez. V0.7 bu legacy veri türünü
+değiştirmeden, ayrı tabulated provider ve harmonic orchestration ekler;
+interpolation sözleşmesi
+[`dynamic_modulus_interpolation.md`](dynamic_modulus_interpolation.md)
+belgesindedir.
 
 ## Kompleks kayma modülü
 
@@ -108,4 +112,7 @@ Mühendislik verisi MPa cinsindeyse çekirdek veri yapısına yazılmadan önce
 - Her veri noktası yalnızca kendi frekans ve sıcaklık koşulunu temsil eder.
 - G' ve G'' aynı frekans, sıcaklık ve kayma koşulunda elde edilmiş kabul edilir.
 - Genlik bağımlılığı ve nonlinear hiperelastik davranış modellenmez.
-- Noktalar arasında interpolasyon veya sıcaklık-frekans kaydırması yapılmaz.
+- Legacy single-point yordam noktalar arasında interpolation yapmaz. V0.7
+  provider yalnız aynı measured isotherm üzerinde açık linear-frequency veya
+  linear-log-frequency-axis interpolation yapar; sıcaklık-frekans kaydırması,
+  WLF/Arrhenius ve TTS uygulamaz.

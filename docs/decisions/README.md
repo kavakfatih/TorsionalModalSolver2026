@@ -32,6 +32,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0011-frequency-domain-complex-solver.md`](0011-frequency-domain-complex-solver.md):
   `exp(+i*omega*t)` harmonic convention, K'/K''/C ayrımı, complex-symmetric
   ZSYSVX reference backend'i ve status-aware frequency-sweep sözleşmesi
+- [`0012-tabulated-dynamic-material-provider.md`](0012-tabulated-dynamic-material-provider.md):
+  primary G'/G'', measured-isotherm interpolation, provider/binding sınırı,
+  harmonic-only dynamic override, prevalidation ve traceability kararı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

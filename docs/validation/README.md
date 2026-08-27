@@ -15,6 +15,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`harmonic_response_validation.md`](harmonic_response_validation.md): V0.6.0
   K'/K''/C/M assembly, complex-symmetric ZSYSVX, status/diagnostics, 1-DOF ve
   iki-atalet analitik cevapları, excitation, FRF ve passivity doğrulaması
+- [`dynamic_material_provider_validation.md`](dynamic_material_provider_validation.md):
+  V0.7 provider data-quality/interpolation, G*→K* mapping, mixed/multiple
+  material-aware harmonic zincir, prevalidation ve singular-point trace kanıtı
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

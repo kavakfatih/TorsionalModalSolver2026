@@ -17,6 +17,9 @@ katman sınırlarını açıklar.
 - [`V0.6_frequency_domain_response.md`](V0.6_frequency_domain_response.md):
   ayrı K'/K''/C/M assembly ve reduction, complex dynamic stiffness, ZSYSVX
   facade, status-aware sweep, physical response recovery ve derived TVD sonuçları
+- [`V0.7_dynamic_material_provider.md`](V0.7_dynamic_material_provider.md):
+  tabulated G'(f)/G''(f) provider sınırı, ayrı eleman binding'i, material-aware
+  K'/K'' preparation/assembly, frozen API uyumluluğu ve material trace
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

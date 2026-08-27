@@ -198,6 +198,30 @@ denklem sözleşmesi
 [`../mathematics/harmonic_torsional_response.md`](../mathematics/harmonic_torsional_response.md)
 belgelerindedir.
 
+V0.7.0 material-aware harmonic doğrulaması üç yeni CTest programı ve ayrı
+expected-failure süreçleriyle aşağıdaki kapıları kapsar:
+
+- tabulated provider exact point, one-ULP numerical match,
+  `LINEAR_FREQUENCY` ve `LINEAR_LOG_FREQUENCY` analitik interpolation,
+- iki policy için alt/üst no-extrapolation, measured-isotherm temperature ve
+  strictly increasing/passive dataset validation,
+- negatif G'' için clipping olmadan red ve input/private-copy immutability,
+- bonded-annular `G'/G'' -> K'/K''` mapping, loss-factor eşitliği ve SHEAR-only
+  direct torsional contract,
+- dynamic override/no-double-counting ile V0.6 frozen nominal yolun yan yana
+  regresyonu; frequency-independent viscous c'nin korunması,
+- constant+dynamic mixed zincir ve iki farklı provider/element binding'i için
+  bağımsız complex 2x2 analitik çözüm,
+- tüm provider domain'inin ZSYSVX öncesinde prevalidation'ı,
+- solved ve exact-singular frequency noktalarında dataset/material state trace.
+
+Interpolation toleransları fiziksel deney uncertainty'si değildir. Exact
+eşleme machine epsilon ölçeğinde, harmonic analitik karşılaştırmalar ise
+double-precision dense solver roundoff'una uygun scale-aware toleransla yapılır.
+Ayrıntılar
+[`../validation/dynamic_material_provider_validation.md`](../validation/dynamic_material_provider_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

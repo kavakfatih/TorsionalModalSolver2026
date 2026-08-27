@@ -4,14 +4,14 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.6.0`, complex peak nodal torque altında
-**direct**, **full-order**, **linear**, **frequency-domain** ve
-**frozen-property** torsional harmonic response hesaplar. Reduced dynamic
-stiffness `Z_r=K'_r-omega^2 M_r+i(K''_r+omega C_r)` biçimindedir. Dense LAPACK
-`ZSYSVX`, complex-symmetric reference backend olarak solver facade arkasında
-kullanılır; V0.5 `DSYGV` modal çözüm yolu değişmeden korunur.
+Güncel geliştirme sürümü `0.7.0`, measured-isotherm tabulated dynamic shear
+modulus `G'(f),G''(f)` verisini ayrı bir provider/binding katmanıyla direct
+harmonic response'a bağlar. Material-aware dynamic stiffness
+`Z_r(f)=K'_r(f)-omega^2 M_r+i(K''_r(f)+omega C_r)` biçimindedir. Dense LAPACK
+`ZSYSVX` mevcut complex-symmetric reference backend olarak yeniden kullanılır;
+V0.5 `DSYGV` modal ve V0.6 frozen harmonic yolları değişmeden korunur.
 
-## V0.6.0 frequency-domain dynamic response kapsamı
+## V0.7.0 tabulated dynamic material provider kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -20,9 +20,15 @@ kullanılır; V0.5 `DSYGV` modal çözüm yolu değişmeden korunur.
 - `tms_dynamic_modulus`: G', G'', frekans ve sıcaklık ile kayıp faktörü hesabı
 - `tms_material_frequency`: frekans-sıcaklık bağımlı malzeme veri noktası
 - `tms_material`: tek çalışma noktası alanları ve dinamik veri noktaları
+- `tms_dynamic_material_metadata`: dataset operating-state ve test traceability
+- `tms_dynamic_modulus_provider`: genişletilebilir constitutive sorgu sınırı
+- `tms_tabulated_dynamic_modulus_provider`: linear/log-frequency interpolation,
+  measured-isotherm ve no-extrapolation sözleşmesi
 - `tms_inertia`: homojen annüler göbek ve halkanın kütle özellikleri
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
 - `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
+- `tms_dynamic_torsional_property_binding`: eleman ID, provider ve önceden
+  hesaplanmış bonded-annular geometri katsayısı bağlantısı
 - `tms_frequency_solver`: tek serbestlik dereceli doğal frekans hesabı
 - `tms_local_matrix`: iki uçlu elemanlar için 2x2 lokal matris veri taşıyıcısı
 - `tms_matrix_types`: private allocatable depolamalı genel dense matris türü
@@ -54,6 +60,10 @@ kullanılır; V0.5 `DSYGV` modal çözüm yolu değişmeden korunur.
 - `tms_complex_linear_solver`: ZSYSVX ayrıntısını gizleyen solver facade'ı
 - `tms_harmonic_response`: sweep status, response, diagnostics ve TVD çıktıları
 - `tms_harmonic_analysis`: direct frequency sweep çözüm orkestrasyonu
+- `tms_material_aware_harmonic_analysis`: prevalidated frequency-dependent
+  K'/K'' override, mixed/multiple provider assembly ve ZSYSVX orkestrasyonu
+- `tms_material_aware_harmonic_response` / `tms_material_state_trace`: V0.6
+  harmonic sonuç bileşimi ile dataset, G*/K* ve interpolation izleri
 - `tms_frf`: tek tanımlı torque input channel için rotational FRF yardımcıları
 - `tms_torsional_node`: genel düğüm kimliği, polar atalet ve sınır koşulu
 - `tms_torsional_element`: ayrı K', K'' ve c bağlantı kanalları
@@ -69,25 +79,28 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.6.0 aşamasındadır. Dinamik elastomer ve kompleks burulma
-rijitliği, annüler rijit gövde ataletleri, generalized node-element topolojisi,
-constraint reduction, sönümsüz modal analiz ve complex harmonic response aynı
-çekirdekte kullanılabilir. K'' ile boyutsal olarak farklı viskoz `c` ayrı
-eleman alanları, global matrisler ve doğrulama kanalları olarak korunur.
+TMS26 şu anda V0.7.0 aşamasındadır. Dinamik elastomer dataset'i, tabulated
+provider, bonded-annular dynamic element binding'i, generalized node-element
+topolojisi, constraint reduction, sönümsüz modal analiz ve complex harmonic
+response aynı çekirdekte kullanılabilir. K'' ile boyutsal olarak farklı viskoz
+`c` ayrı eleman alanları, global matrisler ve doğrulama kanalları olarak korunur.
 
 Lineer elemanların lokal K', K'' ve C katkıları ile düğüm polar ataletleri önce
 constraint'ten bağımsız Full Equation ID uzayında birleştirilir. Constraint
 manager aynı retained indekslerle `K'_r/K''_r/C_r/M_r` matrislerini üretir.
 V0.5 modal yolu `K_r phi=lambda M_r phi` denklemini çözmeye devam eder. V0.6
-harmonic yolu ise her explicit pozitif frekansta `Z_r theta_hat=T_hat`
-denklemini doğrudan çözer ve `theta_hat=P theta_hat_r` ile Physical DOF uzayına
-geri açar. Prescribed statik offset harmonic phasor'a eklenmez.
+frozen harmonic yolu her explicit pozitif frekansta `Z_r theta_hat=T_hat`
+denklemini doğrudan çözer. V0.7 material-aware yol aynı ZSYSVX backend'ini
+kullanır; yalnız bound elemanların `K'(f),K''(f)` katkılarını provider'dan
+günceller. Her iki yol `theta_hat=P theta_hat_r` ile Physical DOF uzayına geri
+açılır; prescribed statik offset harmonic phasor'a eklenmez.
 
-Harmonic sonuç **direct**, **full-order**, **linear**, **small-amplitude**,
-**frequency-domain** ve **frozen-property** kapsamındadır. Complex genlikler
-`exp(+i*omega*t)` konvansiyonunda peak amplitude değerleridir; RMS değildir.
-Elastomer özellikleri sweep boyunca sabit kabul edilir; frekans-sıcaklık
-interpolasyonu yapılmaz.
+Harmonic sonuç **direct**, **full-order**, **linear**, **small-amplitude** ve
+**frequency-domain** kapsamındadır. Complex genlikler `exp(+i*omega*t)`
+konvansiyonunda peak amplitude değerleridir; RMS değildir. V0.6 API'sinde
+özellikler frozen kalır. Ayrı V0.7 API'si `LINEAR_FREQUENCY` veya seçimlik
+`LINEAR_LOG_FREQUENCY` ile tek measured isotherm üzerinde G'/G'' interpolate
+eder; extrapolation veya temperature interpolation yapmaz.
 
 ### Tamamlananlar
 
@@ -167,6 +180,18 @@ interpolasyonu yapılmaz.
   accelerance; genel forced response ile FRF'nin açık ayrımı
 - Viscous-only, K''-only, combined damping, fixed/free two-inertia, passivity,
   exact singular, ill-conditioned ve V0.5 modal cross-validation regresyonları
+- Canonical SI `G'(f),G''(f)` tablosu için private-copy provider abstraction,
+  explicit dataset/test metadata ve SHEAR-only direct torsional contract
+- Default linear-frequency ve seçimlik linear-log-frequency axis interpolation;
+  exact-point machine tolerance, measured-isotherm ve no-extrapolation kuralları
+- Bound eleman nominal K'/K'' değerlerini frozen yol için koruyan, material-aware
+  yolda double-count etmeden dynamic K'/K'' ile override eden ayrı binding
+- Mixed constant/dynamic sistemler, birden çok provider, full-sweep
+  prevalidation ve frequency-independent M/C/DOF/constraint preparation
+- Solved veya singular bütün requested frequency noktalarında dataset kimliği,
+  G'/G'', tan(delta), K'/K'' ve interpolation bracket/alpha material trace'i
+- Exact/interpolated provider, invalid data, annular mapping, 1-DOF full chain,
+  complex 2x2 mixed/multiple system ve singular trace analitik regresyonları
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS LP64 LAPACK ve Windows LP64 OpenBLAS sağlayıcılarıyla GitHub Actions
   derleme/test iş akışları
@@ -174,17 +199,17 @@ interpolasyonu yapılmaz.
 
 ### Henüz kapsam dışında
 
-- İnterpolasyon, eğri uydurma, Prony serisi ve nonlinear elastomer modeli
+- Spline/PCHIP, curve fitting, Prony serisi ve nonlinear elastomer modeli
 - Sönümlü kompleks özdeğer problemi ve mode-superposition harmonic çözüm
-- Frekansa/sıcaklığa bağlı malzeme interpolasyonu veya sweep sırasında K'/K''
-  güncellemesi
+- Temperature/amplitude/prestrain interpolation, WLF, Arrhenius, TTS ve
+  master-curve/reduced-frequency modelleri
 - Sıfırdan farklı dynamic prescribed dönme için RHS correction ve reaction
   torque recovery
 - Sparse matris depolaması, CSR ve production iterative eigen solver
 - Sparse complex direct solver, GMRES/BiCGSTAB ve complex Krylov yöntemleri
 - Lanczos, Block Lanczos, Krylov–Schur, LOBPCG, ARPACK ve SLEPc backend'leri
 - MPC, constraint equation, Lagrange multiplier, penalty ve contact
-- Frekansa bağlı G'(f) interpolasyonu ve öz-tutarlı modal iterasyon
+- Frekansa bağlı malzemeyle nonlinear/öz-tutarlı modal eigenproblem iterasyonu
 - FEM, DXF ve Qt tabanlı kullanıcı arayüzü
 
 Her fiziksel hesap genişletmesi, ilgili matematik belgesi, otomatik test ve
@@ -303,12 +328,14 @@ request'lerde derleme ve test doğrulaması yapar.
 
 ## Dizin yapısı
 
-- `docs/`: mimari, matematik, fizik, doğrulama, geliştirme ve karar kayıtları
+- `docs/`: mimari, malzeme, matematik, fizik, doğrulama, geliştirme ve karar kayıtları
 - `engine/src/`: Fortran hesap motoru kaynakları
 - `engine/src/constraints/`: constraint veri modeli, yönetimi ve reduced system
 - `engine/src/eigen/`: backend-neutral eigenproblem/solution ve DSYGV backend
-- `engine/src/harmonic/`: dynamic stiffness, complex solver ve harmonic sonuç
-  katmanları
+- `engine/src/harmonic/`: dynamic stiffness, complex solver, frozen/material-aware
+  orchestration ve harmonic sonuç/trace katmanları
+- `engine/src/materials/`: legacy malzeme türleri, dataset metadata'sı ve
+  dynamic modulus provider'ları
 - `engine/src/modal/`: modal analiz, doğrulama, sonuç ve fiziksel recovery
 - `engine/src/matrix/`: lokal/global matris, DOF haritası, assembly ve reduction
 - `engine/src/system/`: genel torsional node, element ve sistem topolojisi
@@ -398,6 +425,18 @@ analitik ve solver-status doğrulamaları
 [`docs/validation/harmonic_response_validation.md`](docs/validation/harmonic_response_validation.md),
 complex-symmetric ZSYSVX backend kararı ise
 [`docs/decisions/0011-frequency-domain-complex-solver.md`](docs/decisions/0011-frequency-domain-complex-solver.md)
+belgelerinde açıklanır.
+
+V0.7.0 provider/binding ve material-aware assembly akışı
+[`docs/architecture/V0.7_dynamic_material_provider.md`](docs/architecture/V0.7_dynamic_material_provider.md),
+dataset/test metadata ve DMA→TVD aktarım sınırları
+[`docs/materials/tabulated_dynamic_elastomer_material.md`](docs/materials/tabulated_dynamic_elastomer_material.md),
+interpolation, isotherm, passivity ve causality matematiği
+[`docs/mathematics/dynamic_modulus_interpolation.md`](docs/mathematics/dynamic_modulus_interpolation.md),
+analitik doğrulama kapıları
+[`docs/validation/dynamic_material_provider_validation.md`](docs/validation/dynamic_material_provider_validation.md),
+kalıcı provider kararı ise
+[`docs/decisions/0012-tabulated-dynamic-material-provider.md`](docs/decisions/0012-tabulated-dynamic-material-provider.md)
 belgelerinde açıklanır.
 
 ## Lisans
