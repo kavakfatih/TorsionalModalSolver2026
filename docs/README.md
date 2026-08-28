@@ -51,6 +51,24 @@ süreçlerini ve kalıcı kararlarını içerir.
 - [`decisions/0012-tabulated-dynamic-material-provider.md`](decisions/0012-tabulated-dynamic-material-provider.md):
   harmonic-only tabulated provider ve V0.8 genişleme sınırı
 
+## V0.8.0 thermorheological runtime belgeleri
+
+- [`architecture/V0.8_thermorheological_runtime.md`](architecture/V0.8_thermorheological_runtime.md):
+  shift provider bileşimi, physical/reduced coordinate ayrımı, mevcut binding
+  ve harmonic solver reuse mimarisi
+- [`materials/thermorheological_dynamic_elastomer.md`](materials/thermorheological_dynamic_elastomer.md):
+  reference master curve, operating-state metadata, horizontal TTS ve DMA→TVD
+  aktarım sınırları
+- [`mathematics/temperature_shift_functions.md`](mathematics/temperature_shift_functions.md):
+  canonical `a_T`, WLF, Arrhenius, tabulated log-shift ve log-space reduced
+  frequency denklemleri
+- [`validation/thermorheological_runtime_validation.md`](validation/thermorheological_runtime_validation.md):
+  shift physics, dual-domain, material, harmonic, trace ve regression kapıları
+- [`decisions/0013-thermorheological-runtime-convention.md`](decisions/0013-thermorheological-runtime-convention.md):
+  `a_T=tau(T)/tau(T_ref)`, `f_r=a_Tf` ve horizontal-only runtime kararı
+- [`development/V0.8.0_development_report.md`](development/V0.8.0_development_report.md):
+  kalıcı architecture/technical/validation/CI geliştirme raporu
+
 Kod ile belgenin tutarlılığı aynı değişiklik içinde korunmalıdır. Fiziksel veya
 matematiksel bir hesap değiştirildiğinde ilgili matematik ve fizik belgesi,
 testler ve gerekiyorsa benchmark sonuçları birlikte güncellenir.

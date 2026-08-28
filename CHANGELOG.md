@@ -7,6 +7,65 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.8.0] - 2026-08-28
+
+### Eklendi
+
+- `a_T=tau(T)/tau(T_ref)`, `a_T(T_ref)=1`, `t_r=t/a_T` ve `f_r=a_Tf`
+  canonical sözleşmesini kullanan küçük `temperature_shift_provider_t`
+  abstraction'ı ile ortak evaluation/domain trace türleri.
+- Strictly increasing sıcaklık noktalarında `log10(a_T)` değerini lineer
+  interpolate eden, explicit reference noktası ve no-extrapolation sözleşmeli
+  private-copy tabulated shift provider.
+- Positive `C1/C2`, explicit sıcaklık domain'i ve domain boyunca pozitif
+  denominator/pole koruması kullanan WLF temperature-shift provider.
+- `Ea>0` ve SI `R=8.31446261815324 J/(mol K)` sabitiyle çalışan, explicit
+  sıcaklık domain'li Arrhenius temperature-shift provider.
+- Doğrulanmış V0.7 tabulated master curve ile seçilen shift provider'ı
+  `dynamic_modulus_provider_t` sınırı içinde bileştiren thermorheological
+  dynamic modulus provider.
+- WLF/Arrhenius hand calculation ve sıcaklık yönü, tabulated log-shift,
+  reference identity, dual-domain rejection, log-space uç değer, passivity,
+  full 1-DOF harmonic chain, multiple provider ve singular trace testleri.
+- V0.8 mimari, malzeme, matematik, validation ve Karar 0013 belgeleriyle
+  kalıcı development report.
+
+### Değiştirildi
+
+- Proje sürümü `0.8.0` olarak güncellendi.
+- Material evaluation, binding ve harmonic state trace alanları physical
+  frequency/operating temperature ile reduced lookup frequency/reference
+  temperature'ı birbirinden ayıracak biçimde geriye uyumlu genişletildi.
+- Master-curve interpolation bracket doğrulaması physical frequency yerine
+  lookup/reduced frequency eksenini kullanacak biçimde düzeltildi; V0.7 için
+  `lookup=physical`, `log10(a_T)=0` ve `a_T=1` default'ları korundu.
+- Dynamic material metadata içindeki `dataset_temperature_k`, shifted provider
+  için operating temperature değil master-curve reference temperature olarak
+  açıklandı.
+- README ve test stratejisi thermorheological runtime, analytical gates ve
+  physical/reduced trace sözleşmesini kapsayacak biçimde güncellendi.
+
+### Korundu
+
+- Mevcut `dynamic_torsional_property_binding_t` ve
+  `analyze_material_aware_harmonic_response()` akışı doğrudan yeniden
+  kullanılır; ikinci bir harmonic solver/orchestration API eklenmez.
+- V0.7 measured-isotherm provider davranışı ile V0.6 frozen harmonic ve V0.5
+  DSYGV modal yolları değişmeden kalır.
+- Horizontal shifting yeni modulus üretmez; validated master curve'ün
+  `G'>0`, `G''>=0` passivity koşulları ve `K*=C_theta G*` mapping'i korunur.
+
+### Sınırlamalar
+
+- Input master curve'ün thermorheologically simple olduğu önceden doğrulanmış
+  kabul edilir; isotherm shifting, empirical `a_T` identification,
+  master-curve construction ve TRS acceptance V0.8.1 kapsamındadır.
+- Yalnız horizontal shift (`b_T=1`) vardır. Vertical modulus shift,
+  amplitude/prestrain interpolation, self-heating, thermal expansion,
+  temperature-dependent inertia/density ve nonlinear harmonic iteration yoktur.
+- Combined WLF–Arrhenius, Prony/time-domain viscoelasticity, Payne effect ve
+  nonlinear constitutive modeller bu sürümün kapsamında değildir.
+
 ## [0.7.0] - 2026-08-28
 
 ### Eklendi

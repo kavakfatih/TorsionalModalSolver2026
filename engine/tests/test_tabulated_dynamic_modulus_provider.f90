@@ -9,6 +9,7 @@ program test_tabulated_dynamic_modulus_provider
   use tms_dynamic_modulus_provider, only : dynamic_modulus_evaluation_t, &
     LINEAR_FREQUENCY, LINEAR_LOG_FREQUENCY, &
     evaluate_dynamic_shear_modulus, get_dynamic_modulus_provider_metadata
+  use tms_temperature_shift_types, only : TEMPERATURE_SHIFT_NONE
   use tms_tabulated_dynamic_modulus_provider, only : &
     tabulated_dynamic_modulus_provider_t, &
     create_tabulated_dynamic_modulus_provider, &
@@ -57,14 +58,17 @@ contains
     evaluation = evaluate_dynamic_shear_modulus( &
       linear_provider, 20.0_dp, 293.15_dp)
     call assert_exact_evaluation(evaluation, 2.0e6_dp, 2.0e5_dp)
+    call assert_unshifted_context(evaluation)
     evaluation = evaluate_dynamic_shear_modulus( &
       log_provider, 20.0_dp, 293.15_dp)
     call assert_exact_evaluation(evaluation, 2.0e6_dp, 2.0e5_dp)
+    call assert_unshifted_context(evaluation)
 
     evaluation = evaluate_dynamic_shear_modulus( &
       linear_provider, nearest(20.0_dp, 1.0_dp), &
       nearest(293.15_dp, 1.0_dp))
     call assert_exact_evaluation(evaluation, 2.0e6_dp, 2.0e5_dp)
+    call assert_unshifted_context(evaluation)
 
     ! Machine tolerance'dan belirgin büyük, fakat fiziksel olarak çok küçük
     ! frekans farkı exact-point semantiğini kullanmamalı; interpolation'dır.
@@ -98,6 +102,7 @@ contains
       1.5e5_dp, tolerance, "Linear-frequency G'' hatalı.")
     call assert_close(calculate_loss_factor(evaluation%modulus), &
       0.1_dp, tolerance, "Derived tan(delta) hatalı.")
+    call assert_unshifted_context(evaluation)
   end subroutine test_linear_frequency_interpolation
 
   !> LINEAR_LOG_FREQUENCY modelinde yalnız frequency axis'in log10 alındığını
@@ -327,6 +332,24 @@ contains
     call assert_close(evaluation%modulus%loss_modulus, &
       expected_loss, 0.0_dp, "Exact G'' stored değeri değişti.")
   end subroutine assert_exact_evaluation
+
+  !> V0.7 measured-isotherm provider'ın V0.8 trace genişlemesinde shifted
+  !! görünmediğini doğrular: physical=lookup f [Hz], s=0 ve a_T=1.
+  subroutine assert_unshifted_context(evaluation)
+    type(dynamic_modulus_evaluation_t), intent(in) :: evaluation
+
+    if (evaluation%temperature_shift_applied .or. &
+        evaluation%shift_model_kind /= TEMPERATURE_SHIFT_NONE .or. &
+        abs(evaluation%physical_frequency_hz- &
+          evaluation%lookup_frequency_hz) > 0.0_dp .or. &
+        abs(evaluation%physical_frequency_hz- &
+          evaluation%modulus%frequency) > 0.0_dp .or. &
+        abs(evaluation%log10_a_t) > 0.0_dp .or. &
+        abs(evaluation%a_t-1.0_dp) > 0.0_dp .or. &
+        evaluation%has_temperature_bracket) then
+      error stop "V0.7 provider unshifted trace default'larını korumadı."
+    end if
+  end subroutine assert_unshifted_context
 
   subroutine assert_close(actual, expected, relative_tolerance, message)
     real(dp), intent(in) :: actual

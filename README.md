@@ -4,14 +4,16 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.7.0`, measured-isotherm tabulated dynamic shear
-modulus `G'(f),G''(f)` verisini ayrı bir provider/binding katmanıyla direct
-harmonic response'a bağlar. Material-aware dynamic stiffness
+Güncel geliştirme sürümü `0.8.0`, doğrulanmış reference master curve'ü
+tabulated `log10(a_T)`, WLF veya Arrhenius temperature-shift provider'ıyla
+bileştirir. Canonical koordinat dönüşümü `f_r=a_T(T)f` log-space'te
+doğrulanır; physical `f,T` ile reduced lookup `f_r,T_ref` trace içinde ayrı
+tutulur. Material-aware dynamic stiffness
 `Z_r(f)=K'_r(f)-omega^2 M_r+i(K''_r(f)+omega C_r)` biçimindedir. Dense LAPACK
 `ZSYSVX` mevcut complex-symmetric reference backend olarak yeniden kullanılır;
 V0.5 `DSYGV` modal ve V0.6 frozen harmonic yolları değişmeden korunur.
 
-## V0.7.0 tabulated dynamic material provider kapsamı
+## V0.8.0 thermorheological runtime kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -24,6 +26,14 @@ V0.5 `DSYGV` modal ve V0.6 frozen harmonic yolları değişmeden korunur.
 - `tms_dynamic_modulus_provider`: genişletilebilir constitutive sorgu sınırı
 - `tms_tabulated_dynamic_modulus_provider`: linear/log-frequency interpolation,
   measured-isotherm ve no-extrapolation sözleşmesi
+- `tms_temperature_shift_provider`: ortak shift evaluation, validation ve
+  explicit sıcaklık-domain sözleşmesi
+- `tms_tabulated_temperature_shift`: sıcaklık ekseninde linear `log10(a_T)`
+  interpolation ve no-extrapolation
+- `tms_wlf_temperature_shift`: positive `C1/C2` ve pole-korumalı WLF modeli
+- `tms_arrhenius_temperature_shift`: SI birimli activation-energy modeli
+- `tms_thermorheological_dynamic_modulus_provider`: master curve ile shift
+  modelini mevcut dynamic modulus provider API'sinde bileştiren runtime katmanı
 - `tms_inertia`: homojen annüler göbek ve halkanın kütle özellikleri
 - `tms_torsional_stiffness`: lineer elastomer bölgenin burulma rijitliği
 - `tms_dynamic_torsional_stiffness`: K', K'' ve kayıp faktörü hesabı
@@ -79,11 +89,12 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.7.0 aşamasındadır. Dinamik elastomer dataset'i, tabulated
-provider, bonded-annular dynamic element binding'i, generalized node-element
-topolojisi, constraint reduction, sönümsüz modal analiz ve complex harmonic
-response aynı çekirdekte kullanılabilir. K'' ile boyutsal olarak farklı viskoz
-`c` ayrı eleman alanları, global matrisler ve doğrulama kanalları olarak korunur.
+TMS26 şu anda V0.8.0 aşamasındadır. Dinamik elastomer master curve'ü,
+temperature-shift provider'ları, bonded-annular dynamic element binding'i,
+generalized node-element topolojisi, constraint reduction, sönümsüz modal
+analiz ve complex harmonic response aynı çekirdekte kullanılabilir. K'' ile
+boyutsal olarak farklı viskoz `c` ayrı eleman alanları, global matrisler ve
+doğrulama kanalları olarak korunur.
 
 Lineer elemanların lokal K', K'' ve C katkıları ile düğüm polar ataletleri önce
 constraint'ten bağımsız Full Equation ID uzayında birleştirilir. Constraint
@@ -92,15 +103,19 @@ V0.5 modal yolu `K_r phi=lambda M_r phi` denklemini çözmeye devam eder. V0.6
 frozen harmonic yolu her explicit pozitif frekansta `Z_r theta_hat=T_hat`
 denklemini doğrudan çözer. V0.7 material-aware yol aynı ZSYSVX backend'ini
 kullanır; yalnız bound elemanların `K'(f),K''(f)` katkılarını provider'dan
-günceller. Her iki yol `theta_hat=P theta_hat_r` ile Physical DOF uzayına geri
-açılır; prescribed statik offset harmonic phasor'a eklenmez.
+günceller. V0.8 bu provider sınırını değiştirmeden, externally prescribed
+operating sıcaklıkta reduced-frequency master-curve lookup'u ekler. Her iki yol
+`theta_hat=P theta_hat_r` ile Physical DOF uzayına geri açılır; prescribed
+statik offset harmonic phasor'a eklenmez.
 
 Harmonic sonuç **direct**, **full-order**, **linear**, **small-amplitude** ve
 **frequency-domain** kapsamındadır. Complex genlikler `exp(+i*omega*t)`
 konvansiyonunda peak amplitude değerleridir; RMS değildir. V0.6 API'sinde
 özellikler frozen kalır. Ayrı V0.7 API'si `LINEAR_FREQUENCY` veya seçimlik
 `LINEAR_LOG_FREQUENCY` ile tek measured isotherm üzerinde G'/G'' interpolate
-eder; extrapolation veya temperature interpolation yapmaz.
+eder. V0.8 provider'ı validated `T_ref` master curve ve shift modelini
+horizontal-only TTS ile bileştirir. Temperature ve reduced-frequency
+extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 
 ### Tamamlananlar
 
@@ -192,6 +207,15 @@ eder; extrapolation veya temperature interpolation yapmaz.
   G'/G'', tan(delta), K'/K'' ve interpolation bracket/alpha material trace'i
 - Exact/interpolated provider, invalid data, annular mapping, 1-DOF full chain,
   complex 2x2 mixed/multiple system ve singular trace analitik regresyonları
+- `a_T=tau(T)/tau(T_ref)` ve `f_r=a_Tf` convention'ıyla tabulated
+  `log10(a_T)`, WLF ve Arrhenius temperature-shift provider'ları
+- Shift sıcaklık domain'i ile reduced-frequency master-curve domain'ini ayrı
+  doğrulayan, çarpım taşması yaratmayan log-space runtime evaluation
+- Physical frequency/operating temperature ile reduced lookup
+  frequency/reference temperature'ı ayıran geriye uyumlu material trace
+- Mevcut binding ve `analyze_material_aware_harmonic_response()` API'sini
+  yeniden kullanan thermorheological 1-DOF, multiple-provider, passivity ve
+  singular-trace analitik regresyonları
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS LP64 LAPACK ve Windows LP64 OpenBLAS sağlayıcılarıyla GitHub Actions
   derleme/test iş akışları
@@ -201,8 +225,8 @@ eder; extrapolation veya temperature interpolation yapmaz.
 
 - Spline/PCHIP, curve fitting, Prony serisi ve nonlinear elastomer modeli
 - Sönümlü kompleks özdeğer problemi ve mode-superposition harmonic çözüm
-- Temperature/amplitude/prestrain interpolation, WLF, Arrhenius, TTS ve
-  master-curve/reduced-frequency modelleri
+- Master-curve identification, empirical isotherm alignment, TRS quality
+  metrics, vertical shift, amplitude/prestrain interpolation ve self-heating
 - Sıfırdan farklı dynamic prescribed dönme için RHS correction ve reaction
   torque recovery
 - Sparse matris depolaması, CSR ve production iterative eigen solver
@@ -438,6 +462,20 @@ analitik doğrulama kapıları
 kalıcı provider kararı ise
 [`docs/decisions/0012-tabulated-dynamic-material-provider.md`](docs/decisions/0012-tabulated-dynamic-material-provider.md)
 belgelerinde açıklanır.
+
+V0.8.0 thermorheological provider bileşimi ve trace akışı
+[`docs/architecture/V0.8_thermorheological_runtime.md`](docs/architecture/V0.8_thermorheological_runtime.md),
+dynamic elastomer varsayımları
+[`docs/materials/thermorheological_dynamic_elastomer.md`](docs/materials/thermorheological_dynamic_elastomer.md),
+tabulated/WLF/Arrhenius denklemleri
+[`docs/mathematics/temperature_shift_functions.md`](docs/mathematics/temperature_shift_functions.md),
+analitik doğrulama kapıları
+[`docs/validation/thermorheological_runtime_validation.md`](docs/validation/thermorheological_runtime_validation.md),
+canonical convention kararı ise
+[`docs/decisions/0013-thermorheological-runtime-convention.md`](docs/decisions/0013-thermorheological-runtime-convention.md)
+belgelerinde açıklanır. Uygulama ve doğrulama özeti
+[`docs/development/V0.8.0_development_report.md`](docs/development/V0.8.0_development_report.md)
+altında tutulur.
 
 ## Lisans
 

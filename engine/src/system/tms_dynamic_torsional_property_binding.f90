@@ -18,8 +18,16 @@ module tms_dynamic_torsional_property_binding
   !! interpolation izini birlikte taşır.
   type, public :: dynamic_torsional_property_state_t
     integer :: element_id = 0
+    !> Geriye uyumlu physical query frequency [Hz] alanı.
     real(dp) :: frequency_hz = 0.0_dp
+    !> Explicit physical excitation frequency [Hz].
+    real(dp) :: physical_frequency_hz = 0.0_dp
+    !> Master curve üzerinde kullanılan reduced/lookup frequency [Hz].
+    real(dp) :: lookup_frequency_hz = 0.0_dp
+    !> Geriye uyumlu operating temperature [K] alanı.
     real(dp) :: temperature_k = 0.0_dp
+    !> Explicit externally prescribed operating temperature [K].
+    real(dp) :: operating_temperature_k = 0.0_dp
     real(dp) :: storage_modulus_pa = 0.0_dp
     real(dp) :: loss_modulus_pa = 0.0_dp
     real(dp) :: loss_factor = 0.0_dp
@@ -30,6 +38,16 @@ module tms_dynamic_torsional_property_binding
     real(dp) :: lower_frequency_hz = 0.0_dp
     real(dp) :: upper_frequency_hz = 0.0_dp
     real(dp) :: interpolation_alpha = 0.0_dp
+    logical :: temperature_shift_applied = .false.
+    integer :: shift_model_kind = 0
+    real(dp) :: reference_temperature_k = 0.0_dp
+    real(dp) :: log10_a_t = 0.0_dp
+    real(dp) :: a_t = 1.0_dp
+    logical :: has_temperature_bracket = .false.
+    logical :: shift_exact_temperature_point = .false.
+    real(dp) :: lower_temperature_k = 0.0_dp
+    real(dp) :: upper_temperature_k = 0.0_dp
+    real(dp) :: temperature_interpolation_alpha = 0.0_dp
   end type dynamic_torsional_property_state_t
 
   !> Bir torsional elemanı dinamik shear-modulus provider'ına bağlar.
@@ -114,11 +132,12 @@ contains
   !> Binding'in provider durumunu sorgular ve bonded-annular K* katsayılarına
   !! dönüştürür.
   !! Matematiksel model: G*=G'+iG'', K'=C_theta*G', K''=C_theta*G'' ve
-  !! tan(delta)=G''/G'=K''/K'. Girdiler f [Hz] ile measured-isotherm T [K];
-  !! çıktı G'/G'' [Pa], K'/K'' [N*m/rad] ve interpolation trace'dir.
-  !! Varsayımlar ve sınırlar: Provider extrapolation/sıcaklık interpolation
-  !! yapmaz; pasif modelde G'>0, G''>=0, K'>0 ve K''>=0 korunur. Ayrıntılar:
-  !! docs/architecture/V0.7_dynamic_material_provider.md.
+  !! tan(delta)=G''/G'=K''/K'. Girdiler physical f [Hz] ile externally
+  !! prescribed operating T [K]; çıktı G'/G'' [Pa], K'/K'' [N*m/rad] ve
+  !! provider interpolation/shift trace'idir.
+  !! Varsayımlar ve sınırlar: Provider kendi validated domain'leri dışında
+  !! extrapolation yapmaz; pasif modelde G'>0, G''>=0, K'>0 ve K''>=0 korunur.
+  !! Ayrıntılar: docs/architecture/V0.8_thermorheological_runtime.md.
   pure function evaluate_dynamic_torsional_property( &
       binding, frequency_hz, temperature_k) result(state)
     type(dynamic_torsional_property_binding_t), intent(in) :: binding
@@ -137,7 +156,12 @@ contains
 
     state%element_id = binding%element_id
     state%frequency_hz = modulus_evaluation%modulus%frequency
+    state%physical_frequency_hz = &
+      modulus_evaluation%physical_frequency_hz
+    state%lookup_frequency_hz = modulus_evaluation%lookup_frequency_hz
     state%temperature_k = modulus_evaluation%modulus%temperature
+    state%operating_temperature_k = &
+      modulus_evaluation%modulus%temperature
     state%storage_modulus_pa = &
       modulus_evaluation%modulus%storage_modulus
     state%loss_modulus_pa = modulus_evaluation%modulus%loss_modulus
@@ -149,6 +173,21 @@ contains
     state%lower_frequency_hz = modulus_evaluation%lower_frequency_hz
     state%upper_frequency_hz = modulus_evaluation%upper_frequency_hz
     state%interpolation_alpha = modulus_evaluation%interpolation_alpha
+    state%temperature_shift_applied = &
+      modulus_evaluation%temperature_shift_applied
+    state%shift_model_kind = modulus_evaluation%shift_model_kind
+    state%reference_temperature_k = &
+      modulus_evaluation%reference_temperature_k
+    state%log10_a_t = modulus_evaluation%log10_a_t
+    state%a_t = modulus_evaluation%a_t
+    state%has_temperature_bracket = &
+      modulus_evaluation%has_temperature_bracket
+    state%shift_exact_temperature_point = &
+      modulus_evaluation%shift_exact_temperature_point
+    state%lower_temperature_k = modulus_evaluation%lower_temperature_k
+    state%upper_temperature_k = modulus_evaluation%upper_temperature_k
+    state%temperature_interpolation_alpha = &
+      modulus_evaluation%temperature_interpolation_alpha
   end function evaluate_dynamic_torsional_property
 
   !> Binding'in authoritative torsional eleman kimliğini [-] döndürür.

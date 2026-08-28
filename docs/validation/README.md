@@ -18,6 +18,10 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`dynamic_material_provider_validation.md`](dynamic_material_provider_validation.md):
   V0.7 provider data-quality/interpolation, G*→K* mapping, mixed/multiple
   material-aware harmonic zincir, prevalidation ve singular-point trace kanıtı
+- [`thermorheological_runtime_validation.md`](thermorheological_runtime_validation.md):
+  V0.8 tabulated/WLF/Arrhenius shift physics, log-space reduced frequency,
+  dual-domain material evaluation, mevcut harmonic API entegrasyonu, trace ve
+  V0.1–V0.7 regression kapıları
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

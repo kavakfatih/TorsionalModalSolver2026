@@ -55,8 +55,9 @@ module tms_material_aware_harmonic_analysis
 
 contains
 
-  !> Tabulated dynamic shear material binding'leriyle direct full-order
-  !! frequency-domain torsional response çözer.
+  !> Dynamic shear material provider binding'leriyle direct full-order
+  !! frequency-domain torsional response çözer. Provider tek-isotherm veya
+  !! thermorheological master-curve/temperature-shift bileşimi olabilir.
   !!
   !! Fiziksel model: exp(+i*omega*t) convention'ında passive G''>=0 ve
   !! K''>=0 kullanılır. Bound elemanlar için K'(f)=C_theta*G'(f),
@@ -74,9 +75,11 @@ contains
   !! Varsayımlar ve sınırlar: Provider domain/temperature/mode ve tüm sweep
   !! material state'leri ZSYSVX çağrısından önce prevalidate edilir. Topology,
   !! DOF map, constraints, M, C, base K ve C_theta yalnız bir kez hazırlanır.
-  !! Modal, transient, extrapolation, TTS ve temperature interpolation yoktur.
-  !! Ayrıntılar: docs/architecture/V0.7_dynamic_material_provider.md ve
-  !! docs/mathematics/dynamic_modulus_interpolation.md.
+  !! Modal, transient ve provider domain'leri dışında extrapolation yoktur.
+  !! V0.8 yalnız horizontal temperature shift uygular; vertical shift,
+  !! self-heating ve master-curve identification bu yordamın kapsamında değildir.
+  !! Ayrıntılar: docs/architecture/V0.8_thermorheological_runtime.md ve
+  !! docs/mathematics/temperature_shift_functions.md.
   function analyze_material_aware_harmonic_response( &
       system, manager, frequencies_hz, operating_temperature_k, &
       excitations, bindings) result(response)

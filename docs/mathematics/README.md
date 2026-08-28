@@ -36,6 +36,10 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`dynamic_modulus_interpolation.md`](dynamic_modulus_interpolation.md):
   linear ve log-frequency axis interpolation, exact-point machine tolerance,
   measured-isotherm/no-extrapolation kuralları, passivity ve causality sınırı
+- [`temperature_shift_functions.md`](temperature_shift_functions.md):
+  TMS26 canonical `a_T=tau(T)/tau(T_ref)` convention'ı, WLF, Arrhenius,
+  tabulated `log10(a_T)` interpolation, log-space reduced-frequency hesabı ve
+  dual-domain/no-extrapolation kuralları
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

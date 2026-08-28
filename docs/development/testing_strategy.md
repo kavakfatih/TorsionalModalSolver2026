@@ -222,6 +222,39 @@ Ayrıntılar
 [`../validation/dynamic_material_provider_validation.md`](../validation/dynamic_material_provider_validation.md)
 belgesindedir.
 
+V0.8.0 thermorheological runtime doğrulaması, V0.7 provider abstraction'ını
+değiştirmeden temperature-shift katmanını aşağıdaki ayrı kapılarla sınar:
+
+- WLF için `T_ref` identity, hand-calculated `log10(a_T)`, physical sıcaklık
+  yönü, positive `C1/C2`, explicit domain ve WLF-pole rejection,
+- Arrhenius için hand-calculated `Ea/R(1/T-1/T_ref)`, `T_ref` identity,
+  physical yön ve invalid activation-energy/domain rejection,
+- tabulated shift için exact/reference noktalar, `log10(a_T)` linear
+  interpolation, machine-equivalent temperature, strictly increasing T,
+  NaN/Inf/duplicate rejection ve no extrapolation,
+- abstract provider sınırında operating/reference T, model kind, bracket ve
+  `log10(a_T)`/`a_T` tutarlılığı; bozuk test-double evaluation rejection,
+- `log10(f_r)=log10(f)+log10(a_T)` analytical reduced-frequency hesabı,
+  log-space numerical safety ve ayrı shift-temperature/master-frequency
+  domain kontrolleri,
+- master curve ile shift provider reference-temperature consistency ve
+  `T=T_ref` durumunda aynı V0.7 `G'/G''` sonucu,
+- physical frequency/operating temperature ile reduced lookup
+  frequency/reference temperature'ın trace içinde ayrılması,
+- bütün geçerli sıcaklıklarda `G'>0`, `G''>=0`, `K'>0`, `K''>=0` passivity,
+- mevcut dynamic binding ve `analyze_material_aware_harmonic_response()` ile
+  bağımsız fixed-hub 1-DOF analytical chain,
+- aynı modelde farklı WLF/Arrhenius provider'ları ve singular response
+  noktasında material trace retention.
+
+Tabulated shift ordinatlarına monotonicity zorlanmaz; yalnız temperature axis
+strictly increasing olmalıdır. Testler temperature/master-curve extrapolation,
+endpoint clamp veya nearest-value fallback'i kabul etmez. Büyük shift
+senaryoları invalid point'in ara overflow üretmeden kontrollü reddedildiğini
+doğrular. Ayrıntılar
+[`../validation/thermorheological_runtime_validation.md`](../validation/thermorheological_runtime_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.
@@ -253,6 +286,18 @@ status-aware frequency sweep ve physical response recovery'ye kadar olan yolu
 birleştirir. Low-level solver birden çok RHS'yi sınarken public harmonic analiz
 tek load case'i koruyabilir. Singular bir frekans noktası bütün sweep'i
 sonlandırmamalıdır.
+
+V0.8.0 için thermorheological provider entegrasyonu constitutive layer ile
+mevcut V0.7 binding/harmonic orchestration arasındaki public sınırı sınar.
+Entegrasyon testi yeni bir harmonic API çağırmaz; aşağıdaki zinciri production
+provider, binding ve
+`analyze_material_aware_harmonic_response()` üzerinden yürütür. Multiple shift
+provider ve singular-trace senaryoları solver reuse ile state trace'in birlikte
+korunduğunu kanıtlar.
+
+```text
+physical f,T -> a_T -> f_r -> G'/G'' -> K'/K'' -> Z -> theta
+```
 
 ## Benchmark test
 

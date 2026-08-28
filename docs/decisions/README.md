@@ -35,6 +35,10 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0012-tabulated-dynamic-material-provider.md`](0012-tabulated-dynamic-material-provider.md):
   primary G'/G'', measured-isotherm interpolation, provider/binding sınırı,
   harmonic-only dynamic override, prevalidation ve traceability kararı
+- [`0013-thermorheological-runtime-convention.md`](0013-thermorheological-runtime-convention.md):
+  canonical `a_T=tau(T)/tau(T_ref)` ve `f_r=a_Tf` convention'ı, primary
+  `log10(a_T)`, tabulated/WLF/Arrhenius shift provider'ları, horizontal-only
+  master-curve runtime ve mevcut harmonic API reuse kararı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

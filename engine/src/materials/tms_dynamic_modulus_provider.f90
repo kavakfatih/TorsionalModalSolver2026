@@ -2,6 +2,7 @@ module tms_dynamic_modulus_provider
   use tms_kinds, only : dp
   use tms_dynamic_modulus, only : dynamic_shear_modulus
   use tms_dynamic_material_metadata, only : dynamic_material_metadata_t
+  use tms_temperature_shift_types, only : TEMPERATURE_SHIFT_NONE
   implicit none
   private
 
@@ -13,11 +14,31 @@ module tms_dynamic_modulus_provider
   !! bunlardan ayrıca türetilir.
   type, public :: dynamic_modulus_evaluation_t
     type(dynamic_shear_modulus) :: modulus
+    !> Harmonic excitation/query frekansı [Hz]. Returned modulus içindeki
+    !! frequency alanıyla aynı fiziksel koordinattır.
+    real(dp) :: physical_frequency_hz = 0.0_dp
+    !> Constitutive tablo interpolation'ında kullanılan frekans [Hz].
+    !! V0.7 provider'da physical frequency'ye, shifted provider'da f_r'ye eşittir.
+    real(dp) :: lookup_frequency_hz = 0.0_dp
     integer :: interpolation_policy = 0
     logical :: exact_table_point = .false.
+    !> Aşağıdaki bracket master-curve lookup frequency eksenindedir.
     real(dp) :: lower_frequency_hz = 0.0_dp
     real(dp) :: upper_frequency_hz = 0.0_dp
     real(dp) :: interpolation_alpha = 0.0_dp
+
+    !> Temperature-shift context'i. Unshifted V0.7 için false, model NONE,
+    !! log10(a_T)=0, a_T=1 ve lookup=physical anlamlı default'ları kullanılır.
+    logical :: temperature_shift_applied = .false.
+    integer :: shift_model_kind = TEMPERATURE_SHIFT_NONE
+    real(dp) :: reference_temperature_k = 0.0_dp
+    real(dp) :: log10_a_t = 0.0_dp
+    real(dp) :: a_t = 1.0_dp
+    logical :: has_temperature_bracket = .false.
+    logical :: shift_exact_temperature_point = .false.
+    real(dp) :: lower_temperature_k = 0.0_dp
+    real(dp) :: upper_temperature_k = 0.0_dp
+    real(dp) :: temperature_interpolation_alpha = 0.0_dp
   end type dynamic_modulus_evaluation_t
 
   !> Harmonic solver ile constitutive material model arasındaki küçük ve
@@ -65,10 +86,11 @@ module tms_dynamic_modulus_provider
 
 contains
 
-  !> Provider'dan doğrudan constitutive G*(f)=G'(f)+iG''(f) durumunu alır.
-  !! Girdiler frequency [Hz] ve measured-isotherm temperature [K]; çıktı
-  !! G', G'' [Pa], f [Hz] ve T [K] alanlarıdır. Extrapolation ve sıcaklık
-  !! dönüşümü concrete provider sözleşmesince reddedilir.
+  !> Provider'dan doğrudan constitutive G*(f,T)=G'(f,T)+iG''(f,T) durumunu alır.
+  !! Girdiler physical frequency [Hz] ve operating temperature [K]; çıktı
+  !! G', G'' [Pa] ile aynı physical f [Hz] ve T [K] alanlarıdır. Isotherm
+  !! eşlemesi, temperature shift ve extrapolation politikası concrete provider
+  !! sözleşmesinin sorumluluğundadır.
   pure function query_dynamic_shear_modulus( &
       provider, frequency_hz, temperature_k) result(modulus)
     class(dynamic_modulus_provider_t), intent(in) :: provider

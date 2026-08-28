@@ -20,6 +20,10 @@ katman sınırlarını açıklar.
 - [`V0.7_dynamic_material_provider.md`](V0.7_dynamic_material_provider.md):
   tabulated G'(f)/G''(f) provider sınırı, ayrı eleman binding'i, material-aware
   K'/K'' preparation/assembly, frozen API uyumluluğu ve material trace
+- [`V0.8_thermorheological_runtime.md`](V0.8_thermorheological_runtime.md):
+  tabulated/WLF/Arrhenius shift provider sınırı, validated master-curve
+  bileşimi, physical/reduced coordinate semantics, trace evolution ve mevcut
+  V0.7 harmonic API reuse
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

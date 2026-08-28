@@ -9,6 +9,7 @@ module tms_tabulated_dynamic_modulus_provider
   use tms_dynamic_modulus_provider, only : dynamic_modulus_provider_t, &
     dynamic_modulus_evaluation_t, LINEAR_FREQUENCY, &
     LINEAR_LOG_FREQUENCY, are_machine_equivalent
+  use tms_temperature_shift_types, only : TEMPERATURE_SHIFT_NONE
   implicit none
   private
 
@@ -31,6 +32,7 @@ module tms_tabulated_dynamic_modulus_provider
 
   public :: create_tabulated_dynamic_modulus_provider
   public :: get_tabulated_frequency_points
+  public :: get_tabulated_frequency_domain
   public :: get_tabulated_interpolation_policy
 
 contains
@@ -106,6 +108,9 @@ contains
       error stop "Operating sıcaklığı provider measured isotherm'iyle eşleşmiyor."
     end if
 
+    call initialize_unshifted_evaluation_context( &
+      evaluation, frequency_hz, &
+      self%metadata%dataset_temperature_k)
     evaluation%interpolation_policy = self%interpolation_policy
     do point_index = 1, size(self%frequencies_hz)
       if (are_machine_equivalent( &
@@ -250,6 +255,21 @@ contains
     end do
   end function get_tabulated_frequency_points
 
+  !> Private master-curve tablosunun kapalı frekans domain'ini döndürür.
+  !! Çıktılar strictly positive minimum/maximum frequency [Hz] değerleridir;
+  !! extrapolation policy'si değiştirilmez ve tablo kopyalanmaz.
+  pure subroutine get_tabulated_frequency_domain( &
+      provider, minimum_frequency_hz, maximum_frequency_hz)
+    type(tabulated_dynamic_modulus_provider_t), intent(in) :: provider
+    real(dp), intent(out) :: minimum_frequency_hz
+    real(dp), intent(out) :: maximum_frequency_hz
+
+    call provider%validate()
+    minimum_frequency_hz = provider%frequencies_hz(1)
+    maximum_frequency_hz = &
+      provider%frequencies_hz(size(provider%frequencies_hz))
+  end subroutine get_tabulated_frequency_domain
+
   !> Provider interpolation policy kimliğini [-] döndürür.
   pure function get_tabulated_interpolation_policy(provider) result(policy)
     type(tabulated_dynamic_modulus_provider_t), intent(in) :: provider
@@ -277,5 +297,28 @@ contains
       end if
     end do
   end subroutine validate_points_against_metadata
+
+  !> V0.7 measured-isotherm provider değerlendirmesine geriye uyumlu,
+  !! anlamlı unshifted trace context'i yazar. Fiziksel ve lookup frekansı
+  !! aynıdır; a_T=1 ve log10(a_T)=0'dır. Temperature bracket yoktur.
+  pure subroutine initialize_unshifted_evaluation_context( &
+      evaluation, frequency_hz, reference_temperature_k)
+    type(dynamic_modulus_evaluation_t), intent(inout) :: evaluation
+    real(dp), intent(in) :: frequency_hz
+    real(dp), intent(in) :: reference_temperature_k
+
+    evaluation%physical_frequency_hz = frequency_hz
+    evaluation%lookup_frequency_hz = frequency_hz
+    evaluation%temperature_shift_applied = .false.
+    evaluation%shift_model_kind = TEMPERATURE_SHIFT_NONE
+    evaluation%reference_temperature_k = reference_temperature_k
+    evaluation%log10_a_t = 0.0_dp
+    evaluation%a_t = 1.0_dp
+    evaluation%has_temperature_bracket = .false.
+    evaluation%shift_exact_temperature_point = .false.
+    evaluation%lower_temperature_k = 0.0_dp
+    evaluation%upper_temperature_k = 0.0_dp
+    evaluation%temperature_interpolation_alpha = 0.0_dp
+  end subroutine initialize_unshifted_evaluation_context
 
 end module tms_tabulated_dynamic_modulus_provider

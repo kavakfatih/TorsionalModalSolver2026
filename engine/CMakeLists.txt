@@ -16,8 +16,14 @@ target_sources(
     src/materials/tms_dynamic_modulus.f90
     src/materials/tms_material_frequency.f90
     src/materials/tms_dynamic_material_metadata.f90
+    src/materials/tms_temperature_shift_types.f90
     src/materials/tms_dynamic_modulus_provider.f90
+    src/materials/tms_temperature_shift_provider.f90
     src/materials/tms_tabulated_dynamic_modulus_provider.f90
+    src/materials/tms_tabulated_temperature_shift.f90
+    src/materials/tms_wlf_temperature_shift.f90
+    src/materials/tms_arrhenius_temperature_shift.f90
+    src/materials/tms_thermorheological_dynamic_modulus_provider.f90
     src/materials/tms_material.f90
     src/solver/tms_inertia.f90
     src/solver/tms_torsional_stiffness.f90
@@ -701,6 +707,176 @@ if(BUILD_TESTING)
       NAME "${validation_test}"
       COMMAND
         "$<TARGET_FILE:tms26_test_material_aware_harmonic_analysis>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    tabulated_temperature_shift
+    tests/test_tabulated_temperature_shift.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      less_than_two_points
+      size_mismatch
+      zero_temperature
+      negative_temperature
+      nan_temperature
+      infinite_temperature
+      duplicate_temperature
+      numerical_duplicate_temperature
+      unordered_temperature
+      nan_shift
+      infinite_shift
+      invalid_reference_temperature
+      missing_reference_temperature
+      nonzero_reference_shift
+      below_domain
+      above_domain
+      inconsistent_shift_factor
+      invalid_shift_model_kind
+      invalid_temperature_bracket
+      nonfinite_temperature_bracket
+      inconsistent_provider_evaluation
+  )
+    set(
+      validation_test
+      "tms26.tabulated_temperature_shift.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_tabulated_temperature_shift>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    wlf_temperature_shift
+    tests/test_wlf_temperature_shift.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      zero_c1
+      negative_c1
+      nan_c1
+      zero_c2
+      negative_c2
+      infinite_c2
+      invalid_reference_temperature
+      invalid_minimum_temperature
+      reversed_domain
+      reference_outside_domain
+      pole_in_domain
+      below_domain
+      above_domain
+      invalid_query_temperature
+  )
+    set(
+      validation_test
+      "tms26.wlf_temperature_shift.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_wlf_temperature_shift>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    arrhenius_temperature_shift
+    tests/test_arrhenius_temperature_shift.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      zero_activation_energy
+      negative_activation_energy
+      nan_activation_energy
+      infinite_activation_energy
+      invalid_reference_temperature
+      invalid_minimum_temperature
+      reversed_domain
+      reference_outside_domain
+      below_domain
+      above_domain
+      zero_query_temperature
+      nan_query_temperature
+  )
+    set(
+      validation_test
+      "tms26.arrhenius_temperature_shift.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_arrhenius_temperature_shift>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    thermorheological_dynamic_modulus_provider
+    tests/test_thermorheological_dynamic_modulus_provider.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      reference_temperature_mismatch
+      temperature_below_domain
+      temperature_above_domain
+      reduced_frequency_below_domain
+      reduced_frequency_above_domain
+      zero_physical_frequency
+      nan_physical_frequency
+      infinite_physical_frequency
+      logspace_overflow_outside_domain
+      logspace_underflow_outside_domain
+  )
+    set(
+      validation_test
+      "tms26.thermorheological_dynamic_modulus_provider.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_thermorheological_dynamic_modulus_provider>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
+
+  tms26_add_fortran_test(
+    thermorheological_harmonic_analysis
+    tests/test_thermorheological_harmonic_analysis.f90
+  )
+
+  foreach(
+    validation_case
+    IN ITEMS
+      uncovered_reduced_sweep
+      temperature_outside_domain
+      reference_trace_metadata_mismatch
+  )
+    set(
+      validation_test
+      "tms26.thermorheological_harmonic_analysis.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_thermorheological_harmonic_analysis>"
         "${validation_case}"
     )
     set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)

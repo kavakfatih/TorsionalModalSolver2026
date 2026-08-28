@@ -7,6 +7,7 @@ program test_material_aware_harmonic_analysis
   use tms_dynamic_material_metadata, only : dynamic_material_metadata_t, &
     DYNAMIC_DEFORMATION_MODE_SHEAR
   use tms_dynamic_modulus_provider, only : LINEAR_FREQUENCY
+  use tms_temperature_shift_types, only : TEMPERATURE_SHIFT_NONE
   use tms_tabulated_dynamic_modulus_provider, only : &
     tabulated_dynamic_modulus_provider_t, &
     create_tabulated_dynamic_modulus_provider
@@ -149,6 +150,16 @@ contains
         trace%exact_table_point .or. &
         abs(trace%interpolation_alpha-0.5_dp) > tight_tolerance) then
       error stop "Trace interpolation policy/bracket bilgisi hatalı."
+    end if
+    if (trace%temperature_shift_applied .or. &
+        trace%shift_model_kind /= TEMPERATURE_SHIFT_NONE .or. &
+        abs(trace%physical_frequency_hz-trace%frequency_hz) > 0.0_dp .or. &
+        abs(trace%lookup_frequency_hz-trace%frequency_hz) > 0.0_dp .or. &
+        abs(trace%operating_temperature_k-trace%temperature_k) > 0.0_dp .or. &
+        abs(trace%log10_a_t) > 0.0_dp .or. &
+        abs(trace%a_t-1.0_dp) > 0.0_dp .or. &
+        trace%has_temperature_bracket) then
+      error stop "V0.7 material trace unshifted semantiği değişti."
     end if
     dissipated_energy = pi*trace%loss_stiffness_nm_per_rad*abs(expected)**2
     if (dissipated_energy < 0.0_dp) then

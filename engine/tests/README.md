@@ -218,6 +218,36 @@ Ayrıntılar
 [`../../docs/validation/dynamic_material_provider_validation.md`](../../docs/validation/dynamic_material_provider_validation.md)
 belgesindedir.
 
+V0.8 thermorheological test grubu temperature-shift provider'larını,
+thermorheological dynamic-modulus provider bileşimini ve mevcut
+material-aware harmonic zincirini kapsar. Ana doğrulamalar:
+
+- WLF `T_ref` identity, sıcaklık yönü, hand-calculated shift ve pole/domain
+  hataları,
+- Arrhenius identity, analytical `Ea/R` sonucu, sıcaklık yönü ve invalid
+  input/domain hataları,
+- tabulated `log10(a_T)` exact/midpoint interpolation, reference zero shift,
+  machine-equivalent temperature, input doğrulama ve no extrapolation,
+- common provider boundary'de model kind, sıcaklık/bracket ve
+  `log10(a_T)`/`a_T` evaluation invariant'ları,
+- master curve ile shift provider `T_ref` consistency,
+- `physical_frequency_hz` ile `lookup_frequency_hz=f_r` ayrımı ve returned
+  modulus'un physical `f,T` durumunu koruması,
+- reduced-frequency domain'in önce log-space'te doğrulanması ve extreme shift
+  girdilerinin ara overflow/underflow olmadan reddedilmesi,
+- bütün geçerli sorgularda G'/G'' ve K'/K'' passivity,
+- fixed-hub 1-DOF independent analytical response, aynı modelde multiple shift
+  provider ve singular response'ta shift/material trace retention,
+- thermorheological provider'ın mevcut
+  `analyze_material_aware_harmonic_response()` API'siyle çözülmesi.
+
+V0.7 unshifted provider testleri `log10(a_T)=0`, `a_T=1` ve
+`lookup_frequency=physical_frequency` defaults'unu geriye uyumluluk olarak
+korur. V0.5 modal ve V0.6 frozen harmonic test grupları değişmeden çalışır.
+Ayrıntılar
+[`../../docs/validation/thermorheological_runtime_validation.md`](../../docs/validation/thermorheological_runtime_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

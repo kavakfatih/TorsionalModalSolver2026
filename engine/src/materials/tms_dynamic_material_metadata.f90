@@ -8,11 +8,12 @@ module tms_dynamic_material_metadata
   integer, parameter, public :: DYNAMIC_DEFORMATION_MODE_TENSILE = 2
   integer, parameter, public :: dynamic_metadata_text_length = 256
 
-  !> Tek bir dinamik malzeme veri kümesinin deney ve operating-state
-  !! izlenebilirliğini taşır. Bir provider yalnız bu tek durumu temsil eder;
-  !! farklı sıcaklık, genlik, prestrain veya conditioning durumları ayrı veri
-  !! kümeleri olarak oluşturulmalıdır. Bilinmeyen seçimlik alanlar magic sayı
-  !! yerine açık has_* bayraklarıyla gösterilir.
+  !> Tek bir dinamik malzeme veri kümesinin deney ve reference-state
+  !! izlenebilirliğini taşır. Bir provider tek material, amplitude, prestrain,
+  !! deformation mode ve conditioning durumunu temsil eder. Thermorheological
+  !! provider operating temperature'ı shift modeliyle değiştirirken metadata
+  !! sıcaklığı T_ref olarak kalır. Bilinmeyen seçimlik alanlar magic sayı yerine
+  !! açık has_* bayraklarıyla gösterilir.
   type, public :: dynamic_material_metadata_t
     character(len=dynamic_metadata_text_length) :: dataset_identifier = ""
     character(len=dynamic_metadata_text_length) :: material_identifier = ""
@@ -20,8 +21,9 @@ module tms_dynamic_material_metadata
     logical :: has_specimen_identifier = .false.
     character(len=dynamic_metadata_text_length) :: specimen_identifier = ""
 
-    !> Veri kümesinin ölçülmüş isotherm sıcaklığı [K]. V0.7 bu sıcaklıklar
-    !! arasında interpolation veya shift işlemi yapmaz.
+    !> Veri kümesinin ölçülmüş isotherm veya doğrulanmış master-curve reference
+    !! sıcaklığı [K]. Thermorheological provider'da operating temperature
+    !! değildir; reference-state metadata semantiği korunur.
     real(dp) :: dataset_temperature_k = 0.0_dp
 
     !> Deneydeki dinamik shear strain amplitude gamma_a [-]. Alan yalnız

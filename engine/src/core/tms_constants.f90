@@ -19,4 +19,10 @@ module tms_constants
   !! Matematiksel eşitlik: 1 derece = pi / 180 radyan.
   real(dp), parameter, public :: degree_to_radian_factor = pi / 180.0_dp
 
+  !> Evrensel gaz sabiti; bir mol ideal sistem için sıcaklık ile enerji
+  !! ölçeğini ilişkilendirir. Arrhenius sıcaklık kaydırma modelinde aktivasyon
+  !! enerjisini boyutsuz üsse dönüştürür. SI birimi J/(mol K)'dir.
+  real(dp), parameter, public :: universal_gas_constant_j_per_mol_k = &
+    8.31446261815324_dp
+
 end module tms_constants
