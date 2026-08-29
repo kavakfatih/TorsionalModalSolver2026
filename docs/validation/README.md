@@ -28,6 +28,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`V0.8.2_shift_law_validation.md`](V0.8.2_shift_law_validation.md): adjacent
   pair Arrhenius/WLF recovery, reference invariance, large-C2 identifiability,
   LOTO, immutable empirical result ve parametric runtime round-trip kapıları
+- [`V0.8.3_repeatability_validation.md`](V0.8.3_repeatability_validation.md):
+  sample statistics, canonical campaign mapping, pseudoreplication prevention,
+  cohort availability ve deterministic coupled cluster-bootstrap kapıları
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

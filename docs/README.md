@@ -84,6 +84,21 @@ süreçlerini ve kalıcı kararlarını içerir.
 - [`development/V0.8.2_development_report.md`](development/V0.8.2_development_report.md):
   V0.8.2 implementation, regression ve CI kapanış kaydı
 
+## V0.8.3 repeatability ve uncertainty belgeleri
+
+- [`architecture/V0.8.3_repeatability_uncertainty.md`](architecture/V0.8.3_repeatability_uncertainty.md):
+  campaign/independence/result modeli ve katman sınırları
+- [`mathematics/tts_repeatability_bootstrap.md`](mathematics/tts_repeatability_bootstrap.md):
+  descriptive statistics, deterministic cluster bootstrap ve Type-7 quantile
+- [`materials/experimental_repeatability_and_uncertainty.md`](materials/experimental_repeatability_and_uncertainty.md):
+  intralaboratory semantics, provenance ve physical interpretation sınırları
+- [`validation/V0.8.3_repeatability_validation.md`](validation/V0.8.3_repeatability_validation.md):
+  beş CTest ailesi ve validation gates
+- [`decisions/0016-repeatability-and-cluster-bootstrap.md`](decisions/0016-repeatability-and-cluster-bootstrap.md):
+  complete-campaign sampling ve ortak draw-plan kararı
+- [`development/V0.8.3_development_report.md`](development/V0.8.3_development_report.md):
+  implementation, regression, compiler audit ve CI kapanış kaydı
+
 Kod ile belgenin tutarlılığı aynı değişiklik içinde korunmalıdır. Fiziksel veya
 matematiksel bir hesap değiştirildiğinde ilgili matematik ve fizik belgesi,
 testler ve gerekiyorsa benchmark sonuçları birlikte güncellenir.

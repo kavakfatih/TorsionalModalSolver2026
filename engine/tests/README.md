@@ -289,6 +289,31 @@ reddeder. Ayrıntılar
 [`../../docs/validation/V0.8.2_shift_law_validation.md`](../../docs/validation/V0.8.2_shift_law_validation.md)
 belgesindedir.
 
+V0.8.3 test grubu `tts_sample_statistics`, `tts_bootstrap`,
+`tts_repeatability`, `tts_parametric_repeatability` ve
+`tts_repeatability_bootstrap` ailelerinden oluşur. Bu aileler complete
+independent DMA/TTS campaign'i tek statistical sample unit olarak kullanır;
+frequency point, isotherm ve adjacent pair sayıları `n` değerini büyütmez.
+
+Sample-statistics testi `n-1` SD, SE, median, MAD/scaled MAD ve `n=1` spread
+unavailability semantics'ini sınar. Bootstrap testi explicit seed'li
+Park–Miller sequence'i, replacement sampling, Type-7 percentile convention ve
+partial draw accounting'i doğrular. Coupled campaign quantities aynı draw
+planını paylaşır; her draw'da `B=10A` bağıntısı korunmalıdır.
+
+Repeatability integration fixture'ları unsorted/ascending/descending
+temperature orders, ters pair orientation, farklı original references,
+common-state mismatch, source immutability ve structural reference-anchor
+semantics'ini production V0.8.1/V0.8.2 API'leri üzerinden doğrular. Parametric
+cohort testinde poorly identified/invalid WLF kayıtları count olarak korunur,
+ancak C1/C2/p/q statistics'e zero placeholder olarak girmez.
+
+Üç independent ve iki same-specimen rerun senaryosunda descriptive population
+beş, independent cluster-bootstrap population üç campaign'dir. Yalnız
+same-specimen rerun içeren study independent CI üretmez. Ayrıntılar
+[`../../docs/validation/V0.8.3_repeatability_validation.md`](../../docs/validation/V0.8.3_repeatability_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

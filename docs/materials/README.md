@@ -18,6 +18,9 @@ sınırlarını açıklar.
 - [`parametric_temperature_shift_laws.md`](parametric_temperature_shift_laws.md):
   empirical/parametric ayrımı, `Ea_app`, WLF identifiability, material-state
   applicability ve measured-domain runtime sınırı
+- [`experimental_repeatability_and_uncertainty.md`](experimental_repeatability_and_uncertainty.md):
+  intralaboratory repeatability, campaign independence/provenance, standards
+  context'i ve DMA evidence ile bonded-TVD validation sınırı
 
 Malzeme dosyası içe aktarma, vendor formatı yorumlama ve birim tahmini core
 material modelinin parçası değildir. Core API frekansı Hz, modülleri Pa ve

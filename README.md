@@ -4,18 +4,32 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.8.2`, V0.8.1'in authoritative empirical
-`log10(a_T)` ve master-curve sonuçlarını değiştirmeden adjacent pair `delta_s`
-gözlemlerine Arrhenius ve WLF parametric approximations uygular. Arrhenius
-`Ea_app` analytical least-squares ile, WLF ise analytical C1 profiling ve
-tek-boyutlu C2 Brent aramasıyla tanımlanır. Empirical tabulated runtime yolu
-korunur; parametric runtime export ancak explicit model seçimiyle ve measured
-temperature domain içinde açılır. Canonical koordinat dönüşümü
-`f_r=a_T(T)f` korunur; physical `f,T` ile reduced lookup `f_r,T_ref` trace
-içinde ayrı tutulur. Material-aware dynamic stiffness
-`Z_r(f)=K'_r(f)-omega^2 M_r+i(K''_r(f)+omega C_r)` biçimindedir. Dense LAPACK
-`ZSYSVX` mevcut complex-symmetric reference backend olarak yeniden kullanılır;
-V0.5 `DSYGV` modal ve V0.6 frozen harmonic yolları değişmeden korunur.
+Güncel geliştirme sürümü `0.8.3`, birden fazla complete V0.8.1 DMA/TTS
+campaign'inden intralaboratory repeatability ve deterministic nonparametric
+cluster-bootstrap uncertainty evidence üretir. Statistical sample unit complete
+independent campaign'dir; frequency, isotherm ve adjacent pair noktaları
+replicate sayılmaz. V0.8.1 authoritative empirical sonuçları ile V0.8.2
+Arrhenius/WLF fit semantics'i değişmez. Ortak physical-temperature mapping,
+common-reference normalization, mean/`n-1` SD/SE, median/MAD ve Type-7
+percentile cohort-mean interval'ları additive offline katmanda tutulur. Runtime
+materials, modal ve harmonic solver yolları bu katmana bağımlı değildir.
+
+## V0.8.3 experimental repeatability ve bootstrap kapsamı
+
+- `tms_sample_statistics`: açık availability ile mean, sample SD, SE, median,
+  MAD, scaled MAD, min/max ve mean–median diagnostic'i
+- `tms_deterministic_rng` ve `tms_bootstrap`: explicit seed'li portable RNG,
+  shared complete-campaign draw planı ve Type-7 percentile CI
+- `tms_tts_repeatability_types`: campaign independence/provenance ve additive
+  pair, absolute-shift, Arrhenius/WLF cohort result sözleşmeleri
+- `tms_tts_repeatability_analysis`: physical-key temperature/pair matching,
+  common-reference normalization ve mevcut `fit_tts_shift_laws()` reuse
+- Same-specimen rerun descriptive evidence'a alınabilir; default independent
+  bootstrap population'ına alınmaz.
+- Structural reference `[0,0]` interval measurement uncertainty değildir;
+  explicit anchor semantic'iyle raporlanır.
+- Huber/weighted shifting, automatic outlier deletion, full covariance,
+  automatic model winner ve product-level uncertainty propagation yoktur.
 
 ## V0.8.2 parametric temperature shift-law identification kapsamı
 
@@ -120,9 +134,10 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.8.2 aşamasındadır. Measured isotherm validation, explicit
+TMS26 şu anda V0.8.3 aşamasındadır. Measured isotherm validation, explicit
 quality gaps, exact pair-shift objective, empirical shift chain, runtime
-master-table construction ve adjacent-pair parametric shift-law evidence;
+master-table construction, adjacent-pair parametric shift-law evidence ve
+complete-campaign repeatability/bootstrap evidence;
 temperature-shift provider'ları, bonded-annular
 dynamic element binding'i, generalized topology, constraint reduction,
 sönümsüz modal analiz ve complex harmonic response ile aynı çekirdekte fakat
@@ -140,6 +155,8 @@ günceller. V0.8.0 bu provider sınırını değiştirmeden, externally prescrib
 operating sıcaklıkta reduced-frequency master-curve lookup'u ekler. V0.8.1
 runtime öncesi empirical identification/output katmanında kalır. V0.8.2 aynı
 sonuçtan additive parametric law evidence ve explicit runtime adapter üretir.
+V0.8.3 bu iki authoritative sonucu değiştirmeden offline descriptive ve
+independent-cluster uncertainty evidence üretir.
 Her iki yol
 `theta_hat=P theta_hat_r` ile Physical DOF uzayına geri açılır; prescribed
 statik offset harmonic phasor'a eklenmez.
@@ -155,6 +172,15 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 
 ### Tamamlananlar
 
+- Complete independent DMA/TTS campaign'i sampling unit yapan repeatability
+  veri modeli; explicit independent/rerun/unspecified provenance ayrımı
+- Canonical physical-temperature ve pair-orientation matching ile farklı
+  original references için non-mutating common-reference normalization
+- Mean, `n-1` sample SD, SE, median, MAD, scaled MAD ve açık `n=1` availability
+- Aynı campaign draw planını bütün empirical/Arrhenius/WLF niceliklerinde
+  kullanan deterministic cluster bootstrap ve Type-7 percentile interval
+- Structural reference anchor, partial derived-result availability ve
+  requested/valid/unavailable bootstrap draw accounting
 - Fortran 2018, CMake, Ninja ve CTest tabanlı derleme/test altyapısı
 - SI birim dönüşümleri ile geometri ve dinamik elastomer veri türleri
 - Frekans ve sıcaklık çalışma noktalarında G' ve G'' saklama altyapısı
@@ -562,6 +588,20 @@ ve kalıcı karar
 [`docs/decisions/0015-parametric-shift-law-identification.md`](docs/decisions/0015-parametric-shift-law-identification.md)
 belgelerinde açıklanır. Uygulama/CI kaydı
 [`docs/development/V0.8.2_development_report.md`](docs/development/V0.8.2_development_report.md)
+altında tutulur.
+
+V0.8.3 campaign/statistics katman sınırı
+[`docs/architecture/V0.8.3_repeatability_uncertainty.md`](docs/architecture/V0.8.3_repeatability_uncertainty.md),
+sample/bootstrap matematiği
+[`docs/mathematics/tts_repeatability_bootstrap.md`](docs/mathematics/tts_repeatability_bootstrap.md),
+experimental semantics
+[`docs/materials/experimental_repeatability_and_uncertainty.md`](docs/materials/experimental_repeatability_and_uncertainty.md),
+synthetic doğrulama kapıları
+[`docs/validation/V0.8.3_repeatability_validation.md`](docs/validation/V0.8.3_repeatability_validation.md)
+ve kalıcı karar
+[`docs/decisions/0016-repeatability-and-cluster-bootstrap.md`](docs/decisions/0016-repeatability-and-cluster-bootstrap.md)
+belgelerinde açıklanır. Uygulama/CI kapanışı
+[`docs/development/V0.8.3_development_report.md`](docs/development/V0.8.3_development_report.md)
 altında tutulur.
 
 ## Lisans

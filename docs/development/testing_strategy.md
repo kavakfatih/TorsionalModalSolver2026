@@ -304,6 +304,40 @@ curvature/overlap statistical variance olarak kullanılmaz. Ayrıntılar
 [`../validation/V0.8.2_shift_law_validation.md`](../validation/V0.8.2_shift_law_validation.md)
 belgesindedir.
 
+V0.8.3 repeatability doğrulaması beş CTest ailesi ekler:
+
+- `tms26.tts_sample_statistics`: mean, `n-1` sample SD, SE, median, MAD,
+  scaled MAD, single/empty/nonfinite availability semantics,
+- `tms26.tts_bootstrap`: portable RNG sequence, seed reproducibility,
+  replacement draw, Type-7 quantile ve valid/unavailable draw accounting,
+- `tms26.tts_repeatability`: complete V0.8.1 campaign, physical-temperature
+  mapping, reference normalization, immutability ve incompatible-state yolları,
+- `tms26.tts_parametric_repeatability`: valid Arrhenius ile identifiable WLF
+  cohort statistics ve placeholder içermeyen partial availability,
+- `tms26.tts_repeatability_bootstrap`: independent campaign ile same-specimen
+  rerun population ayrımı ve deterministic interval reproducibility.
+
+Statistical sample unit complete independent campaign'dir. Frequency point,
+isotherm ve adjacent pair bağımsız replicate sayılmaz. Aynı specimen rerun'ı
+default descriptive evidence'a alınabilir, fakat independent bootstrap
+population'ına alınmaz. Same-specimen-only study bağımsız confidence interval
+üretemez.
+
+Tek cluster draw planı bütün adjacent shift, common-reference shift,
+Arrhenius ve WLF niceliklerinde paylaşılır. `A=[1,2,3]`, `B=10A` campaign
+fixture'ı her draw'da `mean(B)=10 mean(A)` koşulunu doğrular; böylece
+quantity-level ayrı resampling regresyonu yakalanır. Derived fit availability
+önceden population filtrelemez: whole-campaign draw'dan sonra usability
+uygulanır ve ikiden az usable değer kalan draw explicit unavailable olur.
+
+Common-reference noktasında normalization gereği mean/SD ve bootstrap interval
+sıfır olabilir. Test, bunu `is_reference_anchor=true` ve
+`uncertainty_informative=false` ile yapısal ankraj olarak doğrular; zero
+measurement uncertainty yorumu yapmaz. Bootstrap confidence interval da
+engineering acceptance tolerance değildir. Ayrıntılar
+[`../validation/V0.8.3_repeatability_validation.md`](../validation/V0.8.3_repeatability_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

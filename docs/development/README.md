@@ -15,6 +15,9 @@ Bu dizin, TMS26 build, test, CI ve katkı süreçlerini açıklar.
 - [`V0.8.2_development_report.md`](V0.8.2_development_report.md): parametric
   shift-law architecture, pair-space fit, WLF identifiability, LOTO, runtime
   export, regression ve CI kapanış kaydı
+- [`V0.8.3_development_report.md`](V0.8.3_development_report.md): repeatability
+  campaign modeli, sample statistics, deterministic cluster bootstrap,
+  validation/regression ve CI kapanış kaydı
 - [`../../engine/tests/README.md`](../../engine/tests/README.md): hesap motoru
   test kategorileri ve test ekleme kuralları
 - [`../../AGENTS.md`](../../AGENTS.md): depo genelindeki zorunlu geliştirme ve

@@ -30,6 +30,9 @@ katman sınırlarını açıklar.
 - [`V0.8.2_parametric_shift_law_identification.md`](V0.8.2_parametric_shift_law_identification.md):
   empirical/parametric ayrımı, pair-space Arrhenius/WLF fit, LOTO,
   identifiability ve explicit measured-domain runtime export
+- [`V0.8.3_repeatability_uncertainty.md`](V0.8.3_repeatability_uncertainty.md):
+  complete-campaign data/independence modeli, canonical temperature mapping,
+  common-reference normalization ve ortak cluster-bootstrap data flow'u
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

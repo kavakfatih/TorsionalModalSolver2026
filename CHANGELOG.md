@@ -7,6 +7,53 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.8.3] - 2026-08-29
+
+### Eklendi
+
+- Complete V0.8.1 campaign, explicit replicate basis ve laboratory/operator/
+  instrument/protocol/calibration/run provenance taşıyan repeatability modeli.
+- Mean, `n-1` sample SD, SE, median, MAD, scaled MAD, min/max ve
+  `|mean-median|` üreten reusable scalar statistics; `n=1` spread availability
+  ve signed shift için CV kullanılmaması.
+- Explicit seed'li, taşma güvenli Park–Miller RNG; common whole-campaign draw
+  planı ve Hyndman–Fan Type-7 percentile cohort-mean interval'ları.
+- Canonical physical-temperature/pair matching, pair orientation normalization
+  ve farklı original references için non-mutating common-reference dönüşümü.
+- Adjacent/absolute empirical shift ile valid Arrhenius ve identifiable WLF
+  cohort repeatability sonuçları; requested/valid/unavailable bootstrap draw
+  accounting.
+- Same-specimen rerun ile independent specimen campaign ayrımı ve structural
+  reference anchor için explicit uncertainty semantics.
+- Sample statistics, deterministic bootstrap, empirical repeatability,
+  parametric cohort ve pseudoreplication/bootstrap policy test aileleri.
+- V0.8.3 architecture, mathematics, material semantics, validation, ADR 0016
+  ve kalıcı development report belgeleri.
+
+### Değiştirildi
+
+- Proje sürümü `0.8.3` olarak güncellendi.
+- CTest kapsamı önceki 288 kayıt korunarak beş V0.8.3 ailesiyle 293 kayda
+  genişletildi.
+
+### Korundu
+
+- Complete independent campaign statistical sample unit'tir; frequency,
+  isotherm ve adjacent pair pseudoreplicate olarak sayılmaz.
+- V0.8.1 empirical shift/master sonuçları ile V0.8.2 fit semantics'i
+  authoritative ve immutable kalır.
+- Runtime materials, modal ve harmonic yolları V0.8.3 offline statistics
+  katmanına bağımlı değildir.
+
+### Sınırlamalar
+
+- Repeatability; reproducibility, accuracy, bias, TRS validity veya bonded TVD
+  product validation değildir.
+- Full covariance, Huber/weighted shifting, automatic outlier deletion,
+  BCa/Bayesian uncertainty ve product-level propagation yoktur.
+- Bootstrap confidence interval engineering acceptance tolerance değildir;
+  common-reference `[0,0]` sonucu yalnız structural anchor'dır.
+
 ## [0.8.2] - 2026-08-29
 
 ### Eklendi

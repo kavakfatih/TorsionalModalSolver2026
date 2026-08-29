@@ -46,6 +46,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`tts_shift_law_identification.md`](tts_shift_law_identification.md):
   adjacent-pair analytical Arrhenius, profiled-1D WLF, pole-safe C2 search,
   large-C2 identifiability, reference transformation ve LOTO denklemleri
+- [`tts_repeatability_bootstrap.md`](tts_repeatability_bootstrap.md): sample
+  mean/SD/SE, median/MAD, common-reference normalization, complete-campaign
+  bootstrap, deterministic RNG ve Type-7 percentile interval matematiği
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

@@ -46,6 +46,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0015-parametric-shift-law-identification.md`](0015-parametric-shift-law-identification.md):
   authoritative empirical model, adjacent-pair Arrhenius/WLF fit, WLF
   identifiability, LOTO ve explicit measured-domain export kararı
+- [`0016-repeatability-and-cluster-bootstrap.md`](0016-repeatability-and-cluster-bootstrap.md):
+  complete campaign sampling unit'i, independence semantics, canonical
+  matching, structural anchor ve ortak deterministic cluster-bootstrap kararı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

@@ -10,10 +10,15 @@ target_sources(
     src/core/tms_constants.f90
     src/core/tms_units.f90
     src/numerics/tms_scalar_minimizer.f90
+    src/numerics/tms_sample_statistics.f90
+    src/numerics/tms_deterministic_rng.f90
+    src/numerics/tms_bootstrap.f90
     src/identification/tms_tts_types.f90
     src/identification/tms_tts_shift_law_types.f90
     src/identification/tms_tts_shift_law_fit.f90
     src/identification/tms_tts_shift_law_validation.f90
+    src/identification/tms_tts_repeatability_types.f90
+    src/identification/tms_tts_repeatability_analysis.f90
     src/identification/tms_tts_pair_shift.f90
     src/identification/tms_tts_shift_chain.f90
     src/identification/tms_tts_master_curve.f90
@@ -980,4 +985,37 @@ if(BUILD_TESTING)
     )
     set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
   endforeach()
+
+  set(
+    tts_repeatability_test_support
+    tests/tms_tts_repeatability_test_support.f90
+  )
+  tms26_add_fortran_test(
+    tts_sample_statistics
+    tests/test_tts_sample_statistics.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_bootstrap
+    tests/test_tts_bootstrap.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_repeatability
+    tests/test_tts_repeatability.f90
+    ${tts_test_support}
+    ${tts_repeatability_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_parametric_repeatability
+    tests/test_tts_parametric_repeatability.f90
+    ${tts_test_support}
+    ${tts_repeatability_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_repeatability_bootstrap
+    tests/test_tts_repeatability_bootstrap.f90
+    ${tts_test_support}
+    ${tts_repeatability_test_support}
+  )
 endif()
