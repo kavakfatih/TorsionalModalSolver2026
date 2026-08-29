@@ -4,16 +4,32 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.8.0`, doğrulanmış reference master curve'ü
-tabulated `log10(a_T)`, WLF veya Arrhenius temperature-shift provider'ıyla
-bileştirir. Canonical koordinat dönüşümü `f_r=a_T(T)f` log-space'te
-doğrulanır; physical `f,T` ile reduced lookup `f_r,T_ref` trace içinde ayrı
-tutulur. Material-aware dynamic stiffness
+Güncel geliştirme sürümü `0.8.1`, measured dynamic-shear/DMA isotherm'lerini
+explicit reference etrafında quality-aware adjacent-pair shifting ile
+tanımlar; provenance-preserving experimental cloud, empirical `log10(a_T)`
+tablosu ve solver-ready stitched master table üretir. Bu outputs mevcut V0.8.0
+thermorheological provider'larına doğrudan aktarılır. Canonical koordinat
+dönüşümü `f_r=a_T(T)f` korunur; physical `f,T` ile reduced lookup `f_r,T_ref`
+trace içinde ayrı tutulur. Material-aware dynamic stiffness
 `Z_r(f)=K'_r(f)-omega^2 M_r+i(K''_r(f)+omega C_r)` biçimindedir. Dense LAPACK
 `ZSYSVX` mevcut complex-symmetric reference backend olarak yeniden kullanılır;
 V0.5 `DSYGV` modal ve V0.6 frozen harmonic yolları değişmeden korunur.
 
-## V0.8.0 thermorheological runtime kapsamı
+## V0.8.1 experimental master-curve identification kapsamı
+
+- `tms_scalar_minimizer`: generic bracketed Brent minimizer ve numerical trace
+- `tms_tts_types`: family/common state, isotherm, point quality ve result model
+- `tms_tts_pair_shift`: contiguous segments, exact log-space L2 objective,
+  coarse scan ve joint/storage-only relative shift
+- `tms_tts_shift_chain`: explicit reference'tan adjacent hot/cold absolute
+  empirical shift zinciri
+- `tms_tts_master_curve`: provenance experimental cloud ve deterministic
+  reference-centered runtime stitching
+- `tms_tts_diagnostics`: VGP, Cole-Cole ve boundary evidence
+- `tms_tts_identification`: failure-aware top-level orchestration
+- `tms_tts_runtime_export`: mevcut V0.8.0 provider nesnelerine direct export
+
+## V0.8.0 thermorheological runtime ve önceki çekirdek kapsamı
 
 - `tms_kinds`: taşınabilir çift hassasiyetli `dp` türü
 - `tms_constants`: pi ve temel mühendislik birim dönüşüm sabitleri
@@ -89,12 +105,13 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.8.0 aşamasındadır. Dinamik elastomer master curve'ü,
-temperature-shift provider'ları, bonded-annular dynamic element binding'i,
-generalized node-element topolojisi, constraint reduction, sönümsüz modal
-analiz ve complex harmonic response aynı çekirdekte kullanılabilir. K'' ile
-boyutsal olarak farklı viskoz `c` ayrı eleman alanları, global matrisler ve
-doğrulama kanalları olarak korunur.
+TMS26 şu anda V0.8.1 aşamasındadır. Measured isotherm validation, explicit
+quality gaps, exact pair-shift objective, empirical shift chain ve runtime
+master-table construction; temperature-shift provider'ları, bonded-annular
+dynamic element binding'i, generalized topology, constraint reduction,
+sönümsüz modal analiz ve complex harmonic response ile aynı çekirdekte fakat
+ayrı katmanlarda kullanılabilir. K'' ile boyutsal olarak farklı viskoz `c`
+ayrı eleman alanları, global matrisler ve doğrulama kanalları olarak korunur.
 
 Lineer elemanların lokal K', K'' ve C katkıları ile düğüm polar ataletleri önce
 constraint'ten bağımsız Full Equation ID uzayında birleştirilir. Constraint
@@ -103,8 +120,9 @@ V0.5 modal yolu `K_r phi=lambda M_r phi` denklemini çözmeye devam eder. V0.6
 frozen harmonic yolu her explicit pozitif frekansta `Z_r theta_hat=T_hat`
 denklemini doğrudan çözer. V0.7 material-aware yol aynı ZSYSVX backend'ini
 kullanır; yalnız bound elemanların `K'(f),K''(f)` katkılarını provider'dan
-günceller. V0.8 bu provider sınırını değiştirmeden, externally prescribed
-operating sıcaklıkta reduced-frequency master-curve lookup'u ekler. Her iki yol
+günceller. V0.8.0 bu provider sınırını değiştirmeden, externally prescribed
+operating sıcaklıkta reduced-frequency master-curve lookup'u ekler. V0.8.1
+runtime öncesi experimental identification/output katmanında kalır. Her iki yol
 `theta_hat=P theta_hat_r` ile Physical DOF uzayına geri açılır; prescribed
 statik offset harmonic phasor'a eklenmez.
 
@@ -216,6 +234,22 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 - Mevcut binding ve `analyze_material_aware_harmonic_response()` API'sini
   yeniden kullanan thermorheological 1-DOF, multiple-provider, passivity ve
   singular-trace analitik regresyonları
+- Authoritative family-level test state ve explicit channel quality modeli
+- Quality gap'leri aşmayan contiguous G'/G'' log-frequency segmentleri
+- Measured domain'den türetilen feasible shift aralığı ve exact
+  piecewise-linear normalized L2 residual integrali
+- Deterministic coarse scan ve yalnız gerçek interior bracket kullanan generic
+  safeguarded Brent minimizer
+- Joint G'/G'' shift, storage-only fallback, overlap, curvature ve
+  storage-loss discrepancy diagnostics
+- Explicit reference-anchored adjacent hot/cold shift chain ve empirical
+  `temperature, log10(a_T), a_T` tablosu
+- Bütün original points/provenance'ı koruyan experimental cloud ile ayrı,
+  strictly increasing reference-centered runtime table
+- Low/high/both-side/no-extension ve deterministic duplicate priority stitching
+- VGP ve Cole-Cole point clouds ile exact TRS/non-TRS/weak-identifiability
+  synthetic validation
+- V0.8.1 outputs'tan mevcut V0.8.0 thermorheological provider'a round-trip
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS LP64 LAPACK ve Windows LP64 OpenBLAS sağlayıcılarıyla GitHub Actions
   derleme/test iş akışları
@@ -225,8 +259,10 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 
 - Spline/PCHIP, curve fitting, Prony serisi ve nonlinear elastomer modeli
 - Sönümlü kompleks özdeğer problemi ve mode-superposition harmonic çözüm
-- Master-curve identification, empirical isotherm alignment, TRS quality
-  metrics, vertical shift, amplitude/prestrain interpolation ve self-heating
+- WLF/Arrhenius parameter fitting, uncertainty weighting, robust/Huber shift,
+  confidence interval, automatic reference selection ve global optimizer
+- Vertical shift, amplitude/prestrain interpolation, self-heating, smoothing,
+  spline/PCHIP ve Prony fitting
 - Sıfırdan farklı dynamic prescribed dönme için RHS correction ve reaction
   torque recovery
 - Sparse matris depolaması, CSR ve production iterative eigen solver
@@ -475,6 +511,20 @@ canonical convention kararı ise
 [`docs/decisions/0013-thermorheological-runtime-convention.md`](docs/decisions/0013-thermorheological-runtime-convention.md)
 belgelerinde açıklanır. Uygulama ve doğrulama özeti
 [`docs/development/V0.8.0_development_report.md`](docs/development/V0.8.0_development_report.md)
+altında tutulur.
+
+V0.8.1 identification/runtime ayrımı ve data flow
+[`docs/architecture/V0.8.1_master_curve_identification.md`](docs/architecture/V0.8.1_master_curve_identification.md),
+experimental quality/provenance modeli
+[`docs/materials/tts_experimental_data_model.md`](docs/materials/tts_experimental_data_model.md),
+exact L2 pair-shift matematiği
+[`docs/mathematics/tts_shift_identification.md`](docs/mathematics/tts_shift_identification.md),
+synthetic doğrulama kapıları
+[`docs/validation/V0.8.1_tts_validation.md`](docs/validation/V0.8.1_tts_validation.md),
+kalıcı kararlar ise
+[`docs/decisions/0014-experimental-master-curve-identification.md`](docs/decisions/0014-experimental-master-curve-identification.md)
+belgelerinde açıklanır. Uygulama özeti
+[`docs/development/V0.8.1_development_report.md`](docs/development/V0.8.1_development_report.md)
 altında tutulur.
 
 ## Lisans

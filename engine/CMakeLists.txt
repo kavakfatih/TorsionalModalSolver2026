@@ -9,6 +9,12 @@ target_sources(
     src/core/tms_kinds.f90
     src/core/tms_constants.f90
     src/core/tms_units.f90
+    src/numerics/tms_scalar_minimizer.f90
+    src/identification/tms_tts_types.f90
+    src/identification/tms_tts_pair_shift.f90
+    src/identification/tms_tts_shift_chain.f90
+    src/identification/tms_tts_master_curve.f90
+    src/identification/tms_tts_diagnostics.f90
     src/system/tms_dof_types.f90
     src/matrix/tms_matrix_types.f90
     src/matrix/tms_local_matrix.f90
@@ -24,6 +30,8 @@ target_sources(
     src/materials/tms_wlf_temperature_shift.f90
     src/materials/tms_arrhenius_temperature_shift.f90
     src/materials/tms_thermorheological_dynamic_modulus_provider.f90
+    src/identification/tms_tts_identification.f90
+    src/identification/tms_tts_runtime_export.f90
     src/materials/tms_material.f90
     src/solver/tms_inertia.f90
     src/solver/tms_torsional_stiffness.f90
@@ -90,7 +98,7 @@ if(BUILD_TESTING)
   function(tms26_add_fortran_test test_name source_file)
     set(test_target "tms26_test_${test_name}")
 
-    add_executable("${test_target}" "${source_file}")
+    add_executable("${test_target}" "${source_file}" ${ARGN})
     target_link_libraries("${test_target}" PRIVATE tms26_engine)
 
     set_target_properties(
@@ -99,6 +107,8 @@ if(BUILD_TESTING)
         Fortran_STANDARD 2018
         Fortran_STANDARD_REQUIRED YES
         Fortran_EXTENSIONS NO
+        Fortran_MODULE_DIRECTORY
+          "${CMAKE_CURRENT_BINARY_DIR}/test-modules/${test_target}"
     )
 
     add_test(NAME "tms26.${test_name}" COMMAND "${test_target}")
@@ -881,4 +891,46 @@ if(BUILD_TESTING)
     )
     set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
   endforeach()
+
+  set(tts_test_support tests/tms_tts_test_support.f90)
+  tms26_add_fortran_test(
+    tts_data_model
+    tests/test_tts_data_model.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_scalar_minimizer
+    tests/test_tts_scalar_minimizer.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_pair_shift
+    tests/test_tts_pair_shift.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_shift_chain
+    tests/test_tts_shift_chain.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_master_curve
+    tests/test_tts_master_curve.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_diagnostics
+    tests/test_tts_diagnostics.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_identification
+    tests/test_tts_identification.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_runtime_roundtrip
+    tests/test_tts_runtime_roundtrip.f90
+    ${tts_test_support}
+  )
 endif()

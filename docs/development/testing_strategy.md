@@ -255,6 +255,28 @@ doğrular. Ayrıntılar
 [`../validation/thermorheological_runtime_validation.md`](../validation/thermorheological_runtime_validation.md)
 belgesindedir.
 
+V0.8.1 experimental identification doğrulaması sekiz ayrı CTest ailesiyle
+aşağıdaki kapıları ekler:
+
+- family-level authoritative common state ve explicit point quality,
+- quality gap üzerinden interpolation yapılmayan contiguous channel segments,
+- measured-domain feasible shift ve exact piecewise-linear L2 integral,
+- deterministic coarse scan ve yalnız valid interior bracket ile Brent,
+- joint G'/G'' shift, storage-only fallback, overlap ve curvature evidence,
+- explicit reference zero shift, colder/hotter adjacent chain ve broken-chain,
+- provenance-preserving master cloud ile low/high/both/no-extension stitching,
+- VGP/Cole-Cole analytical points, exact TRS, deterministic non-TRS ve weak
+  identifiability,
+- existing V0.8.0 provider nesneleri üzerinden runtime round-trip.
+
+Exact synthetic shift toleransı `1.5e-6` boyutsuz düzeydedir ve
+`8*sqrt(epsilon(dp))` numerical stopping ölçeğini kapsar; measurement
+uncertainty değildir. Exact integral/identity testleri `1e-12`–`1e-14`
+ölçeğindedir. Universal TRS acceptance threshold kullanılmaz. Bütün yeni
+testler `-fcheck=all` build'inde de çalıştırılır. Ayrıntılar
+[`../validation/V0.8.1_tts_validation.md`](../validation/V0.8.1_tts_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

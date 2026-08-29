@@ -24,6 +24,9 @@ katman sınırlarını açıklar.
   tabulated/WLF/Arrhenius shift provider sınırı, validated master-curve
   bileşimi, physical/reduced coordinate semantics, trace evolution ve mevcut
   V0.7 harmonic API reuse
+- [`V0.8.1_master_curve_identification.md`](V0.8.1_master_curve_identification.md):
+  experimental/runtime boundary, adjacent-pair identification, master cloud,
+  deterministic stitching, result/status modeli ve V0.8.0 provider export
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

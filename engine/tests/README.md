@@ -248,6 +248,27 @@ Ayrıntılar
 [`../../docs/validation/thermorheological_runtime_validation.md`](../../docs/validation/thermorheological_runtime_validation.md)
 belgesindedir.
 
+V0.8.1 test grubu `tts_data_model`, `tts_scalar_minimizer`, `tts_pair_shift`,
+`tts_shift_chain`, `tts_master_curve`, `tts_diagnostics`, `tts_identification`
+ve `tts_runtime_roundtrip` CTest ailelerinden oluşur. Ortak synthetic helper
+yalnız test target'larına derlenir; production material modeli değildir.
+
+Pair testleri fixed grid sampling yerine exact linear residual integralini,
+irregular frequency spacing ve farklı point density altında doğrular. Loss
+quality gap ayrı segmentlere bölünür; `VALID,G''=0` runtime için korunurken
+log-objective'e alınmaz. G'' support yoksa storage-only, iki channel varsa
+joint shift ve ayrı diagnostic shifts kontrol edilir. No-support ve
+no-interior-minimum clean status ile döner.
+
+Shift-chain ve master testleri explicit reference, hot/cold cumulative shifts,
+broken chain, provenance, low/high/both/no extension, duplicate priority,
+strict ordering ve boundary diagnostics kapsamındadır. Top-level test exact
+TRS ile deterministic non-TRS residual/discrepancy ayrımını ve plateau
+curvature evidence'ını sınar. Round-trip testi V0.8.1 output'larını mevcut
+V0.8.0 providers ile physical `(f,T)` sorgusuna taşır. Ayrıntılar
+[`../../docs/validation/V0.8.1_tts_validation.md`](../../docs/validation/V0.8.1_tts_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman
@@ -263,6 +284,11 @@ ilgili testler aynı commit içinde güncellenir.
 sistemin analitik frekansları ile hub-normalized mod şekillerini, V0.2.3 genel
 topoloji eşlemesini ve V0.5 DSYGV mass-normalized/sign-arbitrary modal sonucunun
 aynı fiziksel eigenspace'i verdiğini tanımlar.
+
+`benchmarks/005_tts_identification/`, exact horizontal-collapse ve farklı
+storage/loss shifts taşıyan deterministic non-TRS family'leri tanımlar.
+Pair/chain, experimental cloud, TRS evidence, stitching ve V0.8.0 provider
+round-trip testleri aynı known-truth girdileri kullanır.
 
 ## Test ekleme
 

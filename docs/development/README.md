@@ -9,6 +9,9 @@ Bu dizin, TMS26 build, test, CI ve katkı süreçlerini açıklar.
 - [`V0.8.0_development_report.md`](V0.8.0_development_report.md):
   thermorheological runtime architecture, teknik kararlar, validation/CI
   kapıları, sınırlamalar ve V0.8.1 hazırlık durumu
+- [`V0.8.1_development_report.md`](V0.8.1_development_report.md): experimental
+  master-curve identification architecture, pair mathematics, validation,
+  regression, CI kapıları, sınırlamalar ve V0.8.2 hazırlığı
 - [`../../engine/tests/README.md`](../../engine/tests/README.md): hesap motoru
   test kategorileri ve test ekleme kuralları
 - [`../../AGENTS.md`](../../AGENTS.md): depo genelindeki zorunlu geliştirme ve

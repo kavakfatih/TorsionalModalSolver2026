@@ -12,6 +12,9 @@ sınırlarını açıklar.
 - [`thermorheological_dynamic_elastomer.md`](thermorheological_dynamic_elastomer.md):
   validated reference master curve, temperature shift, physical/reduced
   material-state ayrımı, horizontal-only TTS ve V0.8.1 TRS sınırı
+- [`tts_experimental_data_model.md`](tts_experimental_data_model.md):
+  family-level common state, isotherm/specimen provenance, explicit point
+  quality, contiguous segment ve zero-loss semantics
 
 Malzeme dosyası içe aktarma, vendor formatı yorumlama ve birim tahmini core
 material modelinin parçası değildir. Core API frekansı Hz, modülleri Pa ve

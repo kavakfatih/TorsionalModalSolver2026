@@ -40,6 +40,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
   TMS26 canonical `a_T=tau(T)/tau(T_ref)` convention'ı, WLF, Arrhenius,
   tabulated `log10(a_T)` interpolation, log-space reduced-frequency hesabı ve
   dual-domain/no-extrapolation kuralları
+- [`tts_shift_identification.md`](tts_shift_identification.md): measured-domain
+  feasible shift, contiguous log segments, exact piecewise-linear L2 objective,
+  coarse scan, interior Brent bracket, curvature ve shift-chain matematiği
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

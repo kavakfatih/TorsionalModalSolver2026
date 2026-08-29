@@ -7,6 +7,56 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.8.1] - 2026-08-29
+
+### Eklendi
+
+- Family-level authoritative test state, measured isotherm, point quality ve
+  provenance taşıyan ayrı experimental TTS data model.
+- TTS logic'ten bağımsız safeguarded generic Brent scalar minimizer; numerical
+  tolerance, bracket, iteration ve function-evaluation diagnostics.
+- Contiguous quality-valid log-frequency segmentleri, measured-domain feasible
+  shift intervali ve exact piecewise-linear normalized L2 pair objective.
+- Default 65 noktalı deterministic coarse scan, yalnız gerçek interior
+  three-point bracket ile Brent ve explicit joint/storage-only shift sonuçları.
+- Explicit measured reference'tan colder/hotter yönlere adjacent shift chain,
+  empirical `temperature, log10(a_T), a_T` tablosu ve broken-chain status'u.
+- Original measurements'ı koruyan experimental master cloud; deterministic
+  reference-centered low/high/both-side runtime stitching ve boundary tanıları.
+- Temperature/source provenance taşıyan Van Gurp-Palmen ve Cole-Cole point
+  cloud diagnostics.
+- V0.8.1 output'larını mevcut V0.8.0 tabulated modulus, tabulated shift ve
+  thermorheological provider nesnelerine dönüştüren runtime export adapter'ı.
+- Exact TRS, deterministic non-TRS, weak identifiability, quality gap, zero
+  loss, storage-only, no-support/no-interior, stitching ve runtime round-trip
+  senaryolarını kapsayan sekiz yeni CTest ailesi.
+- V0.8.1 architecture, experimental material model, identification matematiği,
+  validation, ADR 0014 ve kalıcı development report belgeleri.
+
+### Değiştirildi
+
+- Proje sürümü `0.8.1` olarak güncellendi.
+- V0.8.0 development report, commit `e1d09fa` için gerçek macOS ve Windows
+  GitHub Actions SUCCESS kayıtlarıyla kapatıldı.
+- Test hedefleri, ortak test modüllerini güvenli biçimde derleyebilmek için
+  target-specific Fortran module output dizinleri kullanacak şekilde geliştirildi.
+
+### Korundu
+
+- Canonical `a_T=tau(T)/tau(T_ref)`, `s=log10(a_T)`, `f_r=a_Tf` convention'ı.
+- Existing dynamic-modulus/temperature-shift provider API'leri, dynamic
+  torsional binding ve material-aware harmonic solver akışı.
+- V0.1–V0.8.0 fizik, modal, harmonic ve runtime regresyonları.
+
+### Sınırlamalar
+
+- WLF/Arrhenius fitting, uncertainty weighting, robust/Huber objective,
+  confidence interval, bootstrap ve global multi-isotherm optimizer yoktur.
+- Automatic reference selection, vertical shift, smoothing/spline, Prony,
+  self-heating ve amplitude/prestrain interpolation yoktur.
+- Universal TRS acceptance threshold üretilmez; success yalnız mathematical
+  identification sonucunu belirtir.
+
 ## [0.8.0] - 2026-08-28
 
 ### Eklendi

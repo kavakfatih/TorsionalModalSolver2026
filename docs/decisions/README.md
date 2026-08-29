@@ -39,6 +39,10 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
   canonical `a_T=tau(T)/tau(T_ref)` ve `f_r=a_Tf` convention'ı, primary
   `log10(a_T)`, tabulated/WLF/Arrhenius shift provider'ları, horizontal-only
   master-curve runtime ve mevcut harmonic API reuse kararı
+- [`0014-experimental-master-curve-identification.md`](0014-experimental-master-curve-identification.md):
+  identification/runtime ayrımı, explicit reference, adjacent-pair exact L2,
+  safe Brent, authoritative master cloud, deterministic stitching ve TRS
+  point-cloud evidence kararı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

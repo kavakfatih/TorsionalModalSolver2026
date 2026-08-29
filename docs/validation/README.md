@@ -22,6 +22,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
   V0.8 tabulated/WLF/Arrhenius shift physics, log-space reduced frequency,
   dual-domain material evaluation, mevcut harmonic API entegrasyonu, trace ve
   V0.1–V0.7 regression kapıları
+- [`V0.8.1_tts_validation.md`](V0.8.1_tts_validation.md): experimental quality,
+  Brent safety, exact/non-TRS/weak synthetic evidence, stitching matrix,
+  provenance ve V0.8.0 provider round-trip kapıları
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.
