@@ -78,11 +78,13 @@ ve eşdeğer decimal-log biçimi:
 
 | Büyüklük | Anlam | Birim / kısıt |
 |---|---|---|
-| `E_a` | activation energy | J/mol, `E_a>0` |
+| `E_a` | shift-law energy parameter; V0.8.2 fit sonucunda `E_a,app` apparent activation energy | J/mol, `E_a>0` |
 | `R` | universal gas constant | J/(mol K), `R>0` |
 | `T`, `T_ref` | mutlak sıcaklık | K, pozitif ve sonlu |
 
 Arrhenius provider da explicit `T_min,T_max` validated domain taşır.
+V0.8.2 pair-space identification'ından gelen değer `E_a,app` olarak
+yorumlanır; chemical aging veya cure-reaction activation energy'si değildir.
 Denklemin domain dışında sonlu bir sayı vermesi extrapolation izni değildir.
 `T=T_ref` için identity, positive `E_a` ile sıcaklık yönü analitik olarak
 doğrulanır.

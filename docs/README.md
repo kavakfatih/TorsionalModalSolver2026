@@ -69,6 +69,21 @@ süreçlerini ve kalıcı kararlarını içerir.
 - [`development/V0.8.0_development_report.md`](development/V0.8.0_development_report.md):
   kalıcı architecture/technical/validation/CI geliştirme raporu
 
+## V0.8.1–V0.8.2 identification belgeleri
+
+- [`architecture/V0.8.1_master_curve_identification.md`](architecture/V0.8.1_master_curve_identification.md):
+  measured isotherm pair identification ve authoritative empirical outputs
+- [`architecture/V0.8.2_parametric_shift_law_identification.md`](architecture/V0.8.2_parametric_shift_law_identification.md):
+  pair-space Arrhenius/WLF approximation ve explicit runtime export
+- [`mathematics/tts_shift_law_identification.md`](mathematics/tts_shift_law_identification.md):
+  analytical Arrhenius, profiled WLF, identifiability ve LOTO matematiği
+- [`materials/parametric_temperature_shift_laws.md`](materials/parametric_temperature_shift_laws.md):
+  real-rubber applicability ve measured material-state sınırı
+- [`validation/V0.8.2_shift_law_validation.md`](validation/V0.8.2_shift_law_validation.md):
+  synthetic recovery, invariance, negative ve runtime doğrulama kapıları
+- [`development/V0.8.2_development_report.md`](development/V0.8.2_development_report.md):
+  V0.8.2 implementation, regression ve CI kapanış kaydı
+
 Kod ile belgenin tutarlılığı aynı değişiklik içinde korunmalıdır. Fiziksel veya
 matematiksel bir hesap değiştirildiğinde ilgili matematik ve fizik belgesi,
 testler ve gerekiyorsa benchmark sonuçları birlikte güncellenir.

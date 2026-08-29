@@ -4,16 +4,31 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.8.1`, measured dynamic-shear/DMA isotherm'lerini
-explicit reference etrafında quality-aware adjacent-pair shifting ile
-tanımlar; provenance-preserving experimental cloud, empirical `log10(a_T)`
-tablosu ve solver-ready stitched master table üretir. Bu outputs mevcut V0.8.0
-thermorheological provider'larına doğrudan aktarılır. Canonical koordinat
-dönüşümü `f_r=a_T(T)f` korunur; physical `f,T` ile reduced lookup `f_r,T_ref`
-trace içinde ayrı tutulur. Material-aware dynamic stiffness
+Güncel geliştirme sürümü `0.8.2`, V0.8.1'in authoritative empirical
+`log10(a_T)` ve master-curve sonuçlarını değiştirmeden adjacent pair `delta_s`
+gözlemlerine Arrhenius ve WLF parametric approximations uygular. Arrhenius
+`Ea_app` analytical least-squares ile, WLF ise analytical C1 profiling ve
+tek-boyutlu C2 Brent aramasıyla tanımlanır. Empirical tabulated runtime yolu
+korunur; parametric runtime export ancak explicit model seçimiyle ve measured
+temperature domain içinde açılır. Canonical koordinat dönüşümü
+`f_r=a_T(T)f` korunur; physical `f,T` ile reduced lookup `f_r,T_ref` trace
+içinde ayrı tutulur. Material-aware dynamic stiffness
 `Z_r(f)=K'_r(f)-omega^2 M_r+i(K''_r(f)+omega C_r)` biçimindedir. Dense LAPACK
 `ZSYSVX` mevcut complex-symmetric reference backend olarak yeniden kullanılır;
 V0.5 `DSYGV` modal ve V0.6 frozen harmonic yolları değişmeden korunur.
+
+## V0.8.2 parametric temperature shift-law identification kapsamı
+
+- `tms_tts_shift_law_types`: adjacent pair observation, fit availability,
+  residual, LOTO ve parameter-identifiability sonuç sözleşmeleri
+- `tms_tts_shift_law_fit`: equal-weight analytical Arrhenius `Ea_app` ve
+  profiled-1D WLF `C1/C2` tanımlama yordamları
+- `tms_tts_shift_law_validation`: V0.8.1 pair results extraction ve
+  Leave-One-Temperature-Out predictive diagnostics
+- `tms_tts_parametric_runtime_export`: mevcut V0.8.0 Arrhenius/WLF ve
+  thermorheological provider'larını kullanan explicit measured-domain adapter
+- Automatic best-model seçimi yoktur; empirical shift table authoritative
+  reference model olarak kalır.
 
 ## V0.8.1 experimental master-curve identification kapsamı
 
@@ -105,9 +120,10 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.8.1 aşamasındadır. Measured isotherm validation, explicit
-quality gaps, exact pair-shift objective, empirical shift chain ve runtime
-master-table construction; temperature-shift provider'ları, bonded-annular
+TMS26 şu anda V0.8.2 aşamasındadır. Measured isotherm validation, explicit
+quality gaps, exact pair-shift objective, empirical shift chain, runtime
+master-table construction ve adjacent-pair parametric shift-law evidence;
+temperature-shift provider'ları, bonded-annular
 dynamic element binding'i, generalized topology, constraint reduction,
 sönümsüz modal analiz ve complex harmonic response ile aynı çekirdekte fakat
 ayrı katmanlarda kullanılabilir. K'' ile boyutsal olarak farklı viskoz `c`
@@ -122,7 +138,9 @@ denklemini doğrudan çözer. V0.7 material-aware yol aynı ZSYSVX backend'ini
 kullanır; yalnız bound elemanların `K'(f),K''(f)` katkılarını provider'dan
 günceller. V0.8.0 bu provider sınırını değiştirmeden, externally prescribed
 operating sıcaklıkta reduced-frequency master-curve lookup'u ekler. V0.8.1
-runtime öncesi experimental identification/output katmanında kalır. Her iki yol
+runtime öncesi empirical identification/output katmanında kalır. V0.8.2 aynı
+sonuçtan additive parametric law evidence ve explicit runtime adapter üretir.
+Her iki yol
 `theta_hat=P theta_hat_r` ile Physical DOF uzayına geri açılır; prescribed
 statik offset harmonic phasor'a eklenmez.
 
@@ -250,6 +268,11 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 - VGP ve Cole-Cole point clouds ile exact TRS/non-TRS/weak-identifiability
   synthetic validation
 - V0.8.1 outputs'tan mevcut V0.8.0 thermorheological provider'a round-trip
+- Adjacent pair `delta_s` gözlemlerinden analytical Arrhenius `Ea_app` ve
+  profiled-1D WLF C1/C2 tanımlaması
+- WLF large-C2 identifiability, reference invariance, pair residual ve LOTO
+  predictive diagnostics
+- Explicit measured-domain Arrhenius/WLF runtime export adapter'ları
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS LP64 LAPACK ve Windows LP64 OpenBLAS sağlayıcılarıyla GitHub Actions
   derleme/test iş akışları
@@ -259,8 +282,10 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 
 - Spline/PCHIP, curve fitting, Prony serisi ve nonlinear elastomer modeli
 - Sönümlü kompleks özdeğer problemi ve mode-superposition harmonic çözüm
-- WLF/Arrhenius parameter fitting, uncertainty weighting, robust/Huber shift,
-  confidence interval, automatic reference selection ve global optimizer
+- Pair covariance/uncertainty weighting, robust/Huber shift, confidence
+  interval, automatic reference selection ve global optimizer
+- Automatic WLF/Arrhenius model winner ve measured temperature domain dışına
+  extrapolation
 - Vertical shift, amplitude/prestrain interpolation, self-heating, smoothing,
   spline/PCHIP ve Prony fitting
 - Sıfırdan farklı dynamic prescribed dönme için RHS correction ve reaction
@@ -525,6 +550,18 @@ kalıcı kararlar ise
 [`docs/decisions/0014-experimental-master-curve-identification.md`](docs/decisions/0014-experimental-master-curve-identification.md)
 belgelerinde açıklanır. Uygulama özeti
 [`docs/development/V0.8.1_development_report.md`](docs/development/V0.8.1_development_report.md)
+altında tutulur.
+
+V0.8.2 empirical/parametric ayrımı, pair-space fitting ve export akışı
+[`docs/architecture/V0.8.2_parametric_shift_law_identification.md`](docs/architecture/V0.8.2_parametric_shift_law_identification.md),
+material applicability sınırları
+[`docs/materials/parametric_temperature_shift_laws.md`](docs/materials/parametric_temperature_shift_laws.md),
+synthetic doğrulama kapıları
+[`docs/validation/V0.8.2_shift_law_validation.md`](docs/validation/V0.8.2_shift_law_validation.md)
+ve kalıcı karar
+[`docs/decisions/0015-parametric-shift-law-identification.md`](docs/decisions/0015-parametric-shift-law-identification.md)
+belgelerinde açıklanır. Uygulama/CI kaydı
+[`docs/development/V0.8.2_development_report.md`](docs/development/V0.8.2_development_report.md)
 altında tutulur.
 
 ## Lisans

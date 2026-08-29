@@ -27,6 +27,9 @@ katman sınırlarını açıklar.
 - [`V0.8.1_master_curve_identification.md`](V0.8.1_master_curve_identification.md):
   experimental/runtime boundary, adjacent-pair identification, master cloud,
   deterministic stitching, result/status modeli ve V0.8.0 provider export
+- [`V0.8.2_parametric_shift_law_identification.md`](V0.8.2_parametric_shift_law_identification.md):
+  empirical/parametric ayrımı, pair-space Arrhenius/WLF fit, LOTO,
+  identifiability ve explicit measured-domain runtime export
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

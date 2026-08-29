@@ -15,6 +15,9 @@ sınırlarını açıklar.
 - [`tts_experimental_data_model.md`](tts_experimental_data_model.md):
   family-level common state, isotherm/specimen provenance, explicit point
   quality, contiguous segment ve zero-loss semantics
+- [`parametric_temperature_shift_laws.md`](parametric_temperature_shift_laws.md):
+  empirical/parametric ayrımı, `Ea_app`, WLF identifiability, material-state
+  applicability ve measured-domain runtime sınırı
 
 Malzeme dosyası içe aktarma, vendor formatı yorumlama ve birim tahmini core
 material modelinin parçası değildir. Core API frekansı Hz, modülleri Pa ve

@@ -43,6 +43,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
   identification/runtime ayrımı, explicit reference, adjacent-pair exact L2,
   safe Brent, authoritative master cloud, deterministic stitching ve TRS
   point-cloud evidence kararı
+- [`0015-parametric-shift-law-identification.md`](0015-parametric-shift-law-identification.md):
+  authoritative empirical model, adjacent-pair Arrhenius/WLF fit, WLF
+  identifiability, LOTO ve explicit measured-domain export kararı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

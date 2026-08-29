@@ -11,6 +11,9 @@ target_sources(
     src/core/tms_units.f90
     src/numerics/tms_scalar_minimizer.f90
     src/identification/tms_tts_types.f90
+    src/identification/tms_tts_shift_law_types.f90
+    src/identification/tms_tts_shift_law_fit.f90
+    src/identification/tms_tts_shift_law_validation.f90
     src/identification/tms_tts_pair_shift.f90
     src/identification/tms_tts_shift_chain.f90
     src/identification/tms_tts_master_curve.f90
@@ -32,6 +35,7 @@ target_sources(
     src/materials/tms_thermorheological_dynamic_modulus_provider.f90
     src/identification/tms_tts_identification.f90
     src/identification/tms_tts_runtime_export.f90
+    src/identification/tms_tts_parametric_runtime_export.f90
     src/materials/tms_material.f90
     src/solver/tms_inertia.f90
     src/solver/tms_torsional_stiffness.f90
@@ -938,4 +942,42 @@ if(BUILD_TESTING)
     tests/test_tts_runtime_roundtrip.f90
     ${tts_test_support}
   )
+  tms26_add_fortran_test(
+    tts_arrhenius_fit
+    tests/test_tts_arrhenius_fit.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_wlf_fit
+    tests/test_tts_wlf_fit.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_shift_law_validation
+    tests/test_tts_shift_law_validation.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
+    tts_parametric_runtime_roundtrip
+    tests/test_tts_parametric_runtime_roundtrip.f90
+    ${tts_test_support}
+  )
+  foreach(
+    validation_case
+    IN ITEMS
+      arrhenius_outside_domain
+      wlf_outside_domain
+  )
+    set(
+      validation_test
+      "tms26.tts_parametric_runtime_roundtrip.rejects_${validation_case}"
+    )
+    add_test(
+      NAME "${validation_test}"
+      COMMAND
+        "$<TARGET_FILE:tms26_test_tts_parametric_runtime_roundtrip>"
+        "${validation_case}"
+    )
+    set_tests_properties("${validation_test}" PROPERTIES WILL_FAIL TRUE)
+  endforeach()
 endif()

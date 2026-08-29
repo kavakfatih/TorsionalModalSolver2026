@@ -25,6 +25,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`V0.8.1_tts_validation.md`](V0.8.1_tts_validation.md): experimental quality,
   Brent safety, exact/non-TRS/weak synthetic evidence, stitching matrix,
   provenance ve V0.8.0 provider round-trip kapıları
+- [`V0.8.2_shift_law_validation.md`](V0.8.2_shift_law_validation.md): adjacent
+  pair Arrhenius/WLF recovery, reference invariance, large-C2 identifiability,
+  LOTO, immutable empirical result ve parametric runtime round-trip kapıları
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

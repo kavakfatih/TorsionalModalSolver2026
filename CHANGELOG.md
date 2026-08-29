@@ -7,6 +7,53 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.8.2] - 2026-08-29
+
+### Eklendi
+
+- V0.8.1 adjacent pair `delta_s` sonuçlarını cumulative absolute shift'lerden
+  bağımsız equal-weight observations olarak taşıyan shift-law data modeli.
+- `Ea_app=R*ln(10)*beta` kullanan analytical Arrhenius pair-space
+  least-squares fit, residual metrics ve reference-invariance doğrulaması.
+- Fixed C2 için analytical C1 profiling, adaptive pole-safe bracket ve mevcut
+  Brent minimizer ile tek-boyutlu WLF C2 tanımlaması.
+- WLF `p=C1/C2`, `q=1/C2`, explicit large-C2 poor-identifiability durumu ve
+  fit/residual/predictive/parameter availability ayrımı.
+- En az beş measured temperature için Leave-One-Temperature-Out predictive
+  diagnostics ve held-out pair residual kayıtları.
+- Mevcut V0.8.0 Arrhenius/WLF/thermorheological provider'larını kullanan,
+  measured calibrated domain dışına extrapolation yapmayan explicit runtime
+  export adapter'ları.
+- Analytical Arrhenius/WLF recovery, iki reference reparameterization,
+  large-C2 degeneracy, negative input, LOTO, empirical immutability ve
+  parametric runtime round-trip test aileleri.
+- V0.8.2 architecture, material semantics, validation, ADR 0015 ve kalıcı
+  development report belgeleri.
+
+### Değiştirildi
+
+- Proje sürümü `0.8.2` olarak güncellendi.
+- TTS CTest kapsamı, önceki dokuz aile korunarak dört normal V0.8.2 aile ve
+  iki measured-domain rejection kaydıyla genişletildi.
+
+### Korundu
+
+- Empirical shift table, master cloud ve stitched runtime table authoritative
+  V0.8.1 sonuçlarıdır; parametric fit bunları mutate veya overwrite etmez.
+- Canonical `s=log10(a_T)`, `f_r=a_Tf` convention'ı ve mevcut empirical
+  tabulated runtime export yolu değişmez.
+- Modal, harmonic, dynamic material ve thermorheological runtime API'leri
+  geriye uyumlu kalır; automatic best-model seçimi yapılmaz.
+
+### Sınırlamalar
+
+- Uncertainty/covariance weighting, confidence interval, bootstrap, robust
+  objective ve global multi-isotherm optimizer yoktur.
+- WLF/Arrhenius fit yalnız measured calibrated temperature domain'inde
+  kullanılabilir; temperature extrapolation ve automatic law winner yoktur.
+- Vertical shift, amplitude/prestrain normalization, smoothing, Prony fitting,
+  self-heating ve product-level TVD correlation kapsam dışıdır.
+
 ## [0.8.1] - 2026-08-29
 
 ### Eklendi

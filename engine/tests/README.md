@@ -274,6 +274,21 @@ off-reference physical `(f,T)` sorgusuna taşır. Ayrıntılar
 [`../../docs/validation/V0.8.1_tts_validation.md`](../../docs/validation/V0.8.1_tts_validation.md)
 belgesindedir.
 
+V0.8.2 test grubu `tts_arrhenius_fit`, `tts_wlf_fit`,
+`tts_shift_law_validation` ve `tts_parametric_runtime_roundtrip` ailelerini
+ekler. Arrhenius testi analytical adjacent-pair `Ea_app` ve reference
+invariance'ı; WLF testi profiled C1/C2, reference transformation,
+pole-boundary/no-interior ve large-C2 poor-identifiability durumlarını sınar.
+
+Validation testi fit input'unun cumulative empirical table değil V0.8.1
+adjacent pair `delta_s` sonuçları olduğunu, input result'un mutate edilmediğini
+ve beş-temperature LOTO fold'larını doğrular. Runtime round-trip testi mevcut
+V0.8.0 Arrhenius/WLF/thermorheological provider nesnelerini kullanır; iki ayrı
+expected-failure CTest measured temperature domain dışındaki extrapolation'ı
+reddeder. Ayrıntılar
+[`../../docs/validation/V0.8.2_shift_law_validation.md`](../../docs/validation/V0.8.2_shift_law_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

@@ -281,6 +281,29 @@ testler `-fcheck=all` build'inde de çalıştırılır. Ayrıntılar
 [`../validation/V0.8.1_tts_validation.md`](../validation/V0.8.1_tts_validation.md)
 belgesindedir.
 
+V0.8.2 parametric shift-law doğrulaması dört normal test ailesi ve iki
+expected-failure runtime-domain kaydı ekler:
+
+- analytical Arrhenius beta/Ea_app recovery ve iki measured reference altında
+  apparent activation-energy invariance,
+- profiled WLF C1/C2 recovery, exact reference reparameterization ve physical
+  relative-prediction invariance,
+- large-C2 linear-limit fixture'ında düşük residual ile parameter
+  identifiability'nin ayrılması,
+- pole-boundary/no-interior, insufficient, duplicate ve nonfinite input
+  status yolları,
+- V0.8.1 pair results extraction, cumulative empirical shifts'in fit
+  observation olmadığının ve input result'un immutable kaldığının kontrolü,
+- en az beş temperature'da Leave-One-Temperature-Out predictive diagnostics,
+- existing V0.8.0 Arrhenius/WLF providers ile measured-domain parametric
+  runtime round-trip ve domain dışı sorgu rejection.
+
+Arrhenius/WLF exact recovery toleransları numerical stopping scale'ine göre
+ayarlanır; universal rubber acceptance threshold'u değildir. Pair
+curvature/overlap statistical variance olarak kullanılmaz. Ayrıntılar
+[`../validation/V0.8.2_shift_law_validation.md`](../validation/V0.8.2_shift_law_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

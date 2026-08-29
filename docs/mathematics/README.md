@@ -43,6 +43,9 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`tts_shift_identification.md`](tts_shift_identification.md): measured-domain
   feasible shift, contiguous log segments, exact piecewise-linear L2 objective,
   coarse scan, interior Brent bracket, curvature ve shift-chain matematiği
+- [`tts_shift_law_identification.md`](tts_shift_law_identification.md):
+  adjacent-pair analytical Arrhenius, profiled-1D WLF, pole-safe C2 search,
+  large-C2 identifiability, reference transformation ve LOTO denklemleri
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.
