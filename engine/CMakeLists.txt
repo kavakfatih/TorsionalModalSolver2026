@@ -929,6 +929,11 @@ if(BUILD_TESTING)
     ${tts_test_support}
   )
   tms26_add_fortran_test(
+    tts_generalized_maxwell
+    tests/test_tts_generalized_maxwell.f90
+    ${tts_test_support}
+  )
+  tms26_add_fortran_test(
     tts_runtime_roundtrip
     tests/test_tts_runtime_roundtrip.f90
     ${tts_test_support}

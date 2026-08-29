@@ -5,7 +5,8 @@ module tms_tts_identification
     TTS_IDENTIFICATION_SUCCESS, TTS_IDENTIFICATION_REFERENCE_NOT_FOUND, &
     TTS_IDENTIFICATION_CHAIN_BROKEN, &
     TTS_IDENTIFICATION_MASTER_CURVE_FAILED, &
-    TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED, PAIR_SHIFT_SUCCESS, &
+    TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED, &
+    TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP, PAIR_SHIFT_SUCCESS, &
     validate_tts_material_family
   use tms_tts_shift_chain, only : build_tts_shift_chain
   use tms_tts_master_curve, only : build_tts_master_experimental_cloud, &
@@ -37,6 +38,7 @@ contains
     type(tts_validation_result_t) :: validation
     logical :: master_success
     logical :: runtime_success
+    integer :: runtime_status
 
     result%source_family = family
     validation = validate_tts_material_family(family)
@@ -90,10 +92,16 @@ contains
     call stitch_tts_runtime_master_table(family, &
       result%reference_isotherm_index, result%empirical_shifts, &
       result%master_cloud, result%runtime_master_table, &
-      result%diagnostics%boundaries, runtime_success)
+      result%diagnostics%boundaries, runtime_success, runtime_status)
     if (.not. runtime_success) then
-      result%status = TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED
-      result%message = "Solver-ready runtime master table oluşturulamadı."
+      result%status = runtime_status
+      if (runtime_status == TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP) then
+        result%message = "Runtime reduced-frequency domain unsupported "// &
+          "measurement-quality gap içeriyor."
+      else
+        result%status = TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED
+        result%message = "Solver-ready runtime master table oluşturulamadı."
+      end if
       return
     end if
 

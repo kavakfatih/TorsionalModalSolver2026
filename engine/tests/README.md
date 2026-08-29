@@ -250,7 +250,8 @@ belgesindedir.
 
 V0.8.1 test grubu `tts_data_model`, `tts_scalar_minimizer`, `tts_pair_shift`,
 `tts_shift_chain`, `tts_master_curve`, `tts_diagnostics`, `tts_identification`
-ve `tts_runtime_roundtrip` CTest ailelerinden oluşur. Ortak synthetic helper
+`tts_generalized_maxwell` ve `tts_runtime_roundtrip` CTest ailelerinden oluşur.
+Ortak synthetic helper
 yalnız test target'larına derlenir; production material modeli değildir.
 
 Pair testleri fixed grid sampling yerine exact linear residual integralini,
@@ -262,10 +263,14 @@ no-interior-minimum clean status ile döner.
 
 Shift-chain ve master testleri explicit reference, hot/cold cumulative shifts,
 broken chain, provenance, low/high/both/no extension, duplicate priority,
-strict ordering ve boundary diagnostics kapsamındadır. Top-level test exact
+strict ordering, boundary diagnostics, runtime interval-union coverage,
+internal/edge/cross-isotherm gap davranışı ve checked exponentiation
+kapsamındadır. Top-level test exact
 TRS ile deterministic non-TRS residual/discrepancy ayrımını ve plateau
-curvature evidence'ını sınar. Round-trip testi V0.8.1 output'larını mevcut
-V0.8.0 providers ile physical `(f,T)` sorgusuna taşır. Ayrıntılar
+curvature evidence'ını sınar. Generalized-Maxwell testi bağımsız eğrisel
+viscoelastic denklemlerle known shifts'i doğrular. Round-trip testi V0.8.1
+output'larını mevcut V0.8.0 providers ile exact point yanında intermediate ve
+off-reference physical `(f,T)` sorgusuna taşır. Ayrıntılar
 [`../../docs/validation/V0.8.1_tts_validation.md`](../../docs/validation/V0.8.1_tts_validation.md)
 belgesindedir.
 

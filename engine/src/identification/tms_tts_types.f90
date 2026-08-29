@@ -37,6 +37,7 @@ module tms_tts_types
   integer, parameter, public :: TTS_IDENTIFICATION_OPTIMIZATION_FAILED = 7
   integer, parameter, public :: TTS_IDENTIFICATION_MASTER_CURVE_FAILED = 8
   integer, parameter, public :: TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED = 9
+  integer, parameter, public :: TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP = 10
 
   integer, parameter, public :: DEFAULT_TTS_COARSE_SCAN_POINT_COUNT = 65
 

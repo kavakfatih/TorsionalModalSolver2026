@@ -3,8 +3,12 @@ program test_tts_identification
   use tms_tts_types, only : tts_material_family_t, &
     tts_identification_result_t, tts_pair_shift_result_t, &
     TTS_IDENTIFICATION_SUCCESS, TTS_IDENTIFICATION_INVALID_INPUT, &
-    TTS_IDENTIFICATION_CHAIN_BROKEN, MEASUREMENT_UNAVAILABLE
+    TTS_IDENTIFICATION_CHAIN_BROKEN, &
+    TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP, BELOW_RELIABLE_FLOOR, &
+    MEASUREMENT_UNAVAILABLE
   use tms_tts_identification, only : identify_tts_master_curve
+  use tms_tts_runtime_export, only : tts_runtime_export_t, &
+    create_tts_runtime_export
   use tms_tts_pair_shift, only : identify_tts_pair_shift
   use tms_tts_test_support, only : make_exact_trs_family, &
     replace_loss_truth_shift, find_empirical_shift, assert_true, assert_close
@@ -22,6 +26,7 @@ program test_tts_identification
   type(tts_identification_result_t) :: result
   type(tts_pair_shift_result_t) :: strong_pair
   type(tts_pair_shift_result_t) :: weak_pair
+  type(tts_runtime_export_t) :: unsafe_export
   real(dp) :: exact_objective_sum
   real(dp) :: nontrs_objective_sum
   real(dp) :: stored_original_value
@@ -113,6 +118,22 @@ program test_tts_identification
     .not. result%shift_chain_available .and. &
     .not. result%runtime_export_ready, &
     "Broken chain partial runtime export üretti.")
+
+  ! Pair alignment mümkün olsa da bütün isotherm'lerde aynı internal loss
+  ! quality hole kalırsa master cloud korunmalı, continuous runtime export ise
+  ! explicit domain-gap status'u ile reddedilmelidir.
+  family = make_exact_trs_family( &
+    [293.15_dp, 313.15_dp], [0.0_dp, 0.0_dp])
+  family%isotherms(1)%points(4)%loss_quality = BELOW_RELIABLE_FLOOR
+  family%isotherms(2)%points(4)%loss_quality = BELOW_RELIABLE_FLOOR
+  result = identify_tts_master_curve(family, "ISO-1")
+  call assert_true( &
+    result%status == TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP .and. &
+    result%master_cloud_available .and. .not. result%runtime_export_ready, &
+    "Internal quality hole top-level runtime readiness'i kapatmadı.")
+  unsafe_export = create_tts_runtime_export(result)
+  call assert_true(.not. unsafe_export%available, &
+    "Unsafe identification sonucundan runtime provider oluşturuldu.")
 
   print *, "V0.8.1 exact/non-TRS/weak identification gates doğrulandı."
 end program test_tts_identification

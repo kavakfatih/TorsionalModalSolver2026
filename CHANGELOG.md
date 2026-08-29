@@ -29,7 +29,9 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
   thermorheological provider nesnelerine dönüştüren runtime export adapter'ı.
 - Exact TRS, deterministic non-TRS, weak identifiability, quality gap, zero
   loss, storage-only, no-support/no-interior, stitching ve runtime round-trip
-  senaryolarını kapsayan sekiz yeni CTest ailesi.
+  senaryolarını kapsayan dokuz yeni CTest ailesi.
+- Bağımsız analytical generalized-Maxwell denklemleriyle curved exact-TRS
+  shift, curvature, provenance ve runtime-table benchmark'ı.
 - V0.8.1 architecture, experimental material model, identification matematiği,
   validation, ADR 0014 ve kalıcı development report belgeleri.
 
@@ -40,6 +42,13 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
   GitHub Actions SUCCESS kayıtlarıyla kapatıldı.
 - Test hedefleri, ortak test modüllerini güvenli biçimde derleyebilmek için
   target-specific Fortran module output dizinleri kullanacak şekilde geliştirildi.
+- Runtime master domain'i, shifted adjacent valid measurement interval union'ı
+  tarafından kesintisiz desteklenmediğinde explicit failure verecek şekilde
+  sağlamlaştırıldı; edge shrink ve cross-isotherm bridge davranışı korundu.
+- Reduced-frequency ve derived `a_T` exponentiation yollarında `huge()`/zero
+  sentinel yerine clean overflow, underflow ve nonfinite failure eklendi.
+- V0.8.0 runtime round-trip testi exact master point dışındaki log-frequency
+  midpoint ve off-reference sıcaklık interpolation zincirine genişletildi.
 
 ### Korundu
 

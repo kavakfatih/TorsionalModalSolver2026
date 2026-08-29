@@ -5,9 +5,19 @@ module tms_tts_master_curve
     tts_master_cloud_point_t, tts_runtime_master_point_t, &
     tts_master_boundary_diagnostic_t, is_runtime_export_usable, &
     is_storage_log_usable, is_loss_log_usable, &
-    are_tts_values_machine_equivalent
+    are_tts_values_machine_equivalent, TTS_IDENTIFICATION_SUCCESS, &
+    TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED, &
+    TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP
   implicit none
   private
+
+  !> Solver'ın interpolation yapmasına izin verilen tek bir reduced
+  !! log-frequency interval'ını taşır. Alt ve üst sınırlar
+  !! x_r=log10(f/Hz)+log10(a_T) boyutsuz koordinatındadır.
+  type :: runtime_coverage_interval_t
+    real(dp) :: lower_log10_frequency = 0.0_dp
+    real(dp) :: upper_log10_frequency = 0.0_dp
+  end type runtime_coverage_interval_t
 
   public :: build_tts_master_experimental_cloud
   public :: stitch_tts_runtime_master_table
@@ -31,7 +41,8 @@ contains
     integer :: point_total
     logical :: shift_found
     real(dp) :: log10_a_t
-    real(dp) :: log10_reduced_frequency
+    logical :: frequency_success
+    real(dp) :: reduced_frequency_hz
 
     success = .false.
     point_total = 0
@@ -45,13 +56,19 @@ contains
     do isotherm_index = 1, size(family%isotherms)
       call find_log10_shift(empirical_shifts, isotherm_index, &
         log10_a_t, shift_found)
-      if (.not. shift_found) return
+      if (.not. shift_found) then
+        deallocate(cloud)
+        return
+      end if
       do point_index = 1, size(family%isotherms(isotherm_index)%points)
         cloud_index = cloud_index + 1
-        log10_reduced_frequency = log10(family%isotherms( &
-          isotherm_index)%points(point_index)%frequency_hz) + log10_a_t
-        if (log10_reduced_frequency < log10(tiny(1.0_dp)) .or. &
-            log10_reduced_frequency > log10(huge(1.0_dp))) return
+        call calculate_reduced_frequency_checked( &
+          family%isotherms(isotherm_index)%points(point_index)%frequency_hz, &
+          log10_a_t, reduced_frequency_hz, frequency_success)
+        if (.not. frequency_success) then
+          deallocate(cloud)
+          return
+        end if
         cloud(cloud_index)%source_isotherm_index = isotherm_index
         cloud(cloud_index)%source_point_index = point_index
         cloud(cloud_index)%source_isotherm_identifier = &
@@ -65,8 +82,7 @@ contains
         cloud(cloud_index)%source_frequency_hz = family%isotherms( &
           isotherm_index)%points(point_index)%frequency_hz
         cloud(cloud_index)%log10_a_t = log10_a_t
-        cloud(cloud_index)%reduced_frequency_hz = &
-          10.0_dp**log10_reduced_frequency
+        cloud(cloud_index)%reduced_frequency_hz = reduced_frequency_hz
         cloud(cloud_index)%storage_modulus_pa = family%isotherms( &
           isotherm_index)%points(point_index)%storage_modulus_pa
         cloud(cloud_index)%loss_modulus_pa = family%isotherms( &
@@ -93,7 +109,7 @@ contains
   !! reference, sonra reference'a daha yakın temperature, sonra daha uzaktır.
   pure subroutine stitch_tts_runtime_master_table( &
       family, reference_isotherm_index, empirical_shifts, cloud, &
-      runtime_table, boundaries, success)
+      runtime_table, boundaries, success, status)
     type(tts_material_family_t), intent(in) :: family
     integer, intent(in) :: reference_isotherm_index
     type(tts_empirical_shift_t), intent(in) :: empirical_shifts(:)
@@ -101,7 +117,10 @@ contains
     type(tts_runtime_master_point_t), allocatable, intent(out) :: runtime_table(:)
     type(tts_master_boundary_diagnostic_t), allocatable, intent(out) :: boundaries(:)
     logical, intent(out) :: success
+    integer, intent(out), optional :: status
 
+    type(runtime_coverage_interval_t), allocatable :: coverage_intervals(:)
+    type(runtime_coverage_interval_t), allocatable :: merged_coverage(:)
     type(tts_runtime_master_point_t), allocatable :: selected(:)
     integer, allocatable :: priority_indices(:)
     integer :: boundary_count
@@ -111,6 +130,8 @@ contains
     integer :: max_point_count
     integer :: point_index
     integer :: selected_count
+    logical :: coverage_success
+    logical :: frequency_success
     logical :: shift_found
     real(dp) :: current_maximum
     real(dp) :: current_minimum
@@ -120,6 +141,7 @@ contains
     real(dp) :: reduced_frequency
 
     success = .false.
+    if (present(status)) status = TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED
     if (reference_isotherm_index < 1 .or. &
         reference_isotherm_index > size(family%isotherms)) return
     max_point_count = size(cloud)
@@ -140,11 +162,12 @@ contains
       do point_index = 1, size(family%isotherms(isotherm_index)%points)
         if (.not. is_runtime_export_usable( &
             family%isotherms(isotherm_index)%points(point_index))) cycle
-        reduced_frequency = calculate_reduced_frequency( &
+        if (.not. point_belongs_to_runtime_valid_interval( &
+            family%isotherms(isotherm_index), point_index)) cycle
+        call calculate_reduced_frequency_checked( &
           family%isotherms(isotherm_index)%points(point_index)%frequency_hz, &
-          log10_a_t)
-        if (.not. ieee_is_finite(reduced_frequency) .or. &
-            reduced_frequency <= 0.0_dp) return
+          log10_a_t, reduced_frequency, frequency_success)
+        if (.not. frequency_success) return
         if (selected_count > 0 .and. &
             isotherm_index /= reference_isotherm_index) then
           if (reduced_frequency > previous_minimum .and. &
@@ -187,6 +210,23 @@ contains
             runtime_table(i - 1)%reduced_frequency_hz)) return
     end do
 
+    ! Runtime provider bütün table domain'ini continuous kabul eder. Bu nedenle
+    ! seçilen iki nokta arasındaki her koordinat, en az bir original adjacent
+    ! runtime-valid measurement interval'ı tarafından desteklenmelidir.
+    call build_runtime_valid_reduced_intervals(family, empirical_shifts, &
+      coverage_intervals, coverage_success)
+    if (.not. coverage_success) then
+      deallocate(runtime_table)
+      return
+    end if
+    call merge_runtime_coverage_intervals(coverage_intervals, merged_coverage)
+    if (.not. runtime_domain_is_fully_supported( &
+        runtime_table, merged_coverage)) then
+      deallocate(runtime_table)
+      if (present(status)) status = TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP
+      return
+    end if
+
     boundary_count = 0
     do i = 1, selected_count - 1
       if (runtime_table(i)%source_isotherm_index /= &
@@ -211,6 +251,7 @@ contains
         boundaries(boundary_count))
     end do
     success = .true.
+    if (present(status)) status = TTS_IDENTIFICATION_SUCCESS
   end subroutine stitch_tts_runtime_master_table
 
   pure subroutine find_log10_shift( &
@@ -232,21 +273,228 @@ contains
     end do
   end subroutine find_log10_shift
 
-  pure function calculate_reduced_frequency(frequency_hz, log10_a_t) &
-      result(reduced_frequency_hz)
+  !> Physical frequency [Hz] ve boyutsuz s=log10(a_T) değerinden
+  !! x_r=log10(f)+s, f_r=10^x_r [Hz] hesaplar. Girdi sonlu/pozitif değilse
+  !! veya exponentiation Fortran real(dp) normal aralığının dışına çıkarsa
+  !! success=false döner. huge/tiny sentinel veya clamp üretilmez.
+  pure subroutine calculate_reduced_frequency_checked( &
+      frequency_hz, log10_a_t, reduced_frequency_hz, success)
     real(dp), intent(in) :: frequency_hz
     real(dp), intent(in) :: log10_a_t
-    real(dp) :: reduced_frequency_hz
+    real(dp), intent(out) :: reduced_frequency_hz
+    logical, intent(out) :: success
     real(dp) :: log10_reduced
 
+    reduced_frequency_hz = 0.0_dp
+    success = .false.
+    if (.not. ieee_is_finite(frequency_hz)) return
+    if (frequency_hz <= 0.0_dp) return
+    if (.not. ieee_is_finite(log10_a_t)) return
     log10_reduced = log10(frequency_hz) + log10_a_t
+    if (.not. ieee_is_finite(log10_reduced)) return
     if (log10_reduced < log10(tiny(1.0_dp)) .or. &
-        log10_reduced > log10(huge(1.0_dp))) then
-      reduced_frequency_hz = huge(1.0_dp)
-    else
-      reduced_frequency_hz = 10.0_dp**log10_reduced
+        log10_reduced > log10(huge(1.0_dp))) return
+    reduced_frequency_hz = 10.0_dp**log10_reduced
+    success = ieee_is_finite(reduced_frequency_hz) .and. &
+      reduced_frequency_hz > 0.0_dp
+    if (.not. success) reduced_frequency_hz = 0.0_dp
+  end subroutine calculate_reduced_frequency_checked
+
+  !> Bir measured point'in en az bir adjacent runtime-valid original interval'a
+  !! ait olup olmadığını döndürür. İzole usable point solver interpolation
+  !! domain'ini tek başına genişletemez. G''=0, quality VALID ise usable kalır.
+  pure function point_belongs_to_runtime_valid_interval( &
+      isotherm, point_index) result(belongs)
+    use tms_tts_types, only : tts_isotherm_t
+    type(tts_isotherm_t), intent(in) :: isotherm
+    integer, intent(in) :: point_index
+    logical :: belongs
+
+    belongs = .false.
+    if (point_index < 1) return
+    if (point_index > size(isotherm%points)) return
+    if (point_index > 1) then
+      if (is_runtime_export_usable(isotherm%points(point_index - 1)) .and. &
+          is_runtime_export_usable(isotherm%points(point_index))) then
+        belongs = .true.
+        return
+      end if
     end if
-  end function calculate_reduced_frequency
+    if (point_index < size(isotherm%points)) then
+      if (is_runtime_export_usable(isotherm%points(point_index)) .and. &
+          is_runtime_export_usable(isotherm%points(point_index + 1))) then
+        belongs = .true.
+      end if
+    end if
+  end function point_belongs_to_runtime_valid_interval
+
+  !> Bütün source isotherm'lerde yalnız iki adjacent endpoint'i de
+  !! runtime-export usable olan original interval'ları x_r=x+s koordinatına
+  !! taşır. Frekans [Hz], s boyutsuzdur. Numerical range dışı koordinat clean
+  !! failure üretir; experimental gap threshold uygulanmaz.
+  pure subroutine build_runtime_valid_reduced_intervals( &
+      family, empirical_shifts, intervals, success)
+    type(tts_material_family_t), intent(in) :: family
+    type(tts_empirical_shift_t), intent(in) :: empirical_shifts(:)
+    type(runtime_coverage_interval_t), allocatable, intent(out) :: intervals(:)
+    logical, intent(out) :: success
+
+    type(runtime_coverage_interval_t), allocatable :: buffer(:)
+    integer :: interval_count
+    integer :: isotherm_index
+    integer :: maximum_interval_count
+    integer :: point_index
+    logical :: shift_found
+    real(dp) :: log10_a_t
+    real(dp) :: lower_coordinate
+    real(dp) :: upper_coordinate
+
+    success = .false.
+    maximum_interval_count = 0
+    do isotherm_index = 1, size(family%isotherms)
+      if (.not. allocated(family%isotherms(isotherm_index)%points)) return
+      maximum_interval_count = maximum_interval_count + &
+        max(0, size(family%isotherms(isotherm_index)%points) - 1)
+    end do
+    allocate(buffer(maximum_interval_count))
+    interval_count = 0
+    do isotherm_index = 1, size(family%isotherms)
+      call find_log10_shift(empirical_shifts, isotherm_index, &
+        log10_a_t, shift_found)
+      if (.not. shift_found) return
+      do point_index = 1, &
+          size(family%isotherms(isotherm_index)%points) - 1
+        if (.not. is_runtime_export_usable( &
+            family%isotherms(isotherm_index)%points(point_index))) cycle
+        if (.not. is_runtime_export_usable( &
+            family%isotherms(isotherm_index)%points(point_index + 1))) cycle
+        lower_coordinate = log10(family%isotherms(isotherm_index) &
+          %points(point_index)%frequency_hz) + log10_a_t
+        upper_coordinate = log10(family%isotherms(isotherm_index) &
+          %points(point_index + 1)%frequency_hz) + log10_a_t
+        if (.not. reduced_log_coordinate_is_representable(lower_coordinate)) &
+          return
+        if (.not. reduced_log_coordinate_is_representable(upper_coordinate)) &
+          return
+        if (upper_coordinate <= lower_coordinate) return
+        interval_count = interval_count + 1
+        buffer(interval_count)%lower_log10_frequency = lower_coordinate
+        buffer(interval_count)%upper_log10_frequency = upper_coordinate
+      end do
+    end do
+    allocate(intervals(interval_count))
+    if (interval_count > 0) intervals = buffer(1:interval_count)
+    success = .true.
+  end subroutine build_runtime_valid_reduced_intervals
+
+  !> Reduced log-frequency interval'larını alt sınıra göre deterministik
+  !! sıralar; overlap veya yalnız machine-equivalent touching endpoint varsa
+  !! birleştirir. Bu tolerance physical/experimental gap eşiği değildir.
+  pure subroutine merge_runtime_coverage_intervals(intervals, merged)
+    type(runtime_coverage_interval_t), intent(in) :: intervals(:)
+    type(runtime_coverage_interval_t), allocatable, intent(out) :: merged(:)
+
+    type(runtime_coverage_interval_t), allocatable :: sorted(:)
+    type(runtime_coverage_interval_t), allocatable :: work(:)
+    type(runtime_coverage_interval_t) :: key
+    integer :: i
+    integer :: j
+    integer :: merged_count
+
+    if (size(intervals) == 0) then
+      allocate(merged(0))
+      return
+    end if
+    sorted = intervals
+    do i = 2, size(sorted)
+      key = sorted(i)
+      j = i - 1
+      do while (j >= 1)
+        if (sorted(j)%lower_log10_frequency <= &
+            key%lower_log10_frequency) exit
+        sorted(j + 1) = sorted(j)
+        j = j - 1
+      end do
+      sorted(j + 1) = key
+    end do
+
+    allocate(work(size(sorted)))
+    merged_count = 1
+    work(1) = sorted(1)
+    do i = 2, size(sorted)
+      if (sorted(i)%lower_log10_frequency <= &
+          work(merged_count)%upper_log10_frequency .or. &
+          runtime_log_coordinates_are_equivalent( &
+            sorted(i)%lower_log10_frequency, &
+            work(merged_count)%upper_log10_frequency)) then
+        work(merged_count)%upper_log10_frequency = max( &
+          work(merged_count)%upper_log10_frequency, &
+          sorted(i)%upper_log10_frequency)
+      else
+        merged_count = merged_count + 1
+        work(merged_count) = sorted(i)
+      end if
+    end do
+    allocate(merged(merged_count))
+    merged = work(1:merged_count)
+  end subroutine merge_runtime_coverage_intervals
+
+  !> Strict runtime table'ın [min(log10(f_r)),max(log10(f_r))] domain'inin
+  !! tek bir merged measurement-supported coverage interval'ı içinde kalıp
+  !! kalmadığını doğrular. Ayrık union parçaları arasındaki hole kabul edilmez.
+  pure function runtime_domain_is_fully_supported( &
+      runtime_table, merged_coverage) result(supported)
+    type(tts_runtime_master_point_t), intent(in) :: runtime_table(:)
+    type(runtime_coverage_interval_t), intent(in) :: merged_coverage(:)
+    logical :: supported
+    integer :: i
+    logical :: lower_supported
+    logical :: upper_supported
+    real(dp) :: runtime_lower
+    real(dp) :: runtime_upper
+
+    supported = .false.
+    if (size(runtime_table) < 2) return
+    runtime_lower = log10(runtime_table(1)%reduced_frequency_hz)
+    runtime_upper = log10(runtime_table(size(runtime_table)) &
+      %reduced_frequency_hz)
+    do i = 1, size(merged_coverage)
+      lower_supported = runtime_lower >= &
+        merged_coverage(i)%lower_log10_frequency .or. &
+        runtime_log_coordinates_are_equivalent(runtime_lower, &
+          merged_coverage(i)%lower_log10_frequency)
+      upper_supported = runtime_upper <= &
+        merged_coverage(i)%upper_log10_frequency .or. &
+        runtime_log_coordinates_are_equivalent(runtime_upper, &
+          merged_coverage(i)%upper_log10_frequency)
+      if (lower_supported .and. upper_supported) then
+        supported = .true.
+        return
+      end if
+    end do
+  end function runtime_domain_is_fully_supported
+
+  pure elemental function reduced_log_coordinate_is_representable( &
+      coordinate) result(representable)
+    real(dp), intent(in) :: coordinate
+    logical :: representable
+
+    representable = ieee_is_finite(coordinate) .and. &
+      coordinate >= log10(tiny(1.0_dp)) .and. &
+      coordinate <= log10(huge(1.0_dp))
+  end function reduced_log_coordinate_is_representable
+
+  pure elemental function runtime_log_coordinates_are_equivalent(a, b) &
+      result(equivalent)
+    real(dp), intent(in) :: a
+    real(dp), intent(in) :: b
+    logical :: equivalent
+    real(dp) :: scale
+
+    scale = max(1.0_dp, abs(a), abs(b))
+    equivalent = ieee_is_finite(a) .and. ieee_is_finite(b) .and. &
+      abs(a - b) <= 64.0_dp*epsilon(1.0_dp)*scale
+  end function runtime_log_coordinates_are_equivalent
 
   pure function make_stitch_priority_indices( &
       family, reference_index) result(indices)

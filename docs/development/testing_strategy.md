@@ -255,7 +255,7 @@ doğrular. Ayrıntılar
 [`../validation/thermorheological_runtime_validation.md`](../validation/thermorheological_runtime_validation.md)
 belgesindedir.
 
-V0.8.1 experimental identification doğrulaması sekiz ayrı CTest ailesiyle
+V0.8.1 experimental identification doğrulaması dokuz ayrı CTest ailesiyle
 aşağıdaki kapıları ekler:
 
 - family-level authoritative common state ve explicit point quality,
@@ -265,9 +265,13 @@ aşağıdaki kapıları ekler:
 - joint G'/G'' shift, storage-only fallback, overlap ve curvature evidence,
 - explicit reference zero shift, colder/hotter adjacent chain ve broken-chain,
 - provenance-preserving master cloud ile low/high/both/no-extension stitching,
+- runtime-valid adjacent interval union, internal-hole rejection, edge-domain
+  shrink ve cross-isotherm coverage bridge,
 - VGP/Cole-Cole analytical points, exact TRS, deterministic non-TRS ve weak
   identifiability,
-- existing V0.8.0 provider nesneleri üzerinden runtime round-trip.
+- independent generalized-Maxwell equations ile curved exact-TRS recovery,
+- existing V0.8.0 provider nesneleri üzerinden exact ve intermediate/off-
+  reference runtime round-trip.
 
 Exact synthetic shift toleransı `1.5e-6` boyutsuz düzeydedir ve
 `8*sqrt(epsilon(dp))` numerical stopping ölçeğini kapsar; measurement

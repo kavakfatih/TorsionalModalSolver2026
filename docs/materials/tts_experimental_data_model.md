@@ -67,6 +67,26 @@ nokta segmenti böler. Örneğin `VALID, VALID, FLOOR, VALID, VALID` dizisi iki
 ayrı interpolation segmentidir; floor noktasının üzerinden interpolation
 yapılmaz.
 
+## Runtime Coverage Domain
+
+Solver-ready tablo için point usability tek başına yeterli değildir. Original
+ölçümde iki adjacent endpoint ancak ikisi de `VALID G'>0` ve `VALID G''>=0`
+ise bir runtime coverage interval'ı oluşturur. Bu interval
+`x_r=log10(f)+log10(a_T)` reduced koordinatına taşınır.
+
+Bütün isotherm interval'larının union'ı runtime table'ın minimum ve maksimum
+`log10(f_r)` domain'ini kesintisiz kapsamalıdır. Edge'deki invalid noktalar
+usable domain'i daraltabilir. Internal quality hole ise başka bir isotherm'in
+gerçek valid interval'ları tarafından örtülmüyorsa export'u
+`TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP` statüsüyle durdurur. Böylece V0.8.0
+tabulated provider güvenilmez ölçüm aralığını sessiz interpolation ile
+birleştiremez. Machine tolerance yalnız endpoint representation düzeyindedir;
+experimental gap threshold değildir.
+
+`VALID G''=0` adjacent interval endpoint'i runtime coverage açısından geçerli
+kalmaya devam eder. Bu kural loss-log pair objective'in `G''>0` şartını
+değiştirmez ve epsilon substitution eklemez.
+
 ## Provenance ve Immutability
 
 Experimental master cloud her original noktada isotherm, specimen, source,

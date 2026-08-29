@@ -38,6 +38,7 @@ contains
     integer :: pair_slot
     integer :: reference_position
     integer :: reference_source_index
+    logical :: shift_factor_success
 
     validation = validate_tts_material_family(family)
     if (.not. validation%valid) then
@@ -116,7 +117,12 @@ contains
         chain%empirical_shifts(i)%a_t = 1.0_dp
       else
         chain%empirical_shifts(i)%log10_a_t = absolute_shifts(current_index)
-        chain%empirical_shifts(i)%a_t = 10.0_dp**absolute_shifts(current_index)
+        call calculate_shift_factor_checked(absolute_shifts(current_index), &
+          chain%empirical_shifts(i)%a_t, shift_factor_success)
+        if (.not. shift_factor_success) then
+          chain%status = TTS_IDENTIFICATION_CHAIN_BROKEN
+          return
+        end if
       end if
       if (.not. ieee_is_finite(chain%empirical_shifts(i)%a_t) .or. &
           chain%empirical_shifts(i)%a_t <= 0.0_dp) then
@@ -128,6 +134,24 @@ contains
     chain%status = TTS_IDENTIFICATION_SUCCESS
     chain%available = .true.
   end function build_tts_shift_chain
+
+  !> Primary boyutsuz s=log10(a_T) değerinden derived a_T=10^s üretir.
+  !! s sonlu değilse veya exponentiation real(dp) normal aralığını aşarsa
+  !! success=false döner; zero/huge sentinel ile geçerli shift taklit edilmez.
+  pure subroutine calculate_shift_factor_checked(log10_a_t, a_t, success)
+    real(dp), intent(in) :: log10_a_t
+    real(dp), intent(out) :: a_t
+    logical, intent(out) :: success
+
+    a_t = 0.0_dp
+    success = .false.
+    if (.not. ieee_is_finite(log10_a_t)) return
+    if (log10_a_t < log10(tiny(1.0_dp))) return
+    if (log10_a_t > log10(huge(1.0_dp))) return
+    a_t = 10.0_dp**log10_a_t
+    success = ieee_is_finite(a_t) .and. a_t > 0.0_dp
+    if (.not. success) a_t = 0.0_dp
+  end subroutine calculate_shift_factor_checked
 
   pure function find_reference_index(family, identifier) result(index_value)
     type(tts_material_family_t), intent(in) :: family

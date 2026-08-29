@@ -1,9 +1,12 @@
 program test_tts_master_curve
+  use, intrinsic :: ieee_arithmetic, only : ieee_value, ieee_quiet_nan
   use tms_kinds, only : dp
   use tms_tts_types, only : tts_material_family_t, tts_shift_chain_result_t, &
     tts_empirical_shift_t, tts_master_cloud_point_t, &
     tts_runtime_master_point_t, tts_master_boundary_diagnostic_t, &
-    BELOW_RELIABLE_FLOOR, MEASUREMENT_VALID
+    BELOW_RELIABLE_FLOOR, MEASUREMENT_VALID, MEASUREMENT_UNAVAILABLE, &
+    TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP, &
+    TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED
   use tms_tts_shift_chain, only : build_tts_shift_chain
   use tms_tts_master_curve, only : build_tts_master_experimental_cloud, &
     stitch_tts_runtime_master_table
@@ -28,6 +31,7 @@ program test_tts_master_curve
   logical :: success
   logical :: found
   integer :: i
+  integer :: stitch_status
 
   family = make_exact_trs_family(temperatures, shifts)
   chain = build_tts_shift_chain(family, "ISO-2")
@@ -134,6 +138,101 @@ program test_tts_master_curve
   end do
   call assert_true(.not. found, &
     "Unreliable loss-quality point runtime table'a sızdı.")
+
+  ! İki source'ta da aynı internal measurement-quality hole varsa final
+  ! runtime table bu aralığı V0.8.0 interpolation'ına açmamalıdır. Experimental
+  ! cloud korunur, fakat unsupported continuous solver domain reddedilir.
+  family = make_exact_trs_family( &
+    [293.15_dp, 313.15_dp], [0.0_dp, 0.0_dp])
+  family%isotherms(1)%points(4)%loss_quality = BELOW_RELIABLE_FLOOR
+  family%isotherms(2)%points(4)%loss_quality = BELOW_RELIABLE_FLOOR
+  empirical = make_zero_shift_table(family)
+  call build_tts_master_experimental_cloud(family, empirical, cloud, success)
+  call assert_true(success .and. size(cloud) == 14, &
+    "Internal gap experimental cloud provenance'ını kaybetti.")
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(.not. success, &
+    "Unsupported internal quality gap runtime'a açıldı.")
+  call assert_true(stitch_status == TTS_IDENTIFICATION_RUNTIME_DOMAIN_GAP, &
+    "Internal quality gap explicit status üretmedi.")
+  call assert_true(.not. allocated(table), &
+    "Unsupported gap için unsafe runtime table bırakıldı.")
+
+  ! Edge'deki unavailable ölçümler solver domain'ini ilk contiguous usable
+  ! noktaya daraltabilir; internal hole olmadığı için export başarısız olmaz.
+  family = make_exact_trs_family( &
+    [293.15_dp, 313.15_dp], [0.0_dp, 0.0_dp])
+  do i = 1, 2
+    family%isotherms(1)%points(i)%loss_quality = MEASUREMENT_UNAVAILABLE
+    family%isotherms(2)%points(i)%loss_quality = MEASUREMENT_UNAVAILABLE
+  end do
+  empirical = make_zero_shift_table(family)
+  call build_tts_master_experimental_cloud(family, empirical, cloud, success)
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(success, "Edge quality gap usable domain'e daraltılamadı.")
+  call assert_close(table(1)%reduced_frequency_hz, &
+    family%isotherms(1)%points(3)%frequency_hz, 1.0e-14_dp, &
+    "Runtime minimum frequency ilk usable edge point'ten başlamadı.")
+
+  ! Reference'taki internal hole, ikinci isotherm'in shifted adjacent valid
+  ! interval'ları tarafından gerçekten örtülüyorsa global union continuous'tur.
+  family = make_exact_trs_family( &
+    [293.15_dp, 313.15_dp], [0.0_dp, 0.0_dp])
+  family%isotherms(1)%points(4)%loss_quality = MEASUREMENT_UNAVAILABLE
+  empirical = make_zero_shift_table(family)
+  call build_tts_master_experimental_cloud(family, empirical, cloud, success)
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(success, &
+    "Başka isotherm'in valid coverage bridge'i kabul edilmedi.")
+
+  ! VALID G''=0 loss-log objective'e giremez fakat adjacent runtime coverage
+  ! interval'ını kesmez ve zero-loss measured point solver table'da korunur.
+  family = make_exact_trs_family( &
+    [293.15_dp, 313.15_dp], [0.0_dp, 0.0_dp])
+  family%isotherms(1)%points(4)%loss_modulus_pa = 0.0_dp
+  family%isotherms(2)%points(4)%loss_modulus_pa = 0.0_dp
+  empirical = make_zero_shift_table(family)
+  call build_tts_master_experimental_cloud(family, empirical, cloud, success)
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(success .and. any(table%loss_modulus_pa == 0.0_dp), &
+    "VALID zero-loss adjacent runtime coverage'dan çıkarıldı.")
+
+  ! Extreme shift'ler direct stitching API'sinde fake huge/tiny frequency
+  ! üretmemeli; overflow, underflow ve nonfinite shift clean failure olmalıdır.
+  family = make_exact_trs_family( &
+    [293.15_dp, 313.15_dp], [0.0_dp, 0.0_dp])
+  empirical = make_zero_shift_table(family)
+  call build_tts_master_experimental_cloud(family, empirical, cloud, success)
+  empirical(1)%log10_a_t = log10(huge(1.0_dp)) + 1.0_dp
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(.not. success .and. &
+    stitch_status == TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED, &
+    "Reduced-frequency overflow clean stitching failure üretmedi.")
+  call assert_true(.not. allocated(table), &
+    "Overflow fake huge runtime table bıraktı.")
+
+  empirical = make_zero_shift_table(family)
+  empirical(1)%log10_a_t = log10(tiny(1.0_dp)) - 1.0_dp
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(.not. success .and. &
+    stitch_status == TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED, &
+    "Reduced-frequency underflow clean stitching failure üretmedi.")
+  call assert_true(.not. allocated(table), &
+    "Underflow fake tiny runtime table bıraktı.")
+
+  empirical = make_zero_shift_table(family)
+  empirical(1)%log10_a_t = ieee_value(1.0_dp, ieee_quiet_nan)
+  call stitch_tts_runtime_master_table(family, 1, empirical, cloud, table, &
+    boundaries, success, stitch_status)
+  call assert_true(.not. success .and. &
+    stitch_status == TTS_IDENTIFICATION_RUNTIME_EXPORT_FAILED, &
+    "Nonfinite empirical shift clean stitching failure üretmedi.")
 
   print *, "V0.8.1 master cloud ve deterministic stitching doğrulandı."
 
