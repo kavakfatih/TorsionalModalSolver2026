@@ -314,6 +314,22 @@ same-specimen rerun içeren study independent CI üretmez. Ayrıntılar
 [`../../docs/validation/V0.8.3_repeatability_validation.md`](../../docs/validation/V0.8.3_repeatability_validation.md)
 belgesindedir.
 
+V0.8.4 test grubu `tts_uncertainty_propagation`, `tts_weighted_integrals`,
+`tts_huber_integrals`, `tts_weighted_pair_shift` ve
+`tts_robust_shift_sensitivity` ailelerinden oluşur. Bu testler pointwise
+standard uncertainty'nin `(T,f)` anahtarıyla eşlenmesini, missing uncertainty
+gap'lerini, exact analytical `r^2/v` ve standardized Huber interval
+integrallerini doğrular.
+
+Pair regression'ları homoscedastic baseline eşdeğerliği, weighted global
+uncertainty-scale invariance, heteroscedastic biased-region influence, point
+sayısından bağımsız `0.5/0.5` channel balance ve storage-only status'u kapsar.
+Robust fixture anomaly point'ini silmez; Huber tail fraction ile influence
+sınırlamasını ve authoritative pair/empirical/master/runtime dizilerinin
+bit-level immutability'sini sınar. Ayrıntılar
+[`../../docs/validation/V0.8.4_uncertainty_validation.md`](../../docs/validation/V0.8.4_uncertainty_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

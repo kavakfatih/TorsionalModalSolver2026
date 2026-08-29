@@ -31,6 +31,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`V0.8.3_repeatability_validation.md`](V0.8.3_repeatability_validation.md):
   sample statistics, canonical campaign mapping, pseudoreplication prevention,
   cohort availability ve deterministic coupled cluster-bootstrap kapıları
+- [`V0.8.4_uncertainty_validation.md`](V0.8.4_uncertainty_validation.md):
+  uncertainty propagation/gap semantics, exact weighted/Huber integralleri,
+  heteroscedastic/robust fixtures ve input immutability kapıları
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

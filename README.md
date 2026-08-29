@@ -4,15 +4,29 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.8.3`, birden fazla complete V0.8.1 DMA/TTS
-campaign'inden intralaboratory repeatability ve deterministic nonparametric
-cluster-bootstrap uncertainty evidence üretir. Statistical sample unit complete
-independent campaign'dir; frequency, isotherm ve adjacent pair noktaları
-replicate sayılmaz. V0.8.1 authoritative empirical sonuçları ile V0.8.2
-Arrhenius/WLF fit semantics'i değişmez. Ortak physical-temperature mapping,
-common-reference normalization, mean/`n-1` SD/SE, median/MAD ve Type-7
-percentile cohort-mean interval'ları additive offline katmanda tutulur. Runtime
-materials, modal ve harmonic solver yolları bu katmana bağımlı değildir.
+Güncel geliştirme sürümü `0.8.4`, explicit pointwise dynamic-modulus standard
+uncertainty bilgisinden uncertainty-weighted L2 ve standardized Huber TTS shift
+sensitivity evidence üretir. V0.8.1 unweighted empirical shift'leri
+authoritative kalır; weighted/Huber sonuçlar master cloud veya runtime table'ın
+yerine geçirilmez. Uncertainty overlay source ölçümlere physical `(T,f)`
+anahtarıyla bağlanır, gaps contiguous support'u böler ve değişken variance için
+analitik/grid-free interval integralleri kullanılır. Runtime materials, modal ve
+harmonic solver yolları bu offline sensitivity katmanına bağımlı değildir.
+
+## V0.8.4 measurement-uncertainty weighted/robust kapsamı
+
+- Pointwise `u_G [Pa]` standard uncertainty overlay ve source/provenance
+- `u_log10_G=u_G/(G ln(10))` first-order propagation
+- Missing uncertainty'de gap-preserving contiguous support; no extrapolation
+- Log-frequency ekseninde piecewise-linear log-modulus variance policy'si
+- Diagonal residual variance `v_r=v_i+v_j`; covariance flag'leri explicit false
+- Exact analytical `r^2/v` weighted-L2 interval integrali
+- Standardized `z=r/sqrt(v_r)` üzerinde configurable Huber `c` (default 1.345)
+- Quadratic/tail regime crossing'leri ve analytical Huber tail integrali
+- Baseline/weighted/Huber shift'leri, signed delta'lar ve tail diagnostics
+- Deterministic coarse scan, strict interior bracket ve mevcut Brent reuse
+- Automatic outlier deletion, baseline replacement ve product-level uncertainty
+  propagation yoktur.
 
 ## V0.8.3 experimental repeatability ve bootstrap kapsamı
 
@@ -134,7 +148,7 @@ saklanır. Dışarıdan alınan mühendislik birimleri, veri yapılarına yazıl
 
 ## Geliştirme Durumu
 
-TMS26 şu anda V0.8.3 aşamasındadır. Measured isotherm validation, explicit
+TMS26 şu anda V0.8.4 aşamasındadır. Measured isotherm validation, explicit
 quality gaps, exact pair-shift objective, empirical shift chain, runtime
 master-table construction, adjacent-pair parametric shift-law evidence ve
 complete-campaign repeatability/bootstrap evidence;
@@ -156,7 +170,9 @@ operating sıcaklıkta reduced-frequency master-curve lookup'u ekler. V0.8.1
 runtime öncesi empirical identification/output katmanında kalır. V0.8.2 aynı
 sonuçtan additive parametric law evidence ve explicit runtime adapter üretir.
 V0.8.3 bu iki authoritative sonucu değiştirmeden offline descriptive ve
-independent-cluster uncertainty evidence üretir.
+independent-cluster uncertainty evidence üretir. V0.8.4 de aynı immutable
+boundary üzerinde pointwise standard uncertainty ile weighted/Huber pair
+sensitivity üretir; authoritative empirical/runtime veriyi yeniden kurmaz.
 Her iki yol
 `theta_hat=P theta_hat_r` ile Physical DOF uzayına geri açılır; prescribed
 statik offset harmonic phasor'a eklenmez.
@@ -299,6 +315,12 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 - WLF large-C2 identifiability, reference invariance, pair residual ve LOTO
   predictive diagnostics
 - Explicit measured-domain Arrhenius/WLF runtime export adapter'ları
+- Pointwise standard uncertainty overlay, physical `(T,f)` matching ve
+  gap-preserving weighted support segmentleri
+- First-order log-modulus propagation ile analytical weighted-L2 ve
+  standardized Huber pair objectives
+- Baseline/weighted/Huber sensitivity delta'ları, equal channel weighting,
+  storage-only status ve Huber tail diagnostics
 - Analitik referans testleri ve annüler TVD benchmark'ları
 - macOS LP64 LAPACK ve Windows LP64 OpenBLAS sağlayıcılarıyla GitHub Actions
   derleme/test iş akışları
@@ -308,8 +330,10 @@ extrapolation, vertical shift, self-heating ve master-curve fitting yapmaz.
 
 - Spline/PCHIP, curve fitting, Prony serisi ve nonlinear elastomer modeli
 - Sönümlü kompleks özdeğer problemi ve mode-superposition harmonic çözüm
-- Pair covariance/uncertainty weighting, robust/Huber shift, confidence
-  interval, automatic reference selection ve global optimizer
+- Full measurement covariance, generalized least squares/Mahalanobis objective,
+  automatic reference selection ve global optimizer
+- Automatic outlier deletion veya weighted/Huber shift'in authoritative
+  empirical baseline yerine geçirilmesi
 - Automatic WLF/Arrhenius model winner ve measured temperature domain dışına
   extrapolation
 - Vertical shift, amplitude/prestrain interpolation, self-heating, smoothing,
@@ -602,6 +626,22 @@ ve kalıcı karar
 [`docs/decisions/0016-repeatability-and-cluster-bootstrap.md`](docs/decisions/0016-repeatability-and-cluster-bootstrap.md)
 belgelerinde açıklanır. Uygulama/CI kapanışı
 [`docs/development/V0.8.3_development_report.md`](docs/development/V0.8.3_development_report.md)
+altında tutulur.
+
+V0.8.4 uncertainty-weighted/robust katman sınırı
+[`docs/architecture/V0.8.4_uncertainty_weighted_tts.md`](docs/architecture/V0.8.4_uncertainty_weighted_tts.md),
+weighted objective matematiği
+[`docs/mathematics/tts_uncertainty_weighted_objective.md`](docs/mathematics/tts_uncertainty_weighted_objective.md),
+Huber regime integralleri
+[`docs/mathematics/tts_huber_sensitivity.md`](docs/mathematics/tts_huber_sensitivity.md),
+measurement semantics
+[`docs/materials/dynamic_modulus_measurement_uncertainty.md`](docs/materials/dynamic_modulus_measurement_uncertainty.md),
+validation kapıları
+[`docs/validation/V0.8.4_uncertainty_validation.md`](docs/validation/V0.8.4_uncertainty_validation.md)
+ve kalıcı karar
+[`docs/decisions/0017-measurement-uncertainty-weighted-tts.md`](docs/decisions/0017-measurement-uncertainty-weighted-tts.md)
+belgelerinde açıklanır. Uygulama/CI kapanışı
+[`docs/development/V0.8.4_development_report.md`](docs/development/V0.8.4_development_report.md)
 altında tutulur.
 
 ## Lisans

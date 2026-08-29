@@ -49,6 +49,11 @@ varsayımları ve geçerlilik sınırlarını içerir.
 - [`tts_repeatability_bootstrap.md`](tts_repeatability_bootstrap.md): sample
   mean/SD/SE, median/MAD, common-reference normalization, complete-campaign
   bootstrap, deterministic RNG ve Type-7 percentile interval matematiği
+- [`tts_uncertainty_weighted_objective.md`](tts_uncertainty_weighted_objective.md):
+  log-modulus uncertainty propagation, disjoint support normalization ve
+  analitik `r^2/v` interval integrali
+- [`tts_huber_sensitivity.md`](tts_huber_sensitivity.md): standardized Huber
+  loss, quadratic crossing'ler, analitik tail integral ve diagnostics
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

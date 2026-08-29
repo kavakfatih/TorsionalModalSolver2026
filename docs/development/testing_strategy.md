@@ -338,6 +338,29 @@ engineering acceptance tolerance değildir. Ayrıntılar
 [`../validation/V0.8.3_repeatability_validation.md`](../validation/V0.8.3_repeatability_validation.md)
 belgesindedir.
 
+V0.8.4 measurement-uncertainty sensitivity doğrulaması beş CTest ailesidir:
+
+- `tms26.tts_uncertainty_propagation`: physical `(T,f)` eşleme,
+  `u_G/(G ln(10))`, common-scale invariance, uncertainty gap ve invalid data,
+- `tms26.tts_weighted_integrals`: independent analytical `r^2/v`, constant
+  variance limit'i, small-slope continuity ve numerical failure,
+- `tms26.tts_huber_integrals`: quadratic/positive-tail/negative-tail, bir/iki
+  crossing, nearly-constant/nonconstant variance ve near-tangent root,
+- `tms26.tts_weighted_pair_shift`: homoscedastic ve global-scale invariants,
+  heteroscedastic fixture, equal channel weighting, storage-only ve strict
+  optimization failures,
+- `tms26.tts_robust_shift_sensitivity`: clean Huber invariant, localized
+  anomaly influence, tail diagnostics, covariance flags ve bütün authoritative
+  V0.8.1 arrays için immutability.
+
+Measurement uncertainty missing point'i support gap'tir; test convex-hull
+normalization veya gap interpolation kabul etmez. Heteroscedastic ve anomaly
+fixtures yalnız inverse-variance/robust influence semantics'ini doğrular;
+weighted/Huber yöntemin her gerçek dataset'te daha doğru olduğu iddiası değildir.
+Huber tail point silinmez ve invalid measurement sayılmaz. Ayrıntılar
+[`../validation/V0.8.4_uncertainty_validation.md`](../validation/V0.8.4_uncertainty_validation.md)
+belgesindedir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

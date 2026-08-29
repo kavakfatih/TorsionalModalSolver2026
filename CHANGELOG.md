@@ -7,6 +7,50 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.8.4] - 2026-08-30
+
+### Eklendi
+
+- Authoritative V0.8.1 ölçümlerine unique physical `(T,f)` key ile bağlanan,
+  pointwise storage/loss standard uncertainty ve provenance taşıyan additive
+  overlay veri modeli.
+- `u_log10_G=u_G/(G ln(10))` first-order propagation, missing uncertainty gap
+  semantics ve log-frequency ekseninde piecewise-linear variance segmentleri.
+- Lineer residual/variance için numerically stable analytical `r^2/v` integrali
+  ve standardized Huber quadratic/tail regime integralleri.
+- Mevcut deterministic coarse scan, strict interior bracket ve Brent minimizer
+  üzerine kurulan weighted-L2 ile standardized-Huber adjacent-pair sensitivity.
+- Baseline/weighted/Huber shift'leri, signed sensitivity delta'ları, configurable
+  `c=1.345`, tail width/fraction ve explicit covariance-assumption alanları.
+- Uncertainty propagation, weighted integral, Huber integral, weighted pair ve
+  robust top-level sensitivity için beş yeni CTest ailesi.
+- V0.8.4 architecture, mathematics, material uncertainty, validation, ADR 0017
+  ve kalıcı development report belgeleri.
+
+### Değiştirildi
+
+- Proje sürümü `0.8.4` olarak güncellendi.
+- CTest kapsamı önceki 293 kayıt korunarak beş V0.8.4 ailesiyle 298 kayda
+  genişletildi.
+
+### Korundu
+
+- V0.8.1 unweighted empirical pair shifts, empirical table, experimental
+  master cloud ve runtime master table authoritative ve immutable kalır.
+- Joint channel objective her channel ayrı support-width normalize edildikten
+  sonra `0.5/0.5` ağırlık kullanır; point-count weighting yoktur.
+- Runtime material provider, modal/harmonic solver ve V0.8.3
+  repeatability/bootstrap yolları V0.8.4'e bağımlı değildir.
+- Huber hiçbir measurement point'i silmez ve weighted/robust sonuçlar baseline
+  yerine otomatik geçirilmez.
+
+### Sınırlamalar
+
+- Cross-channel/cross-isotherm/common-mode covariance, GLS/Mahalanobis ve Monte
+  Carlo propagation V0.8.5 kapsamındadır.
+- Low weighted/Huber residual TRS kanıtı değildir; DMA uncertainty bonded TVD
+  angle/torque/fatigue product validation uncertainty'si değildir.
+
 ## [0.8.3] - 2026-08-29
 
 ### Eklendi

@@ -99,6 +99,23 @@ süreçlerini ve kalıcı kararlarını içerir.
 - [`development/V0.8.3_development_report.md`](development/V0.8.3_development_report.md):
   implementation, regression, compiler audit ve CI kapanış kaydı
 
+## V0.8.4 measurement-uncertainty sensitivity belgeleri
+
+- [`architecture/V0.8.4_uncertainty_weighted_tts.md`](architecture/V0.8.4_uncertainty_weighted_tts.md):
+  additive overlay, weighted/Huber pair akışı ve immutable baseline sınırı
+- [`mathematics/tts_uncertainty_weighted_objective.md`](mathematics/tts_uncertainty_weighted_objective.md):
+  log propagation, residual variance ve exact weighted integral
+- [`mathematics/tts_huber_sensitivity.md`](mathematics/tts_huber_sensitivity.md):
+  standardized Huber regime splitting ve analytical tail integration
+- [`materials/dynamic_modulus_measurement_uncertainty.md`](materials/dynamic_modulus_measurement_uncertainty.md):
+  standard uncertainty/provenance ile DMA/product sınırı
+- [`validation/V0.8.4_uncertainty_validation.md`](validation/V0.8.4_uncertainty_validation.md):
+  beş yeni CTest ailesi ve analytical/synthetic validation gates
+- [`decisions/0017-measurement-uncertainty-weighted-tts.md`](decisions/0017-measurement-uncertainty-weighted-tts.md):
+  kalıcı weighting, robustness ve covariance-boundary kararı
+- [`development/V0.8.4_development_report.md`](development/V0.8.4_development_report.md):
+  implementation, regression, compiler audit ve CI kapanış kaydı
+
 Kod ile belgenin tutarlılığı aynı değişiklik içinde korunmalıdır. Fiziksel veya
 matematiksel bir hesap değiştirildiğinde ilgili matematik ve fizik belgesi,
 testler ve gerekiyorsa benchmark sonuçları birlikte güncellenir.

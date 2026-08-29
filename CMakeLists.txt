@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
   TorsionalModalSolver2026
-  VERSION 0.8.3
+  VERSION 0.8.4
   DESCRIPTION "Elastomer esaslı burulma titreşimi sistemleri hesap motoru"
   LANGUAGES Fortran
 )

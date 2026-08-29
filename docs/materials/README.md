@@ -21,6 +21,9 @@ sınırlarını açıklar.
 - [`experimental_repeatability_and_uncertainty.md`](experimental_repeatability_and_uncertainty.md):
   intralaboratory repeatability, campaign independence/provenance, standards
   context'i ve DMA evidence ile bonded-TVD validation sınırı
+- [`dynamic_modulus_measurement_uncertainty.md`](dynamic_modulus_measurement_uncertainty.md):
+  pointwise standard uncertainty, physical-key provenance, log propagation,
+  covariance sınırı ve DMA/product uncertainty ayrımı
 
 Malzeme dosyası içe aktarma, vendor formatı yorumlama ve birim tahmini core
 material modelinin parçası değildir. Core API frekansı Hz, modülleri Pa ve

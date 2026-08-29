@@ -33,6 +33,9 @@ katman sınırlarını açıklar.
 - [`V0.8.3_repeatability_uncertainty.md`](V0.8.3_repeatability_uncertainty.md):
   complete-campaign data/independence modeli, canonical temperature mapping,
   common-reference normalization ve ortak cluster-bootstrap data flow'u
+- [`V0.8.4_uncertainty_weighted_tts.md`](V0.8.4_uncertainty_weighted_tts.md):
+  pointwise uncertainty overlay, weighted/Huber pair sensitivity, immutable
+  empirical boundary ve covariance extension point'i
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.
