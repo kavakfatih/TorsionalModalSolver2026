@@ -1,0 +1,69 @@
+{
+	"servers": {
+		"oraios/serena": {
+			"type": "stdio",
+			"command": "uvx",
+			"args": [
+				"--from",
+				"git+https://github.com/oraios/serena",
+				"serena",
+				"start-mcp-server",
+				"serena@latest",
+				"--context",
+				"ide-assistant"
+			],
+			"gallery": "https://api.mcp.github.com",
+			"version": "1.0.0"
+		},
+		"io.github.upstash/context7": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"@upstash/context7-mcp@4.0.4"
+			],
+			"env": {
+				"CONTEXT7_API_KEY": "${input:CONTEXT7_API_KEY}"
+			},
+			"gallery": "https://api.mcp.github.com",
+			"version": "4.0.4"
+		},
+		"com.figma.mcp/mcp": {
+			"type": "http",
+			"url": "https://mcp.figma.com/mcp",
+			"gallery": "https://api.mcp.github.com",
+			"version": "1.0.3"
+		},
+		"io.github.github/github-mcp-server": {
+			"type": "stdio",
+			"command": "docker",
+			"args": [
+				"run",
+				"-i",
+				"--rm",
+				"-p",
+				"127.0.0.1:8085:8085",
+				"-e",
+				"GITHUB_OAUTH_CALLBACK_PORT=8085",
+				"-e",
+				"GITHUB_PERSONAL_ACCESS_TOKEN=${input:token}",
+				"ghcr.io/github/github-mcp-server:1.11.0"
+			],
+			"gallery": "https://api.mcp.github.com",
+			"version": "1.11.0"
+		}
+	},
+	"inputs": [
+		{
+			"id": "CONTEXT7_API_KEY",
+			"type": "promptString",
+			"description": "API key for authentication",
+			"password": true
+		},
+		{
+			"id": "token",
+			"type": "promptString",
+			"description": "",
+			"password": true
+		}
+	]
+}
