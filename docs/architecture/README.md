@@ -36,6 +36,9 @@ katman sınırlarını açıklar.
 - [`V0.8.4_uncertainty_weighted_tts.md`](V0.8.4_uncertainty_weighted_tts.md):
   pointwise uncertainty overlay, weighted/Huber pair sensitivity, immutable
   empirical boundary ve covariance extension point'i
+- [`V0.8.5_bivariate_covariance_tts.md`](V0.8.5_bivariate_covariance_tts.md):
+  point-local G'/G'' covariance, bivariate common support, matched-diagonal
+  control, Mahalanobis sensitivity ve full-GLS sınırı
 
 Yeni modül veya katman eklendiğinde sorumluluk, bağımlılık yönü ve mevcut API'ye
 etkisi burada belgelenmelidir.

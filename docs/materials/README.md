@@ -24,6 +24,9 @@ sınırlarını açıklar.
 - [`dynamic_modulus_measurement_uncertainty.md`](dynamic_modulus_measurement_uncertainty.md):
   pointwise standard uncertainty, physical-key provenance, log propagation,
   covariance sınırı ve DMA/product uncertainty ayrımı
+- [`dynamic_modulus_cross_channel_covariance.md`](dynamic_modulus_cross_channel_covariance.md):
+  same-point G'/G'' covariance provenance'ı, standards position,
+  common-mode sınırı ve DMA covariance/TVD product covariance ayrımı
 
 Malzeme dosyası içe aktarma, vendor formatı yorumlama ve birim tahmini core
 material modelinin parçası değildir. Core API frekansı Hz, modülleri Pa ve

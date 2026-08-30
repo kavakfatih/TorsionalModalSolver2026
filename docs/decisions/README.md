@@ -52,6 +52,9 @@ tutar. Her kayıt bağlam, karar, sonuçlar, durum ve tarih bilgilerini içermel
 - [`0017-measurement-uncertainty-weighted-tts.md`](0017-measurement-uncertainty-weighted-tts.md):
   standard uncertainty overlay, analytical weighted/Huber objective, immutable
   empirical baseline ve covariance-aware V0.8.5 sınırı
+- [`0018-point-local-covariance-mahalanobis-tts.md`](0018-point-local-covariance-mahalanobis-tts.md):
+  canonical physical covariance, SPD/no-regularization, bivariate common
+  support, matched-diagonal control ve Mahalanobis sensitivity kararı
 
 Mevcut karar değiştirilecekse eski kayıt silinmez; yeni bir karar kaydıyla
 önceki kararın yerini aldığı belirtilir.

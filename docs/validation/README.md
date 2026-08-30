@@ -34,6 +34,9 @@ matematiksel invariantlarla karşılaştıran doğrulama kanıtlarını içerir.
 - [`V0.8.4_uncertainty_validation.md`](V0.8.4_uncertainty_validation.md):
   uncertainty propagation/gap semantics, exact weighted/Huber integralleri,
   heteroscedastic/robust fixtures ve input immutability kapıları
+- [`V0.8.5_covariance_validation.md`](V0.8.5_covariance_validation.md): polar/log
+  covariance propagation, SPD/gap/interpolation, independent integral oracle,
+  correlation yönü ve support/covariance decomposition kapıları
 
 Buradaki çalışmalar **analytical code verification** niteliğindedir. Deneysel
 ölçüm veya saha verisiyle fiziksel model korelasyonu ayrıca yürütülmelidir.

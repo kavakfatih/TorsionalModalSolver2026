@@ -54,6 +54,12 @@ varsayımları ve geçerlilik sınırlarını içerir.
   analitik `r^2/v` interval integrali
 - [`tts_huber_sensitivity.md`](tts_huber_sensitivity.md): standardized Huber
   loss, quadratic crossing'ler, analitik tail integral ve diagnostics
+- [`tts_bivariate_covariance_propagation.md`](tts_bivariate_covariance_propagation.md):
+  physical Pa² covariance, magnitude/phase Jacobian'ı, log-space first-order
+  propagation, correlation invariance ve SPD conditioning
+- [`tts_mahalanobis_objective.md`](tts_mahalanobis_objective.md): bivariate
+  common support, matched-diagonal control, 2x2 Mahalanobis residual ve
+  cubic/quadratic grid-free analytical interval integrali
 
 Fiziksel veya matematiksel bir yordam değiştirildiğinde denklem, girdi/çıktı
 birimleri, varsayımlar ve test referansları aynı değişiklikte güncellenmelidir.

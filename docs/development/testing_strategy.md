@@ -361,6 +361,24 @@ Huber tail point silinmez ve invalid measurement sayılmaz. Ayrıntılar
 [`../validation/V0.8.4_uncertainty_validation.md`](../validation/V0.8.4_uncertainty_validation.md)
 belgesindedir.
 
+### V0.8.5 covariance ve Mahalanobis regression
+
+Point-local covariance testleri physical Pa² ve log-space propagation'ı,
+correlation invariance'ı, SPD/singular/near-singular sınıfları ile real support
+gaps'i sınar. Covariance matrix interpolation rho/SD üzerinden değil full
+entrywise convex formda test edilir.
+
+Analytical Mahalanobis interval sonucu production antiderivative'ından bağımsız
+adaptive oracle'a karşı doğrulanır. Pair/top-level regression; zero-covariance
+diagonal limit, positive/negative correlation direction, matrix-scale
+invariance, no storage-only fallback ve aşağıdaki decomposition'ı kapsar:
+
+- support-only fixture: covariance support dar, off-diagonal zero,
+- covariance-only fixture: original ve matched support aynı, correlation nonzero,
+- V0.8.1/V0.8.4/V0.8.5 input ve authoritative output immutability.
+
+Bu regression tolerance'ları engineering acceptance limitleri değildir.
+
 ## Integration test
 
 Entegrasyon testleri, birden fazla modülün birlikte kullanımını doğrular.

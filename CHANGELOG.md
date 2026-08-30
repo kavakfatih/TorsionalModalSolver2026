@@ -7,6 +7,53 @@ temel alır ve proje anlamsal sürümleme ilkelerini izlemeyi hedefler.
 
 ## [Yayımlanmamış]
 
+## [0.8.5] - 2026-08-31
+
+### Eklendi
+
+- Same-point physical `(T,f)` anahtarlı `G'/G''` 2x2 covariance overlay,
+  Pa² canonical matrix, source/instrument/calibration provenance ve explicit
+  availability/gap modeli.
+- Magnitude/phase Jacobian helper'ı, physical-to-log first-order covariance
+  propagation, correlation invariance ve Pa↔MPa consistent scaling.
+- Positive diagonal/determinant, perfect-correlation ve reciprocal-condition
+  tabanlı near-singular validation; automatic regularization yapılmaması.
+- Storage/loss/uncertainty/covariance kesişiminden bivariate common support,
+  gap splitting ve full-matrix log-frequency interpolation.
+- Aynı support üzerinde matched-diagonal control ile point-local Mahalanobis
+  adjacent-pair objective ve mevcut deterministic coarse scan/Brent reuse.
+- Cubic numerator/quadratic determinant için polynomial-division ve
+  log/atan primitives kullanan analytical/grid-free interval integrali.
+- Baseline, original weighted, matched-diagonal ve Mahalanobis shift'leri ile
+  support/covariance/total sensitivity delta decomposition.
+- Propagation, validation, analytical integrals, pair shift ve top-level
+  sensitivity için beş yeni CTest ailesi.
+- V0.8.5 architecture, iki mathematics belgesi, material covariance semantics,
+  validation, ADR 0018 ve kalıcı development report.
+
+### Değiştirildi
+
+- Proje sürümü `0.8.5` olarak güncellendi.
+- CTest kapsamı önceki 298 kayıt korunarak beş V0.8.5 ailesiyle 303 kayda
+  genişletildi.
+
+### Korundu
+
+- V0.8.1 pair/empirical/master/runtime sonuçları authoritative ve immutable;
+  V0.8.4 original weighted result bağımsız evidence olarak kalır.
+- Diagonal source ambiguity'si önlenir: full covariance diyagonalleri V0.8.4
+  `u_G²` ile machine-equivalent değilse analysis reddedilir.
+- Mahalanobis storage-only moda düşmez; covariance-aware Huber eklenmez.
+- Runtime material, modal ve harmonic katmanlar V0.8.5 offline modüllerini
+  import etmez.
+
+### Sınırlamalar
+
+- Cross-frequency/isotherm/temperature ve common-mode covariance, temperature
+  axis uncertainty, full GLS, Monte Carlo ve automatic regularization yoktur.
+- DMA point-local covariance bonded TVD product covariance değildir; small veya
+  large shift delta automatic TRS/data-quality kararı değildir.
+
 ## [0.8.4] - 2026-08-30
 
 ### Eklendi

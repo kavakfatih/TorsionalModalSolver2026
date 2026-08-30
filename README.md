@@ -4,14 +4,33 @@ TMS26, elastomer esaslı burulma titreşimi sistemleri için geliştirilen bir
 mühendislik hesaplama yazılımıdır. Projenin hesap motoru modern Fortran 2018
 ile geliştirilecek; derleme ve test süreçleri CMake ile yönetilecektir.
 
-Güncel geliştirme sürümü `0.8.4`, explicit pointwise dynamic-modulus standard
-uncertainty bilgisinden uncertainty-weighted L2 ve standardized Huber TTS shift
-sensitivity evidence üretir. V0.8.1 unweighted empirical shift'leri
-authoritative kalır; weighted/Huber sonuçlar master cloud veya runtime table'ın
-yerine geçirilmez. Uncertainty overlay source ölçümlere physical `(T,f)`
-anahtarıyla bağlanır, gaps contiguous support'u böler ve değişken variance için
-analitik/grid-free interval integralleri kullanılır. Runtime materials, modal ve
-harmonic solver yolları bu offline sensitivity katmanına bağımlı değildir.
+Güncel geliştirme sürümü `0.8.5`, aynı physical DMA noktasındaki explicit
+`G'/G''` covariance bilgisinden matched-support diagonal ve bivariate
+Mahalanobis TTS shift sensitivity evidence üretir. V0.8.1 empirical baseline ve
+V0.8.4 original weighted result ayrı tutulur; master cloud veya runtime table
+değiştirilmez. Physical Pa² covariance, first-order log propagation, SPD
+validation, gap-aware common support ve analytical/grid-free rational interval
+integrali kullanılır. Runtime materials, modal ve harmonic solver yolları bu
+offline point-local covariance katmanına bağımlı değildir.
+
+## V0.8.5 point-local bivariate covariance kapsamı
+
+- Aynı `(temperature, frequency)` noktasında physical Pa² 2x2 `G'/G''`
+  covariance ve explicit provenance
+- Optional magnitude/phase Jacobian helper ve dimensionless log-space
+  first-order covariance propagation
+- Positive-definite/near-singular kontrolleri; jitter, clipping ve pseudoinverse
+  yoktur.
+- Missing covariance'de real gap ve storage/loss/uncertainty/covariance
+  kesişiminden bivariate common support `O_B`
+- Full matrix elemanlarının `log10(f)` üzerinde deterministic interpolation'ı
+- Aynı `O_B` üzerinde matched-support diagonal control ve Mahalanobis objective
+- Cubic-numerator/quadratic-determinant analytical interval integrali
+- `s_baseline`, `s_weighted_original`, `s_diagonal_matched_support` ve
+  `s_mahalanobis` sonuçlarının ayrı tutulması
+- Support, pure covariance ve total shift delta decomposition
+- Cross-frequency/isotherm/common-mode covariance, full GLS, covariance-aware
+  Huber ve automatic authoritative replacement yoktur.
 
 ## V0.8.4 measurement-uncertainty weighted/robust kapsamı
 
@@ -642,6 +661,22 @@ ve kalıcı karar
 [`docs/decisions/0017-measurement-uncertainty-weighted-tts.md`](docs/decisions/0017-measurement-uncertainty-weighted-tts.md)
 belgelerinde açıklanır. Uygulama/CI kapanışı
 [`docs/development/V0.8.4_development_report.md`](docs/development/V0.8.4_development_report.md)
+altında tutulur.
+
+V0.8.5 point-local covariance katman sınırı
+[`docs/architecture/V0.8.5_bivariate_covariance_tts.md`](docs/architecture/V0.8.5_bivariate_covariance_tts.md),
+propagation matematiği
+[`docs/mathematics/tts_bivariate_covariance_propagation.md`](docs/mathematics/tts_bivariate_covariance_propagation.md),
+Mahalanobis objective/integral
+[`docs/mathematics/tts_mahalanobis_objective.md`](docs/mathematics/tts_mahalanobis_objective.md),
+measurement provenance
+[`docs/materials/dynamic_modulus_cross_channel_covariance.md`](docs/materials/dynamic_modulus_cross_channel_covariance.md),
+validation kapıları
+[`docs/validation/V0.8.5_covariance_validation.md`](docs/validation/V0.8.5_covariance_validation.md)
+ve kalıcı karar
+[`docs/decisions/0018-point-local-covariance-mahalanobis-tts.md`](docs/decisions/0018-point-local-covariance-mahalanobis-tts.md)
+belgelerinde açıklanır. Uygulama/CI kapanışı
+[`docs/development/V0.8.5_development_report.md`](docs/development/V0.8.5_development_report.md)
 altında tutulur.
 
 ## Lisans

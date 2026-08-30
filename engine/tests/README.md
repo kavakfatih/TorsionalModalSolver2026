@@ -330,6 +330,21 @@ bit-level immutability'sini sınar. Ayrıntılar
 [`../../docs/validation/V0.8.4_uncertainty_validation.md`](../../docs/validation/V0.8.4_uncertainty_validation.md)
 belgesindedir.
 
+V0.8.5 test grubu `tts_covariance_propagation`,
+`tts_covariance_validation`, `tts_mahalanobis_integrals`,
+`tts_mahalanobis_pair_shift` ve `tts_covariance_sensitivity` ailelerinden
+oluşur. Physical Pa² covariance ve polar/log first-order propagation;
+correlation invariance, SPD/singular/near-singular rejection, unique `(T,f)`
+matching, real covariance gaps ve full-matrix interpolation ile sınanır.
+
+Mahalanobis interval testi production analytical primitive'ten bağımsız adaptive
+oracle kullanır. Pair/sensitivity fixtures; positive/negative correlation
+yönünü, zero-covariance diagonal limitini, matrix-scale invariance'ı,
+storage-only fallback yasağını, matched-support effect ile pure covariance
+effect ayrımını ve V0.8.1/V0.8.4 input immutability'sini doğrular. Ayrıntılar
+[`../../docs/validation/V0.8.5_covariance_validation.md`](../../docs/validation/V0.8.5_covariance_validation.md)
+belgesindedir.
+
 ## Benchmark regression
 
 Birden fazla fizik adımını temsil eden sabit referans modelin sonuçları zaman

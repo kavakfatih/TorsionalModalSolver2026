@@ -116,6 +116,23 @@ süreçlerini ve kalıcı kararlarını içerir.
 - [`development/V0.8.4_development_report.md`](development/V0.8.4_development_report.md):
   implementation, regression, compiler audit ve CI kapanış kaydı
 
+## V0.8.5 point-local covariance sensitivity belgeleri
+
+- [`architecture/V0.8.5_bivariate_covariance_tts.md`](architecture/V0.8.5_bivariate_covariance_tts.md):
+  additive covariance data flow'u, authoritative hierarchy ve full-GLS sınırı
+- [`mathematics/tts_bivariate_covariance_propagation.md`](mathematics/tts_bivariate_covariance_propagation.md):
+  physical/polar/log covariance propagation ve SPD koşulları
+- [`mathematics/tts_mahalanobis_objective.md`](mathematics/tts_mahalanobis_objective.md):
+  bivariate common support, matched control ve analytical rational integral
+- [`materials/dynamic_modulus_cross_channel_covariance.md`](materials/dynamic_modulus_cross_channel_covariance.md):
+  measurement provenance, standards position ve product-level sınır
+- [`validation/V0.8.5_covariance_validation.md`](validation/V0.8.5_covariance_validation.md):
+  beş CTest ailesi ve support/covariance decomposition validation gates
+- [`decisions/0018-point-local-covariance-mahalanobis-tts.md`](decisions/0018-point-local-covariance-mahalanobis-tts.md):
+  canonical covariance, no-regularization ve immutable baseline kararı
+- [`development/V0.8.5_development_report.md`](development/V0.8.5_development_report.md):
+  implementation, regression, strict audit ve gerçek CI kapanış kaydı
+
 Kod ile belgenin tutarlılığı aynı değişiklik içinde korunmalıdır. Fiziksel veya
 matematiksel bir hesap değiştirildiğinde ilgili matematik ve fizik belgesi,
 testler ve gerekiyorsa benchmark sonuçları birlikte güncellenir.
